@@ -1,0 +1,90 @@
+/* 基础变量（现代简约风格核心） */
+:root {
+  --primary-color: #1890ff;       /* 主色调（蓝） */
+  --primary-light: #e6f4ff;      /* 主色浅背景 */
+  --text-primary: #1f2d3d;       /* 主文字色 */
+  --text-secondary: #5e7387;     /* 次文字色 */
+  --bg-base: #f8f9fa;            /* 基础背景色 */
+  --bg-container: #ffffff;       /* 容器背景色 */
+  --border-color: #e5e7eb;       /* 边框色 */
+  --shadow-light: 0 2px 8px rgba(0,0,0,0.05); /* 轻阴影 */
+  --success-color: #52c41a;      /* 成功绿色（对应编辑操作） */
+  --success-light: #f6ffed;      /* 成功浅绿背景 */
+  --danger-color: #ff4d4f;       /* 危险红色（对应删除操作） */
+  --danger-light: #fff1f0;       /* 危险浅红背景 */
+}
+
+/* 深主题变量覆盖 */
+.theme-dark {
+  --primary-color: #409eff;
+  --primary-light: #303133;
+  --text-primary: #ffffff;
+  --text-secondary: #c0c4cc;
+  --bg-base: #1f2d3d;
+  --bg-container: #303133;
+  --border-color: #484848;
+  --shadow-light: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+/* 绿主题变量覆盖 */
+.theme-green {
+  --primary-color: #52c41a;
+  --primary-light: #f6ffed;
+  --text-primary: #232f21;
+  --text-secondary: #597053;
+  --bg-base: #f0f9eb;
+  --bg-container: #ffffff;
+  --border-color: #e1f3d8;
+}
+
+body {
+  color: var(--text-primary);
+  background: var(--bg-base);
+  min-height: 100vh;
+  color: var(--color-text);
+  background: var(--color-background);
+  transition:
+    color 0.5s,
+    background-color 0.5s;
+  line-height: 1.6;
+  font-family:
+    Inter,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    Oxygen,
+    Ubuntu,
+    Cantarell,
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    sans-serif;
+  font-size: 15px;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.el-button--primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.el-table {
+  background-color: var(--bg-container);
+}
+
+.el-table__header th {
+  background-color: var(--primary-light);
+  color: var(--text-primary);
+}
+
+.el-dialog {
+  background: var(--bg-container);
+  box-shadow: var(--shadow-light);
+}
+
+.el-form-item__label {
+  color: var(--text-primary);
+}

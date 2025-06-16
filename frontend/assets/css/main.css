@@ -1,0 +1,14 @@
+/* 全局基础样式 */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+  color: var(--text-primary);
+  background: var(--bg-base);
+}
+
+/* 复用后台主题变量（需确保已在 nuxt.config.ts 中正确引入 element-plus 样式） */
+:root {
+  --text-primary: #1f2d3d;
+  --bg-base: #f8f9fa;
+}
