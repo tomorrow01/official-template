@@ -1,15 +1,15 @@
 [
   {
     "id": 1,
-    "image": "/images/banner1.jpg",
-    "link": "/articles/1",
+    "image": "/images/banner_gradient.png",
+    "link": "/product/1",
     "sort": 1,
     "createTime": "2024-07-10T15:00:00.000Z"
   },
   {
     "id": 2,
-    "image": "/images/banner2.jpg",
-    "link": "/articles/2",
+    "image": "/images/banner_gradient.png",
+    "link": "/product/2",
     "sort": 2,
     "createTime": "2024-07-10T15:00:00.000Z"
   }

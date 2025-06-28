@@ -1,5 +1,5 @@
 <template>
-  <el-header class="navbar">
+  <!-- <el-header class=""> -->
     <div class="container">
       <NuxtLink to="/" class="logo">
         <img src="/images/logo.png" alt="官网logo" class="logo-img">
@@ -16,7 +16,7 @@
         <el-menu-item index="/contact">联系我们</el-menu-item>
       </el-menu>
     </div>
-  </el-header>
+  <!-- </el-header> -->
 </template>
 
 <script setup>
@@ -50,7 +50,7 @@ const currentRoute = useRoute();
 }
 
 .nav-menu .el-menu-item {
-  height: 80px;
+  /* height: 80px; */
   line-height: 80px;
   font-size: 16px;
 }

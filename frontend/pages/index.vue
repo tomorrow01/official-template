@@ -61,19 +61,29 @@
           </NuxtLink>
         </div>
       </section>
-    <!-- </template> -->
 
     <Footer />
   </div>
 </template>
 
 <script setup>
-// 轮播图数据（引用 /images/ 下的图片）
-const banners = ref([
-  { image: '/images/banner1.jpg', link: '/articles/1' },
-  { image: '/images/banner2.jpg', link: '/articles/2' }
-]);
+import { ref, onMounted } from 'vue';
+import { getBannerList } from '@/api/banner'; // 使用Nuxt别名@引用api目录
 
+const banners = ref([]);
+const loading = ref(true);
+const error = ref(null);
+
+const fetchBanners = async () => {
+  try {
+    const data = await getBannerList();
+    banners.value = data;
+  } catch (err) {
+    error.value = '获取Banner数据失败，请稍后重试';
+  } finally {
+    loading.value = false;
+  }
+};
 // 客户案例数据（引用 /images/ 下的图片）
 const cases = ref([
   { 
@@ -147,6 +157,9 @@ const latestArticles = ref([
     image: '/images/article4-placeholder.jpg'  // 对应 public/images/article4.jpg
   },
 ]);
+onMounted(() => {
+  fetchBanners();
+});
 </script>
 
 <style scoped>
@@ -296,12 +309,43 @@ const latestArticles = ref([
   background-size: cover;
   background-attachment: fixed;
   min-height: 100vh;
-  padding-bottom: 60px;
+  padding-bottom: 10px;
   animation: gradient 15s ease infinite;
 }
 @keyframes gradient {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
+}
+.quick-nav {
+  position: fixed;
+  right: 20px;
+  bottom: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 1000;
+}
+
+.quick-btn {
+  width: 48px;
+  height: 48px;
+  border: none;
+  border-radius: 8px;
+  background: var(--primary-color);  /* 使用主题色 */
+  color: white;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.quick-btn:hover {
+  opacity: 0.8;
+}
+
+.quick-icon {
+  font-size: 24px;
 }
 </style>

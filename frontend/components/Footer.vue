@@ -8,9 +8,9 @@
         </div>
         <div class="footer-links">
           <h3>快速链接</h3>
-          <NuxtLink to="/about">公司介绍</NuxtLink>
-          <NuxtLink to="/contact">联系我们</NuxtLink>
-          <NuxtLink to="/privacy">隐私政策</NuxtLink>
+          <NuxtLink to="/about" class="footer-link-text">公司介绍</NuxtLink>
+          <NuxtLink to="/contact" class="footer-link-text">联系我们</NuxtLink>
+          <NuxtLink to="/privacy" class="footer-link-text">隐私政策</NuxtLink>
         </div>
         <div class="footer-contact">
           <h3>联系信息</h3>
@@ -20,8 +20,8 @@
         </div>
       </div>
       <div class="footer-bottom">
-        <p>© 2024 官网名称. 所有权利保留</p>
-        <p>备案号：京ICP备XXXXXXX号-1</p>
+        <span>© 2024 官网名称. 所有权利保留</span>
+        <span>备案号：京ICP备XXXXXXX号-1</span>
       </div>
     </div>
   </div>
@@ -30,7 +30,7 @@
 <style scoped>
 .footer {
   background: var(--bg-container);  /* 保持原有背景 */
-  padding: 20px 0 40px;
+  padding: 20px 20px 20px;
   /* margin-top: 100px; */
   /* border-top: 1px solid rgba(255,255,255,0.1);   */
 }
@@ -55,6 +55,13 @@
   transition: all 0.3s ease;
   position: relative;
   padding-left: 18px;
+}
+.footer-links .footer-link-text{
+  color: #ffffff;
+  padding: 10px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  position: relative;
 }
 
 .footer-links NuxtLink::before {
@@ -84,5 +91,8 @@
   text-align: center;
   color: rgba(255,255,255,0.7);  /* 底部文字半透明白色 */
   font-size: 14px;
+}
+.footer-bottom span {
+  margin: 0 10px;
 }
 </style>

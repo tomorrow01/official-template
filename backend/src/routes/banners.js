@@ -10,6 +10,7 @@ router.get('/', async (req, res) => {
   try {
     const data = await fs.readFile(dataPath, 'utf8');
     res.json(JSON.parse(data));
+    console.log("轮播图数据：", JSON.parse(data))
   } catch (err) {
     res.status(500).json({ error: '读取轮播图数据失败' });
   }
