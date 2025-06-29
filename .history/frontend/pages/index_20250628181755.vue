@@ -25,7 +25,7 @@
     <section class="cases-section">
       <div class="container">
         <h2 class="section-title">客户案例</h2>
-        <el-carousel indicator-position="outside">
+        <el-carousel :height="height" indicator-position="outside">
           <!-- 将 v-for 变量从 "case" 改为 "caseItem"（非保留字） -->
           <el-carousel-item v-for="caseItem in cases" :key="caseItem.id">
             <div class="case-card">

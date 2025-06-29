@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "image": "/images/case1.png",
+    "title": "Vue 3 新特性解读",
+    "description": "深入解析组合式 API...",
+    "createTime": "2024-07-10T12:00:00.000Z"
+  },
+  {
+    "id": 2,
+    "image": "/images/case2.png",
+    "title": "React 性能优化实践",
+    "description": "分享 React 组件优化技巧...",
+    "createTime": "2024-07-11T14:30:00.000Z"
+  }
+]

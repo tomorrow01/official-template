@@ -4,7 +4,6 @@ const bodyParser = require('body-parser');
 const articlesRouter = require('./routes/articles');
 const contentsRouter = require('./routes/contents');
 const bannersRouter = require('./routes/banners');
-const casesRouter = require('./routes/cases'); // 引入 cases 路由
 
 const app = express();
 const port = process.env.PORT || 3001; // 修改为3001端口
@@ -25,7 +24,6 @@ app.use((req, res, next) => {
 app.use('/articles', articlesRouter);
 app.use('/contents', contentsRouter);
 app.use('/banners', bannersRouter);
-app.use('/cases', casesRouter); // 挂载 cases 路由
 
 // 启动服务
 app.listen(port, () => {
