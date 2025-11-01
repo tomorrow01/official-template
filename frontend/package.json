@@ -4,10 +4,10 @@
   "type": "module",
   "scripts": {
     "build": "nuxt build",
-    "dev": "nuxt dev --dotenv .env.development", 
-    "build:staging": "nuxt build --dotenv .env.staging", 
-    "build:prod": "nuxt build --dotenv .env.production", 
-    "preview:staging": "nuxt preview --dotenv .env.staging", 
+    "dev": "nuxt dev --dotenv .env.development",
+    "build:staging": "nuxt build --dotenv .env.staging",
+    "build:prod": "nuxt build --dotenv .env.production",
+    "preview:staging": "nuxt preview --dotenv .env.staging",
     "preview:prod": "nuxt preview --dotenv .env.production",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
@@ -22,6 +22,7 @@
     "vue-router": "^4.5.1"
   },
   "devDependencies": {
+    "less": "^4.4.1",
     "sass-embedded": "^1.89.1"
   }
 }
