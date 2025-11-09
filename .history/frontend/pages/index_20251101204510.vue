@@ -1,9 +1,9 @@
 <template>
-  <div class="home-container" style="margin-top: 0; padding-top: 0; position: relative;">
+  <div class="home-container">
     <Navbar />
     
     <!-- 英雄区域 -->
-    <section class="hero-section relative overflow-hidden" style="margin-top: -1px; padding-top: 0; top: 0; z-index: 0;">
+    <section class="hero-section relative overflow-hidden">
       <div class="absolute inset-0 z-0">
         <img 
           src="https://picsum.photos/id/1071/1920/1080" 
@@ -12,7 +12,7 @@
         >
         <div class="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40"></div>
       </div>
-      <div class="container relative z-10 py-20 md:py-28">
+      <div class="container relative z-10 py-24 md:py-32">
         <div class="max-w-3xl">
           <h1 class="text-[clamp(2.5rem,5vw,4rem)] font-bold text-white leading-tight mb-6">
             创新技术<br>
@@ -40,9 +40,9 @@
     </section>
 
     <!-- 我们的优势 -->
-    <section class="features-section py-6 bg-white" style="margin-bottom: 0;">
+    <section class="features-section py-20 bg-white">
       <div class="container">
-        <div class="section-header text-center mb-6 max-w-3xl mx-auto">
+        <div class="section-header text-center mb-16 max-w-3xl mx-auto">
           <span class="section-tag text-primary font-medium">我们的优势</span>
           <h2 class="section-title text-3xl md:text-4xl font-bold mt-2 mb-4">为什么选择我们</h2>
           <p class="section-subtitle text-gray-600">多年行业经验，专业技术团队，为您提供定制化解决方案</p>
@@ -83,52 +83,56 @@
     </section>
     
     <!-- 核心服务模块 -->
-    <section class="services-section py-12 bg-gray-50" style="margin-top: 0; margin-bottom: 0;">
+    <section class="services-section py-20 bg-gray-50">
       <div class="container">
         <!-- 区块标题 -->
-        <div class="section-header text-center mb-12 max-w-3xl mx-auto">
+        <div class="section-header text-center mb-16 max-w-3xl mx-auto">
           <span class="section-tag text-primary font-medium">核心服务</span>
           <h2 class="section-title text-3xl md:text-4xl font-bold mt-2 mb-4">专业解决方案</h2>
           <p class="section-subtitle text-gray-600">我们提供全方位的技术服务，助力企业数字化转型</p>
         </div>
         
-        <!-- 服务卡片网格 - 强制3列布局 -->
-        <div style="display: grid !important; grid-template-columns: 1fr 1fr 1fr !important; gap: 24px !important; width: 100% !important; max-width: none !important; min-width: 0 !important;">
-          <!-- 每个服务项是一个独立卡片 -->
-          <a 
+        <!-- 服务卡片网格 -->
+        <div class="services-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div 
             v-for="(service, index) in services" 
             :key="service.id" 
-            href="/services" 
-            style="display: block !important; width: auto !important; min-width: 0 !important;"
-            class="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1">
-            <!-- 卡片内部：图片在上 -->
-            <div class="h-52 overflow-hidden">
-              <img :src="getServiceImage(index)" alt="服务图片" class="w-full h-full object-cover transition-transform duration-700 hover:scale-110">
+            class="service-card bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group transform hover:-translate-y-2"
+            :style="{animationDelay: `${index * 100}ms`}"
+          >
+            <div class="service-image h-40 overflow-hidden">
+              <img 
+                :src="getServiceImage(index)" 
+                alt="服务图片" 
+                class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+              >
             </div>
-            
-            <!-- 卡片内部：标题和详情在下 -->
             <div class="p-6">
-              <!-- 标题 -->
-              <h3 class="text-xl font-semibold mb-3">{{ service.title }}</h3>
-              
-              <!-- 详情 -->
-              <p class="text-gray-600 mb-4 leading-relaxed">{{ service.desc || '为客户提供专业的技术解决方案，助力业务增长和数字化转型。' }}</p>
-              
-              <!-- 跳转到详情页面的链接 -->
-              <div class="flex items-center text-primary font-medium">
-                查看详情 <el-icon class="ml-2"><ArrowRight /></el-icon>
+              <div class="service-icon bg-primary/10 w-12 h-12 rounded-full flex items-center justify-center mb-4 group-hover:bg-primary group-hover:text-white transition-all duration-300">
+                <el-icon :size="24">
+                  <component :is="service.icon" />
+                </el-icon>
+              </div>
+              <h3 class="service-title text-xl font-semibold mb-3">{{ service.title }}</h3>
+              <p class="service-desc text-gray-600 mb-6">
+                {{ service.desc || '为客户提供专业的技术解决方案，助力业务增长和数字化转型。' }}
+              </p>
+              <div class="service-arrow flex justify-start">
+                <a href="#" class="inline-flex items-center text-primary group-hover:translate-x-2 transition-transform duration-300">
+                  了解更多 <el-icon class="ml-2"><ArrowRight /></el-icon>
+                </a>
               </div>
             </div>
-          </a>
+          </div>
         </div>
       </div>
     </section>
 
     <!-- 客户案例模块 -->
-    <section class="cases-section py-8 bg-white">
+    <section class="cases-section py-24 bg-white">
       <div class="container">
         <!-- 区块标题 -->
-        <div class="section-header text-center mb-10 max-w-3xl mx-auto">
+        <div class="section-header text-center mb-16 max-w-3xl mx-auto">
           <span class="section-tag text-primary font-medium">客户案例</span>
           <h2 class="section-title text-3xl md:text-4xl font-bold mt-2 mb-4">成功合作案例</h2>
           <p class="section-subtitle text-gray-600">我们与众多行业领先企业建立了长期合作关系</p>
@@ -139,28 +143,24 @@
           <div 
             v-for="(caseItem, index) in cases" 
             :key="caseItem.id" 
-            class="case-card bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl group flex flex-col md:flex-row-reverse"
+            class="case-card bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl group"
             :style="{animationDelay: `${index * 100}ms`}"
           >
-            <!-- 图片部分 - 右侧 -->
-            <div class="case-image-container w-full md:w-2/5 h-48 md:h-auto overflow-hidden">
+            <div class="case-image-container h-56 overflow-hidden">
               <img 
                 :src="caseItem.image || getCaseImage(index)" 
                 alt="客户案例"
                 class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               >
             </div>
-            <!-- 内容部分 - 左侧 -->
-            <div class="p-6 flex-1 flex flex-col justify-between">
-              <div>
-                <h3 class="case-title text-xl font-semibold mb-3">
-                  {{ getCaseTitle(index) }}
-                </h3>
-                <p class="case-desc text-gray-600 mb-4 line-clamp-4">
-                  {{ caseItem.description || '我们的解决方案帮助客户实现了业务增长和效率提升。' }}
-                </p>
-              </div>
-              <div class="case-cta">
+            <div class="p-6">
+              <h3 class="case-title text-xl font-semibold mb-3">
+                {{ getCaseTitle(index) }}
+              </h3>
+              <p class="case-desc text-gray-600 mb-6">
+                {{ caseItem.description || '我们的解决方案帮助客户实现了业务增长和效率提升。' }}
+              </p>
+              <div class="case-cta flex justify-between items-center">
                 <el-button type="primary" class="rounded-full bg-primary hover:bg-primary-dark">
                   查看详情 <el-icon class="ml-2"><ArrowRight /></el-icon>
                 </el-button>
@@ -170,14 +170,14 @@
         </div>
         
         <!-- 客户logo展示 -->
-        <div class="clients-logos mt-10 py-6 border-t border-gray-200">
-          <h3 class="text-center text-lg font-medium text-gray-500 mb-4">值得信赖的合作伙伴</h3>
-          <div style="display: flex; flex-wrap: wrap; gap: 1rem;">
-            <div v-for="i in 6" :key="i" style="width: 200px;">
+        <div class="clients-logos mt-20 py-8 border-t border-gray-200">
+          <h3 class="text-center text-lg font-medium text-gray-500 mb-8">值得信赖的合作伙伴</h3>
+          <div class="logos-grid grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8 items-center">
+            <div v-for="i in 6" :key="i" class="client-logo flex justify-center opacity-60 hover:opacity-100 transition-opacity">
               <img 
                 :src="`https://picsum.photos/seed/logo${i}/200/80`" 
                 alt="合作伙伴" 
-                class="max-h-12 grayscale hover:grayscale-0 transition-all w-auto opacity-60 hover:opacity-100"
+                class="max-h-12 grayscale hover:grayscale-0 transition-all"
               >
             </div>
           </div>
@@ -188,32 +188,32 @@
     <!-- 数据统计 -->
     <section class="stats-section py-16 bg-gradient-to-r from-primary to-secondary text-white">
       <div class="container">
-        <div style="display: flex; flex-wrap: wrap; gap: 2rem; justify-content: center;">
-          <div style="flex: 0 0 auto; width: 220px; text-align: center;">
-            <div style="font-size: 3.5rem; font-weight: bold; margin-bottom: 0.5rem;">100+</div>
-            <div style="font-size: 1.25rem; opacity: 0.8;">成功案例</div>
+        <div class="stats-grid grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+          <div class="stat-item">
+            <div class="stat-number text-4xl font-bold mb-2 counter">100+</div>
+            <div class="stat-label text-white/80">成功案例</div>
           </div>
-          <div style="flex: 0 0 auto; width: 220px; text-align: center;">
-            <div style="font-size: 3.5rem; font-weight: bold; margin-bottom: 0.5rem;">50+</div>
-            <div style="font-size: 1.25rem; opacity: 0.8;">企业客户</div>
+          <div class="stat-item">
+            <div class="stat-number text-4xl font-bold mb-2 counter">50+</div>
+            <div class="stat-label text-white/80">企业客户</div>
           </div>
-          <div style="flex: 0 0 auto; width: 220px; text-align: center;">
-            <div style="font-size: 3.5rem; font-weight: bold; margin-bottom: 0.5rem;">150+</div>
-            <div style="font-size: 1.25rem; opacity: 0.8;">项目完成</div>
+          <div class="stat-item">
+            <div class="stat-number text-4xl font-bold mb-2 counter">150+</div>
+            <div class="stat-label text-white/80">项目完成</div>
           </div>
-          <div style="flex: 0 0 auto; width: 220px; text-align: center;">
-            <div style="font-size: 3.5rem; font-weight: bold; margin-bottom: 0.5rem;">98%</div>
-            <div style="font-size: 1.25rem; opacity: 0.8;">客户满意度</div>
+          <div class="stat-item">
+            <div class="stat-number text-4xl font-bold mb-2 counter">98%</div>
+            <div class="stat-label text-white/80">客户满意度</div>
           </div>
         </div>
       </div>
     </section>
 
     <!-- 最新动态 -->
-    <section class="latest-articles py-8 bg-gray-50">
+    <section class="latest-articles py-20 bg-gray-50">
       <div class="container">
         <!-- 区块标题 -->
-        <div class="section-header text-center mb-10 max-w-3xl mx-auto">
+        <div class="section-header text-center mb-16 max-w-3xl mx-auto">
           <span class="section-tag text-primary font-medium">最新动态</span>
           <h2 class="section-title text-3xl md:text-4xl font-bold mt-2 mb-4">行业资讯与技术分享</h2>
           <p class="section-subtitle text-gray-600">定期发布最新行业动态、技术趋势和解决方案</p>
@@ -256,7 +256,7 @@
         </div>
         
         <!-- 查看更多按钮 -->
-        <div class="articles-cta text-center mt-8">
+        <div class="articles-cta text-center mt-12">
           <el-button type="primary" class="rounded-full bg-primary hover:bg-primary-dark px-8 py-3">
             查看所有文章
           </el-button>
@@ -265,17 +265,17 @@
     </section>
 
     <!-- 团队展示 -->
-    <section class="team-section py-6 bg-white" style="margin-top: 0; margin-bottom: 0;">
+    <section class="team-section py-20 bg-white">
       <div class="container">
-        <div class="section-header text-center mb-10 max-w-3xl mx-auto">
+        <div class="section-header text-center mb-16 max-w-3xl mx-auto">
           <span class="section-tag text-primary font-medium">核心团队</span>
           <h2 class="section-title text-3xl md:text-4xl font-bold mt-2 mb-4">专业的技术团队</h2>
           <p class="section-subtitle text-gray-600">汇聚行业精英，为您提供最专业的技术支持</p>
         </div>
         
-        <div class="team-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;">
+        <div class="team-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           <div 
-            v-for="i in 3" 
+            v-for="i in 4" 
             :key="i" 
             class="team-member group"
             :style="{animationDelay: `${i * 100}ms`}"
@@ -300,7 +300,7 @@
     </section>
 
     <!-- CTA区域 -->
-    <section class="cta-section py-10 relative overflow-hidden bg-gradient-to-r from-primary to-secondary">
+    <section class="cta-section py-24 relative overflow-hidden bg-gradient-to-r from-primary to-secondary">
       <!-- 背景装饰 -->
       <div class="cta-decor absolute top-0 left-0 w-full h-full opacity-10">
         <div class="decor-circle absolute top-10 left-10 w-40 h-40 rounded-full border-4 border-white"></div>
@@ -343,116 +343,33 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
-import Navbar from '@/components/Navbar.vue';
-import Footer from '@/components/Footer.vue';
 import { getBannerList } from '@/api/banner';
 import { getCaseList } from '@/api/cases';
 import { getServiceList } from '@/api/services';
+import Footer from '@/components/Footer.vue';
 
-const services = ref([]);
+const banners = ref([]);
 const cases = ref([]);
+const services = ref([]);
 const latestArticles = ref([]);
 const showBackToTop = ref(false);
+const loadingBanners = ref(true);
 const loadingCases = ref(true);
 const loadingServices = ref(true);
 const loadingArticles = ref(true);
 const error = ref(null);
 
-// 获取服务数据
-const fetchServices = async () => {
-  loadingServices.value = true;
-  error.value = null;
+// 获取Banner数据
+const fetchBanners = async () => {
   try {
-    console.log('开始获取服务数据...');
-    const res = await getServiceList();
-    services.value = Array.isArray(res) ? res : (res.data || []);
-    console.log('获取到的服务数据:', services.value);
-    
-    // 如果没有数据，使用模拟数据
-    if (!services.value.length) {
-      services.value = [
-        {
-          id: '1',
-          icon: 'Management',
-          title: '软件开发',
-          desc: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。'
-        },
-        {
-          id: '2',
-          icon: 'Monitor',
-          title: '数字化转型',
-          desc: '帮助企业实现数字化转型，优化业务流程，提升运营效率。'
-        },
-        {
-          id: '3',
-          icon: 'Cloud',
-          title: '云服务',
-          desc: '提供云计算解决方案，包括云迁移、云托管和云安全服务。'
-        },
-        {
-          id: '4',
-          icon: 'StarFilled',
-          title: '人工智能',
-          desc: '利用人工智能技术为企业提供智能决策支持和自动化解决方案。'
-        },
-        {
-          id: '5',
-          icon: 'Histogram',
-          title: '大数据分析',
-          desc: '通过大数据分析帮助企业挖掘数据价值，优化业务决策。'
-        },
-        {
-          id: '6',
-          icon: 'Briefcase',
-          title: 'IT咨询',
-          desc: '提供专业的IT战略咨询服务，帮助企业制定技术发展规划。'
-        }
-      ];
-    }
+    const data = await getBannerList();
+    banners.value = Array.isArray(data) ? data : [];
+    console.log('获取到banners数据:', banners.value);
   } catch (err) {
-    console.error('获取服务数据失败:', err);
-    error.value = '获取服务数据失败，请稍后重试';
-    // 提供默认服务数据
-    services.value = [
-      {
-        id: '1',
-        icon: 'Management',
-        title: '软件开发',
-        desc: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。'
-      },
-      {
-        id: '2',
-        icon: 'Monitor',
-        title: '数字化转型',
-        desc: '帮助企业实现数字化转型，优化业务流程，提升运营效率。'
-      },
-      {
-        id: '3',
-        icon: 'Cloud',
-        title: '云服务',
-        desc: '提供云计算解决方案，包括云迁移、云托管和云安全服务。'
-      },
-      {
-        id: '4',
-        icon: 'StarFilled',
-        title: '人工智能',
-        desc: '利用人工智能技术为企业提供智能决策支持和自动化解决方案。'
-      },
-      {
-        id: '5',
-        icon: 'Histogram',
-        title: '大数据分析',
-        desc: '通过大数据分析帮助企业挖掘数据价值，优化业务决策。'
-      },
-      {
-        id: '6',
-        icon: 'Briefcase',
-        title: 'IT咨询',
-        desc: '提供专业的IT战略咨询服务，帮助企业制定技术发展规划。'
-      }
-    ];
+    console.error('获取Banner数据失败:', err);
+    error.value = '获取Banner数据失败，请稍后重试';
   } finally {
-    loadingServices.value = false;
+    loadingBanners.value = false;
   }
 };
 
@@ -473,15 +390,18 @@ const fetchCaseList = async () => {
       cases.value = [
         {
           id: '1',
-          description: '通过实施智能制造解决方案，帮助企业提升生产效率30%，降低运营成本25%。'
+          image: '/images/case1.png',
+          description: 'XX教育使用我们的内容管理系统，内容发布效率提升60%'
         },
         {
           id: '2',
-          description: '为金融机构打造安全可靠的交易平台，支持日均交易量超过10万笔。'
+          image: '/images/case2.png',
+          description: 'YY电商通过轮播图运营，首页点击率增长35%'
         },
         {
           id: '3',
-          description: '对现有电商系统进行全面升级，提升用户体验和系统性能，销售额增长45%。'
+          image: '/images/case3.png',
+          description: 'ZZ金融平台利用我们的解决方案，用户转化率提升40%'
         }
       ];
     }
@@ -492,19 +412,120 @@ const fetchCaseList = async () => {
     cases.value = [
       {
         id: '1',
-        description: '通过实施智能制造解决方案，帮助企业提升生产效率30%，降低运营成本25%。'
+        image: '/images/case1.png',
+        description: 'XX教育使用我们的内容管理系统，内容发布效率提升60%'
       },
       {
         id: '2',
-        description: '为金融机构打造安全可靠的交易平台，支持日均交易量超过10万笔。'
+        image: '/images/case2.png',
+        description: 'YY电商通过轮播图运营，首页点击率增长35%'
       },
       {
         id: '3',
-        description: '对现有电商系统进行全面升级，提升用户体验和系统性能，销售额增长45%。'
+        image: '/images/case3.png',
+        description: 'ZZ金融平台利用我们的解决方案，用户转化率提升40%'
       }
     ];
   } finally {
     loadingCases.value = false;
+  }
+};
+
+// 获取服务数据
+const fetchServices = async () => {
+  loadingServices.value = true;
+  error.value = null;
+  try {
+    console.log('开始获取服务数据...');
+    const res = await getServiceList();
+    services.value = Array.isArray(res) ? res : (res.data || []);
+    console.log('获取到的服务数据:', services.value);
+    
+    // 如果没有数据，使用模拟数据
+    if (!services.value.length) {
+      services.value = [
+        {
+          id: '1',
+          icon: 'Management',
+          title: '内容管理系统',
+          desc: '专业的企业级内容管理系统，帮助企业快速构建和管理网站内容。'
+        },
+        {
+          id: '2',
+          icon: 'Monitor',
+          title: '响应式网站开发',
+          desc: '定制化网站开发，响应式设计，为企业打造专业的线上形象。'
+        },
+        {
+          id: '3',
+          icon: 'ShoppingCart',
+          title: '电商解决方案',
+          desc: '完整的电商平台构建，包括产品管理、订单处理、支付集成等功能。'
+        },
+        {
+          id: '4',
+          icon: 'Setting',
+          title: '技术支持服务',
+          desc: '7x24小时技术支持服务，确保系统稳定运行，及时解决各种问题。'
+        },
+        {
+          id: '5',
+          icon: 'Link',
+          title: 'API集成开发',
+          desc: '企业系统与第三方平台的无缝对接，实现数据互通与业务协同。'
+        },
+        {
+          id: '6',
+          icon: 'DocumentCopy',
+          title: '数据分析服务',
+          desc: '基于大数据技术的商业智能分析，助力企业决策与业务增长。'
+        }
+      ];
+    }
+  } catch (err) {
+    console.error('获取服务数据失败:', err);
+    error.value = '获取服务数据失败，请稍后重试';
+    // 提供默认服务数据
+    services.value = [
+      {
+        id: '1',
+        icon: 'Management',
+        title: '内容管理系统',
+        desc: '专业的企业级内容管理系统，帮助企业快速构建和管理网站内容。'
+      },
+      {
+        id: '2',
+        icon: 'Monitor',
+        title: '响应式网站开发',
+        desc: '定制化网站开发，响应式设计，为企业打造专业的线上形象。'
+      },
+      {
+        id: '3',
+        icon: 'ShoppingCart',
+        title: '电商解决方案',
+        desc: '完整的电商平台构建，包括产品管理、订单处理、支付集成等功能。'
+      },
+      {
+        id: '4',
+        icon: 'Setting',
+        title: '技术支持服务',
+        desc: '7x24小时技术支持服务，确保系统稳定运行，及时解决各种问题。'
+      },
+      {
+        id: '5',
+        icon: 'Link',
+        title: 'API集成开发',
+        desc: '企业系统与第三方平台的无缝对接，实现数据互通与业务协同。'
+      },
+      {
+        id: '6',
+        icon: 'DocumentCopy',
+        title: '数据分析服务',
+        desc: '基于大数据技术的商业智能分析，助力企业决策与业务增长。'
+      }
+    ];
+  } finally {
+    loadingServices.value = false;
   }
 };
 
@@ -515,46 +536,18 @@ const fetchLatestArticles = async () => {
   try {
     console.log('开始获取最新文章数据...');
     // 由于没有单独的获取最新文章API，这里我们调用通用的文章API并限制返回数量
-    try {
-      const request = (await import('@/api/request')).getRequestInstance();
-      const response = await request.get('/api/articles?limit=3');
-      const articles = response.data.data || [];
-      
-      // 格式化文章数据以匹配前端组件期望的格式
-      latestArticles.value = articles.map(article => ({
-        id: article._id || article.id,
-        title: article.title,
-        excerpt: article.content ? article.content.substring(0, 100) + '...' : '',
-        createTime: article.createTime || article.createdAt,
-        image: ''
-      }));
-    } catch (apiError) {
-      console.warn('API调用失败，使用模拟数据');
-      // 使用模拟数据
-      latestArticles.value = [
-        {
-          id: '1',
-          title: '2024年企业数字化转型趋势分析',
-          excerpt: '随着技术的快速发展，企业数字化转型已成为必然趋势。本文深入分析了2024年数字化转型的主要方向和策略。',
-          createTime: '2024-03-15',
-          image: ''
-        },
-        {
-          id: '2',
-          title: '人工智能在企业决策中的应用',
-          excerpt: '人工智能技术正在改变企业的决策方式，从数据中提取有价值的洞察，帮助企业做出更明智的决策。',
-          createTime: '2024-03-10',
-          image: ''
-        },
-        {
-          id: '3',
-          title: '云计算如何提升企业IT效率',
-          excerpt: '云计算技术为企业带来了灵活性和可扩展性，本文介绍了如何利用云服务优化IT基础设施。',
-          createTime: '2024-03-05',
-          image: ''
-        }
-      ];
-    }
+    const request = (await import('@/api/request')).getRequestInstance();
+    const response = await request.get('/api/articles?limit=4');
+    const articles = response.data.data || [];
+    
+    // 格式化文章数据以匹配前端组件期望的格式
+    latestArticles.value = articles.map(article => ({
+      id: article._id || article.id,
+      title: article.title,
+      excerpt: article.content ? article.content.substring(0, 100) + '...' : '',
+      createTime: article.createTime || article.createdAt,
+      image: article.image || '/images/article-placeholder.jpg'
+    }));
     
     console.log('获取到的最新文章数据:', latestArticles.value);
   } catch (err) {
@@ -564,63 +557,36 @@ const fetchLatestArticles = async () => {
     latestArticles.value = [
       {
         id: '1',
-        title: '2024年企业数字化转型趋势分析',
-        excerpt: '随着技术的快速发展，企业数字化转型已成为必然趋势。本文深入分析了2024年数字化转型的主要方向和策略。',
-        createTime: '2024-03-15',
-        image: ''
+        title: 'Vue 3新特性解读',
+        excerpt: '深入解析Vue 3组合式API的优势，对比选项式API的性能提升与开发体验优化...',
+        createTime: '2024-07-10',
+        image: '/images/article1-placeholder.jpg'
       },
       {
         id: '2',
-        title: '人工智能在企业决策中的应用',
-        excerpt: '人工智能技术正在改变企业的决策方式，从数据中提取有价值的洞察，帮助企业做出更明智的决策。',
-        createTime: '2024-03-10',
-        image: ''
+        title: '前端性能优化指南',
+        excerpt: '从资源加载（懒加载/预加载）到渲染优化（虚拟列表/防抖节流）的全流程实践方案...',
+        createTime: '2024-07-09',
+        image: '/images/article2-placeholder.jpg'
       },
       {
         id: '3',
-        title: '云计算如何提升企业IT效率',
-        excerpt: '云计算技术为企业带来了灵活性和可扩展性，本文介绍了如何利用云服务优化IT基础设施。',
-        createTime: '2024-03-05',
-        image: ''
+        title: 'Nuxt 3 SSR实战技巧',
+        excerpt: '如何利用Nuxt 3的自动路由和组合式API实现高效服务端渲染，避免常见SEO陷阱...',
+        createTime: '2024-07-08',
+        image: '/images/article3-placeholder.jpg'
+      },
+      {
+        id: '4',
+        title: 'AI在前端开发中的应用',
+        excerpt: '探索AI工具（如GitHub Copilot、Figma AI）如何辅助代码编写、设计稿生成与测试用例创建...',
+        createTime: '2024-07-07',
+        image: '/images/article4-placeholder.jpg'
       }
     ];
   } finally {
     loadingArticles.value = false;
   }
-};
-
-// 获取服务图片
-const getServiceImage = (index) => {
-  const imageIds = [180, 239, 24, 119, 96, 101];
-  return `https://picsum.photos/id/${imageIds[index % imageIds.length]}/600/400`;
-};
-
-// 获取案例图片
-const getCaseImage = (index) => {
-  const imageIds = [239, 24, 119];
-  return `https://picsum.photos/id/${imageIds[index % imageIds.length]}/800/600`;
-};
-
-// 获取案例标题
-const getCaseTitle = (index) => {
-  const titles = [
-    '某大型制造企业数字化转型项目',
-    '金融科技平台开发项目',
-    '电商系统升级改造项目'
-  ];
-  return titles[index % titles.length];
-};
-
-// 获取团队成员姓名
-const getTeamMemberName = (index) => {
-  const names = ['张明', '李华', '王芳', '赵强'];
-  return names[index - 1];
-};
-
-// 获取团队成员职位
-const getTeamMemberPosition = (index) => {
-  const positions = ['技术总监', '产品经理', 'UI设计师', '前端工程师'];
-  return positions[index - 1];
 };
 
 // 返回顶部函数
@@ -636,19 +602,20 @@ const handleScroll = () => {
   showBackToTop.value = window.scrollY > 300;
   
   // 添加滚动动画效果
-  const elements = document.querySelectorAll('.service-card, .case-card, .article-card, .team-member');
+  const elements = document.querySelectorAll('.service-card, .case-card, .article-card');
   elements.forEach(element => {
     const elementPosition = element.getBoundingClientRect().top;
     const screenPosition = window.innerHeight / 1.3;
     
     if (elementPosition < screenPosition) {
-      element.classList.add('fade-in-up');
+      element.classList.add('animate-in');
     }
   });
 };
 
 onMounted(() => {
   // 页面加载时获取所有数据
+  fetchBanners();
   fetchCaseList();
   fetchServices();
   fetchLatestArticles();
@@ -666,35 +633,6 @@ onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll);
 });
 </script>
-
-<style>
-/* 强制服务卡片3列布局 */
-.service-card-wrapper {
-  display: flex !important;
-  flex-wrap: wrap !important;
-  margin: 0 -12px !important;
-  width: 100% !important;
-}
-.service-card-item {
-  width: 33.3333% !important;
-  padding: 0 12px !important;
-  margin-bottom: 24px !important;
-  box-sizing: border-box !important;
-  display: block !important;
-  float: left !important;
-}
-/* 响应式断点 */
-@media (max-width: 768px) {
-  .service-card-item {
-    width: 50% !important;
-  }
-}
-@media (max-width: 640px) {
-  .service-card-item {
-    width: 100% !important;
-  }
-}
-</style>
 
 <style scoped>
 /* 全局容器样式 */
@@ -723,60 +661,15 @@ onUnmounted(() => {
 }
 
 .section-title {
-  font-size: 2.75rem;
-  font-weight: 700;
+  font-weight: 800;
   line-height: 1.2;
   color: var(--text-dark);
-  position: relative;
-  display: inline-block;
-  text-align: center;
-  width: 100%;
-  margin-bottom: calc(var(--spacing-md) + 12px);
-}
-
-.section-title::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  bottom: -12px;
-  width: 60px;
-  height: 4px;
-  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-  border-radius: 2px;
-  transform: translateX(-50%);
 }
 
 .section-subtitle {
   font-size: 1rem;
   line-height: 1.7;
   color: var(--text-muted);
-}
-
-/* 模块分隔样式 */
-.features-section,
-.services-section,
-.cases-section,
-.latest-articles,
-.team-section {
-  padding: 6rem 0;
-  position: relative;
-}
-
-.services-section,
-.cases-section,
-.latest-articles,
-.team-section {
-  border-top: 1px solid var(--border-light);
-}
-
-/* 优化英雄区域 */
-.hero-section {
-  padding: 8rem 0;
-}
-
-/* 数据统计区域优化 */
-.stats-section {
-  padding: 4rem 0;
 }
 
 /* 服务区块样式 */
@@ -992,29 +885,8 @@ onUnmounted(() => {
   transform: translateX(4px);
 }
 
-/* 团队网格样式 */
-.team-grid {
-  display: grid !important;
-  grid-template-columns: repeat(3, 1fr) !important;
-  gap: 2rem !important;
-  width: 100% !important;
-}
-
-/* 响应式团队网格 */
-@media (max-width: 768px) {
-  .team-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-  }
-}
-
-@media (max-width: 480px) {
-  .team-grid {
-    grid-template-columns: 1fr !important;
-  }
-}
-
 .articles-cta {
-  margin-top: var(--spacing-lg);
+  margin-top: var(--spacing-2xl);
   text-align: center;
 }
 
@@ -1022,7 +894,7 @@ onUnmounted(() => {
 .cta-section {
   position: relative;
   overflow: hidden;
-  margin-top: 2rem;
+  margin-top: 4rem;
 }
 
 .cta-content {

@@ -19,28 +19,35 @@ export const getServiceList = async (): Promise<ServiceItem[]> => {
   const request = getRequestInstance();
   try {
     const response = await request.get('/api/services');
-    return response.data.data || [];
+    // 安全地访问响应数据
+    if (response && response.data) {
+      if (Array.isArray(response.data)) {
+        return response.data;
+      }
+      return response.data.data || [];
+    }
+    return [];
   } catch (error) {
     console.error('获取服务列表失败:', error);
     // 返回模拟数据作为备用
     return [
       {
         id: '1',
-        icon: 'el-icon-s-grid',
-        title: '网站建设',
-        desc: '专业的网站设计与开发，响应式布局，提升品牌形象'
+        icon: 'Management',
+        title: '软件开发',
+        desc: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。'
       },
       {
         id: '2',
-        icon: 'el-icon-mobile',
-        title: 'APP开发',
-        desc: '定制化移动应用开发，原生体验，满足企业需求'
+        icon: 'Monitor',
+        title: '数字化转型',
+        desc: '帮助企业实现数字化转型，优化业务流程，提升运营效率。'
       },
       {
         id: '3',
-        icon: 'el-icon-pie-chart',
-        title: '数据分析',
-        desc: '专业的数据收集与分析服务，助力企业决策'
+        icon: 'Cloud',
+        title: '云服务',
+        desc: '提供云计算解决方案，包括云迁移、云托管和云安全服务。'
       }
     ];
   }

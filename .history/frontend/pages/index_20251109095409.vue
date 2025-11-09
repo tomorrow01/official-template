@@ -93,14 +93,13 @@
         </div>
         
         <!-- 服务卡片网格 - 强制3列布局 -->
-        <div style="display: grid !important; grid-template-columns: 1fr 1fr 1fr !important; gap: 24px !important; width: 100% !important; max-width: none !important; min-width: 0 !important;">
+        <div class="service-card-wrapper">
           <!-- 每个服务项是一个独立卡片 -->
           <a 
             v-for="(service, index) in services" 
             :key="service.id" 
             href="/services" 
-            style="display: block !important; width: auto !important; min-width: 0 !important;"
-            class="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1">
+            class="service-card-item bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1">
             <!-- 卡片内部：图片在上 -->
             <div class="h-52 overflow-hidden">
               <img :src="getServiceImage(index)" alt="服务图片" class="w-full h-full object-cover transition-transform duration-700 hover:scale-110">
@@ -139,28 +138,24 @@
           <div 
             v-for="(caseItem, index) in cases" 
             :key="caseItem.id" 
-            class="case-card bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl group flex flex-col md:flex-row-reverse"
+            class="case-card bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl group"
             :style="{animationDelay: `${index * 100}ms`}"
           >
-            <!-- 图片部分 - 右侧 -->
-            <div class="case-image-container w-full md:w-2/5 h-48 md:h-auto overflow-hidden">
+            <div class="case-image-container h-56 overflow-hidden">
               <img 
                 :src="caseItem.image || getCaseImage(index)" 
                 alt="客户案例"
                 class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               >
             </div>
-            <!-- 内容部分 - 左侧 -->
-            <div class="p-6 flex-1 flex flex-col justify-between">
-              <div>
-                <h3 class="case-title text-xl font-semibold mb-3">
-                  {{ getCaseTitle(index) }}
-                </h3>
-                <p class="case-desc text-gray-600 mb-4 line-clamp-4">
-                  {{ caseItem.description || '我们的解决方案帮助客户实现了业务增长和效率提升。' }}
-                </p>
-              </div>
-              <div class="case-cta">
+            <div class="p-6">
+              <h3 class="case-title text-xl font-semibold mb-3">
+                {{ getCaseTitle(index) }}
+              </h3>
+              <p class="case-desc text-gray-600 mb-6">
+                {{ caseItem.description || '我们的解决方案帮助客户实现了业务增长和效率提升。' }}
+              </p>
+              <div class="case-cta flex justify-between items-center">
                 <el-button type="primary" class="rounded-full bg-primary hover:bg-primary-dark">
                   查看详情 <el-icon class="ml-2"><ArrowRight /></el-icon>
                 </el-button>

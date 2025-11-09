@@ -139,28 +139,24 @@
           <div 
             v-for="(caseItem, index) in cases" 
             :key="caseItem.id" 
-            class="case-card bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl group flex flex-col md:flex-row-reverse"
+            class="case-card bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl group"
             :style="{animationDelay: `${index * 100}ms`}"
           >
-            <!-- 图片部分 - 右侧 -->
-            <div class="case-image-container w-full md:w-2/5 h-48 md:h-auto overflow-hidden">
+            <div class="case-image-container h-56 overflow-hidden">
               <img 
                 :src="caseItem.image || getCaseImage(index)" 
                 alt="客户案例"
                 class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               >
             </div>
-            <!-- 内容部分 - 左侧 -->
-            <div class="p-6 flex-1 flex flex-col justify-between">
-              <div>
-                <h3 class="case-title text-xl font-semibold mb-3">
-                  {{ getCaseTitle(index) }}
-                </h3>
-                <p class="case-desc text-gray-600 mb-4 line-clamp-4">
-                  {{ caseItem.description || '我们的解决方案帮助客户实现了业务增长和效率提升。' }}
-                </p>
-              </div>
-              <div class="case-cta">
+            <div class="p-6">
+              <h3 class="case-title text-xl font-semibold mb-3">
+                {{ getCaseTitle(index) }}
+              </h3>
+              <p class="case-desc text-gray-600 mb-6">
+                {{ caseItem.description || '我们的解决方案帮助客户实现了业务增长和效率提升。' }}
+              </p>
+              <div class="case-cta flex justify-between items-center">
                 <el-button type="primary" class="rounded-full bg-primary hover:bg-primary-dark">
                   查看详情 <el-icon class="ml-2"><ArrowRight /></el-icon>
                 </el-button>

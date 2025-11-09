@@ -92,30 +92,38 @@
           <p class="section-subtitle text-gray-600">我们提供全方位的技术服务，助力企业数字化转型</p>
         </div>
         
-        <!-- 服务卡片网格 - 强制3列布局 -->
-        <div style="display: grid !important; grid-template-columns: 1fr 1fr 1fr !important; gap: 24px !important; width: 100% !important; max-width: none !important; min-width: 0 !important;">
+        <!-- 服务卡片网格 - 响应式布局：大屏3列，中屏2列，小屏1列 -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           <!-- 每个服务项是一个独立卡片 -->
           <a 
             v-for="(service, index) in services" 
             :key="service.id" 
             href="/services" 
-            style="display: block !important; width: auto !important; min-width: 0 !important;"
-            class="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1">
+            style="display: flex; flex-direction: column; background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); transition: all 0.3s ease;"
+            class="hover:shadow-xl transform hover:-translate-y-1"
+          >
             <!-- 卡片内部：图片在上 -->
-            <div class="h-52 overflow-hidden">
-              <img :src="getServiceImage(index)" alt="服务图片" class="w-full h-full object-cover transition-transform duration-700 hover:scale-110">
+            <div style="height: 200px; overflow: hidden;">
+              <img 
+                :src="getServiceImage(index)" 
+                alt="服务图片" 
+                style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease;"
+                class="hover:scale-110"
+              >
             </div>
             
             <!-- 卡片内部：标题和详情在下 -->
-            <div class="p-6">
+            <div style="padding: 1.5rem;">
               <!-- 标题 -->
-              <h3 class="text-xl font-semibold mb-3">{{ service.title }}</h3>
+              <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 0.75rem;">{{ service.title }}</h3>
               
               <!-- 详情 -->
-              <p class="text-gray-600 mb-4 leading-relaxed">{{ service.desc || '为客户提供专业的技术解决方案，助力业务增长和数字化转型。' }}</p>
+              <p style="color: #666; margin-bottom: 1rem; line-height: 1.6;">
+                {{ service.desc || '为客户提供专业的技术解决方案，助力业务增长和数字化转型。' }}
+              </p>
               
               <!-- 跳转到详情页面的链接 -->
-              <div class="flex items-center text-primary font-medium">
+              <div style="display: flex; align-items: center; color: #0d6efd; font-weight: 500;">
                 查看详情 <el-icon class="ml-2"><ArrowRight /></el-icon>
               </div>
             </div>
@@ -139,28 +147,24 @@
           <div 
             v-for="(caseItem, index) in cases" 
             :key="caseItem.id" 
-            class="case-card bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl group flex flex-col md:flex-row-reverse"
+            class="case-card bg-white rounded-xl shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl group"
             :style="{animationDelay: `${index * 100}ms`}"
           >
-            <!-- 图片部分 - 右侧 -->
-            <div class="case-image-container w-full md:w-2/5 h-48 md:h-auto overflow-hidden">
+            <div class="case-image-container h-56 overflow-hidden">
               <img 
                 :src="caseItem.image || getCaseImage(index)" 
                 alt="客户案例"
                 class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               >
             </div>
-            <!-- 内容部分 - 左侧 -->
-            <div class="p-6 flex-1 flex flex-col justify-between">
-              <div>
-                <h3 class="case-title text-xl font-semibold mb-3">
-                  {{ getCaseTitle(index) }}
-                </h3>
-                <p class="case-desc text-gray-600 mb-4 line-clamp-4">
-                  {{ caseItem.description || '我们的解决方案帮助客户实现了业务增长和效率提升。' }}
-                </p>
-              </div>
-              <div class="case-cta">
+            <div class="p-6">
+              <h3 class="case-title text-xl font-semibold mb-3">
+                {{ getCaseTitle(index) }}
+              </h3>
+              <p class="case-desc text-gray-600 mb-6">
+                {{ caseItem.description || '我们的解决方案帮助客户实现了业务增长和效率提升。' }}
+              </p>
+              <div class="case-cta flex justify-between items-center">
                 <el-button type="primary" class="rounded-full bg-primary hover:bg-primary-dark">
                   查看详情 <el-icon class="ml-2"><ArrowRight /></el-icon>
                 </el-button>
@@ -666,35 +670,6 @@ onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll);
 });
 </script>
-
-<style>
-/* 强制服务卡片3列布局 */
-.service-card-wrapper {
-  display: flex !important;
-  flex-wrap: wrap !important;
-  margin: 0 -12px !important;
-  width: 100% !important;
-}
-.service-card-item {
-  width: 33.3333% !important;
-  padding: 0 12px !important;
-  margin-bottom: 24px !important;
-  box-sizing: border-box !important;
-  display: block !important;
-  float: left !important;
-}
-/* 响应式断点 */
-@media (max-width: 768px) {
-  .service-card-item {
-    width: 50% !important;
-  }
-}
-@media (max-width: 640px) {
-  .service-card-item {
-    width: 100% !important;
-  }
-}
-</style>
 
 <style scoped>
 /* 全局容器样式 */
