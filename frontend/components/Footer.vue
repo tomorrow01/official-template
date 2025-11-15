@@ -1,481 +1,312 @@
 <template>
   <footer class="footer">
-    <!-- 背景渐变和装饰 -->
+    <!-- 背景 -->
     <div class="footer-bg"></div>
     
     <div class="container">
-      <!-- 主要内容区 -->
+      <!-- 主要内容区 - 参考美的IoT设计 -->
       <div class="footer-content">
-        <!-- 品牌信息 -->
-        <div class="footer-brand">
-          <NuxtLink to="/" class="footer-logo flex items-center mb-6 group">
-            <img 
-              src="/images/logo.png" 
-              alt="官网logo" 
-              class="h-12 transition-transform duration-300 group-hover:scale-105"
-            >
-            <span class="ml-3 text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">
-              明日科技
-            </span>
-          </NuxtLink>
-          <p class="text-white mb-8 max-w-md leading-relaxed">
-            专注于企业级内容管理解决方案，助力客户高效运营数字内容，
-            提升品牌影响力和用户体验，为企业数字化转型提供全方位支持。
-          </p>
-          <div class="social-links flex space-x-5">
-            <a 
-              href="#" 
-              class="social-link w-12 h-12 rounded-lg bg-white/5 backdrop-blur-sm flex items-center justify-center 
-                     hover:bg-primary hover:scale-105 transition-all duration-300" 
-              aria-label="微信"
-            >
-              <span class="text-white text-xl">📱</span>
-            </a>
-            <a 
-              href="#" 
-              class="social-link w-12 h-12 rounded-lg bg-white/5 backdrop-blur-sm flex items-center justify-center 
-                     hover:bg-primary hover:scale-105 transition-all duration-300" 
-              aria-label="微博"
-            >
-              <span class="text-white text-xl">📢</span>
-            </a>
-            <a 
-              href="#" 
-              class="social-link w-12 h-12 rounded-lg bg-white/5 backdrop-blur-sm flex items-center justify-center 
-                     hover:bg-primary hover:scale-105 transition-all duration-300" 
-              aria-label="LinkedIn"
-            >
-              <span class="text-white text-xl">🔗</span>
-            </a>
+        <!-- 左侧内容区域 -->
+        <div class="footer-main">
+          <!-- 品牌信息 -->
+          <div class="footer-brand">
+            <NuxtLink to="/" class="footer-logo flex items-center mb-6">
+              <img 
+                src="/images/logo.png" 
+                alt="官网logo" 
+                class="h-12"
+              >
+              <span class="ml-3 text-2xl font-bold text-white">
+                明日科技
+              </span>
+            </NuxtLink>
           </div>
         </div>
-        
-        <!-- 快速链接 -->
-        <div class="footer-section">
-          <h4 class="footer-heading text-xl font-semibold mb-6 text-white">
-            <span class="relative inline-block">
-              快速链接
-              <span class="absolute -bottom-2 left-0 w-12 h-1 bg-primary rounded-full"></span>
-            </span>
-          </h4>
-          <ul class="space-y-4">
-            <li><NuxtLink to="/" class="footer-link text-white hover:text-white group" style="color: white !important;">
-              首页
-              <span class="inline-block w-0 h-[1px] bg-white group-hover:w-full transition-all duration-300"></span>
-            </NuxtLink></li>
-            <li><NuxtLink to="/about" class="footer-link text-white hover:text-white group" style="color: white !important;">
-              公司简介
-              <span class="inline-block w-0 h-[1px] bg-white group-hover:w-full transition-all duration-300"></span>
-            </NuxtLink></li>
-            <li><NuxtLink to="/services" class="footer-link text-white hover:text-white group" style="color: white !important;">
-              服务项目
-              <span class="inline-block w-0 h-[1px] bg-white group-hover:w-full transition-all duration-300"></span>
-            </NuxtLink></li>
-            <li><NuxtLink to="/cases" class="footer-link text-white hover:text-white group" style="color: white !important;">
-              成功案例
-              <span class="inline-block w-0 h-[1px] bg-white group-hover:w-full transition-all duration-300"></span>
-            </NuxtLink></li>
-            <li><NuxtLink to="/articles" class="footer-link text-white hover:text-white group" style="color: white !important;">
-              资讯中心
-              <span class="inline-block w-0 h-[1px] bg-white group-hover:w-full transition-all duration-300"></span>
-            </NuxtLink></li>
+      </div>
+      
+      <!-- 导航链接区域 - 参考美的IoT的多列布局 -->
+      <div class="footer-nav">
+        <div class="nav-column">
+          <h4 class="nav-title text-lg font-semibold mb-4 text-white">关于我们</h4>
+          <ul class="nav-links space-y-3">
+            <li><NuxtLink to="/about" class="nav-link text-white hover:text-gray-300">公司简介</NuxtLink></li>
+            <li><a href="#" class="nav-link text-white hover:text-gray-300">发展历程</a></li>
+            <li><a href="#" class="nav-link text-white hover:text-gray-300">企业文化</a></li>
+            <li><a href="#" class="nav-link text-white hover:text-gray-300">团队介绍</a></li>
           </ul>
         </div>
         
-        <!-- 联系我们 -->
-        <div class="footer-section">
-          <h4 class="footer-heading text-xl font-semibold mb-6 text-white">
-            <span class="relative inline-block">
-              联系我们
-              <span class="absolute -bottom-2 left-0 w-12 h-1 bg-primary rounded-full"></span>
-            </span>
-          </h4>
-          <ul class="space-y-5">
-            <li class="flex items-start group">
-              <span class="text-primary mr-4 mt-1">📍</span>
-              <span class="text-white group-hover:text-white transition-colors">
-                北京市朝阳区建国路88号<br>现代国际大厦A座25层
-              </span>
-            </li>
-            <li class="flex items-center group">
-              <span class="text-primary mr-4">📞</span>
-              <a href="tel:4001234567" class="text-white hover:text-white transition-colors" style="color: white !important;">
-                400-123-4567
-              </a>
-            </li>
-            <li class="flex items-center group">
-              <span class="text-primary mr-4">✉️</span>
-              <a href="mailto:contact@example.com" class="text-white hover:text-white transition-colors" style="color: white !important;">
-                contact@example.com
-              </a>
-            </li>
+        <div class="nav-column">
+          <h4 class="nav-title text-lg font-semibold mb-4 text-white">产品服务</h4>
+          <ul class="nav-links space-y-3">
+            <li><NuxtLink to="/services" class="nav-link text-white hover:text-gray-300">服务项目</NuxtLink></li>
+            <li><NuxtLink to="/cases" class="nav-link text-white hover:text-gray-300">成功案例</NuxtLink></li>
+            <li><a href="#" class="nav-link text-white hover:text-gray-300">解决方案</a></li>
+            <li><a href="#" class="nav-link text-white hover:text-gray-300">技术支持</a></li>
           </ul>
         </div>
         
-        <!-- 订阅区域 -->
-        <div class="footer-section">
-          <h4 class="footer-heading text-xl font-semibold mb-6 text-white">
-            <span class="relative inline-block">
-              订阅通讯
-              <span class="absolute -bottom-2 left-0 w-12 h-1 bg-primary rounded-full"></span>
-            </span>
-          </h4>
-          <p class="text-white mb-5">
-            订阅我们的通讯，获取最新动态和行业资讯，率先了解我们的新产品和服务。
-          </p>
-          <form class="newsletter-form" @submit.prevent="handleSubscribe">
-            <div class="relative">
-              <input 
-                v-model="email" 
-                type="email" 
-                placeholder="您的邮箱地址" 
-                class="w-full px-5 py-4 bg-white/10 backdrop-blur-sm border border-white/20 
-                       text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
-                required
-              />
-              <button 
-                type="submit" 
-                class="absolute right-2 top-1/2 transform -translate-y-1/2 px-5 py-2 bg-primary hover:bg-primary-dark 
-                       text-white rounded-lg transition-all duration-300 shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30"
-              >
-                订阅
-              </button>
-            </div>
-            <p class="text-gray-400 text-sm mt-3">
-              我们尊重您的隐私，不会向第三方分享您的信息
-            </p>
-          </form>
+        <div class="nav-column">
+          <h4 class="nav-title text-lg font-semibold mb-4 text-white">新闻资讯</h4>
+          <ul class="nav-links space-y-3">
+            <li><NuxtLink to="/articles" class="nav-link text-white hover:text-gray-300">资讯中心</NuxtLink></li>
+            <li><a href="#" class="nav-link text-white hover:text-gray-300">公司动态</a></li>
+            <li><a href="#" class="nav-link text-white hover:text-gray-300">行业资讯</a></li>
+            <li><a href="#" class="nav-link text-white hover:text-gray-300">活动公告</a></li>
+          </ul>
+        </div>
+        
+        <div class="nav-column">
+          <h4 class="nav-title text-lg font-semibold mb-4 text-white">联系我们</h4>
+          <ul class="nav-links space-y-3">
+            <li><NuxtLink to="/contact" class="nav-link text-white hover:text-gray-300">联系方式</NuxtLink></li>
+            <li><a href="#" class="nav-link text-white hover:text-gray-300">加入我们</a></li>
+            <li><a href="#" class="nav-link text-white hover:text-gray-300">意见反馈</a></li>
+            <li><a href="#" class="nav-link text-white hover:text-gray-300">常见问题</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <!-- 友情链接区域 - 参考美的IoT设计 -->
+      <div class="footer-friendlinks">
+        <h4 class="friendlinks-title text-lg font-semibold mb-4 text-white">友情链接</h4>
+        <div class="friendlinks-content">
+          <a href="#" class="friendlink text-white hover:text-gray-300">美的集团</a>
+          <a href="#" class="friendlink text-white hover:text-gray-300">美的商城</a>
+          <a href="#" class="friendlink text-white hover:text-gray-300">合作伙伴1</a>
+          <a href="#" class="friendlink text-white hover:text-gray-300">合作伙伴2</a>
         </div>
       </div>
       
       <!-- 分隔线 -->
-      <div class="footer-divider my-10 bg-white/10 h-[1px]"></div>
+      <div class="footer-divider my-8 bg-white/20 h-[1px]"></div>
       
-      <!-- 底部信息 -->
+      <!-- 底部信息 - 参考美的IoT设计 -->
       <div class="footer-bottom">
-        <div class="footer-copyright text-center text-gray-400">
-          <p class="text-lg mb-4">© 2024 明日科技. 保留所有权利.</p>
-          <div class="footer-terms flex flex-wrap justify-center gap-x-6 gap-y-3">
-            <a href="#" class="footer-term text-white hover:text-white transition-colors relative inline-block" style="color: white !important;">
-              隐私政策
-              <span class="absolute -bottom-1 left-0 w-0 h-[1px] bg-white transition-all duration-300 hover:w-full"></span>
-            </a>
-            <a href="#" class="footer-term text-white hover:text-white transition-colors relative inline-block" style="color: white !important;">
-              服务条款
-              <span class="absolute -bottom-1 left-0 w-0 h-[1px] bg-white transition-all duration-300 hover:w-full"></span>
-            </a>
-            <a href="#" class="footer-term text-white hover:text-white transition-colors relative inline-block" style="color: white !important;">
-              网站地图
-              <span class="absolute -bottom-1 left-0 w-0 h-[1px] bg-white transition-all duration-300 hover:w-full"></span>
-            </a>
-            <span class="text-gray-500">备案号：京ICP备XXXXXXX号-1</span>
+        <div class="footer-copyright text-center">
+          <p class="mb-4 text-white">© 2024 明日科技. 保留所有权利.</p>
+          <div class="footer-links flex flex-wrap justify-center gap-x-6 gap-y-2">
+            <a href="#" class="footer-link text-white hover:text-gray-300">隐私政策</a>
+            <a href="#" class="footer-link text-white hover:text-gray-300">服务条款</a>
+            <a href="#" class="footer-link text-white hover:text-gray-300">网站地图</a>
+          </div>
+          <div class="footer-info mt-4">
+            <span class="text-white mr-6">粤ICP备09215446号</span>
+            <span class="text-white">粤公网安备 44060602000243号</span>
           </div>
         </div>
       </div>
-    </div>
-    
-    <!-- 装饰元素 -->
-    <div class="footer-decorations pointer-events-none">
-      <!-- 左侧装饰 -->
-      <div class="decoration-left absolute top-0 left-0 w-1/3 h-1/2 bg-primary/10 rounded-full blur-[100px]
-           transform -translate-x-1/2 -translate-y-1/2"></div>
-      <!-- 右侧装饰 -->
-      <div class="decoration-right absolute bottom-0 right-0 w-1/3 h-1/2 bg-secondary/10 rounded-full blur-[100px]
-           transform translate-x-1/2 translate-y-1/2"></div>
-      <!-- 中央装饰 -->
-      <div class="decoration-center absolute top-1/2 left-1/2 w-1/2 h-1/2 bg-tertiary/5 rounded-full blur-[120px]
-           transform -translate-x-1/2 -translate-y-1/2"></div>
     </div>
   </footer>
 </template>
 
 <script setup>
-import { ref } from 'vue';
-
-const email = ref('');
-
-// 处理订阅逻辑
-const handleSubscribe = () => {
-  // 这里可以添加实际的订阅逻辑
-  if (email.value) {
-    console.log('订阅邮箱:', email.value);
-    // 可以在这里添加API调用
-    email.value = '';
-    // 可以显示成功提示
-  }
-};
+// 美的IoT风格的Footer组件
+// 简化了脚本部分，移除了订阅功能，专注于导航和链接展示
 </script>
 
 <style scoped>
 .footer {
   position: relative;
-  color: white !important;
-  padding: 5rem 0 3rem;
-  overflow: hidden;
+  color: white;
+  padding: 3rem 0 2rem;
+  background-color: #0a0a0a;
 }
 
 .footer-bg {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, #121212 0%, #1a1a1a 100%);
+  background-color: #0a0a0a;
   z-index: 0;
 }
 
 .footer-content {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 4rem;
   position: relative;
   z-index: 1;
-}
-
-.footer-brand {
-  display: flex;
-  flex-direction: column;
+  margin-bottom: 2rem;
 }
 
 .footer-logo img {
   filter: brightness(0) invert(1);
 }
 
-.footer-section h4 {
-  font-weight: 700;
-  margin-bottom: 1.5rem;
-}
-
-.footer-link {
-  display: inline-block;
-  position: relative;
-  padding-bottom: 0.25rem;
-  font-size: 1rem;
-  color: white !important;
-  text-decoration: none !important;
-}
-
-.footer-link:hover {
-  color: white !important;
-}
-
-.footer-term {
-  color: white !important;
-  text-decoration: none !important;
-}
-
-.footer-term:hover {
-  color: white !important;
-}
-
-/* 确保所有链接都显示为白色 */
-.footer a,
-.footer a:link,
-.footer a:visited,
-.footer a:hover,
-.footer a:active,
-.footer a:focus {
-  color: white !important;
-  text-decoration: none !important;
-  outline: none !important;
-}
-
-/* 确保NuxtLink也显示为白色 */
-.footer .nuxt-link-active,
-.footer .nuxt-link-exact-active {
-  color: white !important;
-}
-
-/* 为所有文本元素设置白色 */
-.footer span,
-.footer p,
-.footer li,
-.footer h4 {
-  color: white !important;
-}
-
-/* 强制覆盖任何可能的全局样式 */
-:root {
-  --footer-link-color: white !important;
-}
-
-.footer * {
-  color: inherit !important;
-}
-
-/* 确保内联样式被正确应用 */
-.footer [style*="color: white"] {
-  color: white !important;
-}
-
-.footer-link span {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  transition: width 0.3s ease;
-}
-
-.social-links {
-  display: flex;
-  gap: 1rem;
-  margin-top: 1.5rem;
-}
-
-.social-link {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0.5rem;
-  transition: all 0.3s ease;
-}
-
-.social-link:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 25px -5px rgba(255, 255, 255, 0.1);
-}
-
-.newsletter-form {
-  width: 100%;
-}
-
-.newsletter-form input::placeholder {
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.footer-divider {
-  width: 100%;
+/* 导航链接区域样式 */
+.footer-nav {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
   position: relative;
   z-index: 1;
 }
 
+.nav-column {
+  margin-bottom: 1rem;
+}
+
+.nav-title {
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: white;
+}
+
+.nav-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-link {
+  display: inline-block;
+  padding: 0.5rem 0;
+  color: white;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  font-size: 0.95rem;
+}
+
+.nav-link:hover {
+  color: #cccccc;
+}
+
+/* 友情链接区域样式 */
+.footer-friendlinks {
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.friendlinks-title {
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: white;
+}
+
+.friendlinks-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.friendlink {
+  color: white;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  transition: color 0.3s ease;
+}
+
+.friendlink:hover {
+  color: #cccccc;
+}
+
+/* 分隔线样式 */
+.footer-divider {
+  width: 100%;
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.1);
+  margin: 2rem 0;
+  position: relative;
+  z-index: 1;
+}
+
+/* 底部信息样式 */
 .footer-bottom {
   position: relative;
   z-index: 1;
+  text-align: center;
 }
 
-.footer-terms {
+.footer-copyright p {
+  margin-bottom: 1rem;
+  color: white;
+  font-size: 0.9rem;
+}
+
+.footer-links {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 2rem;
-  margin-top: 1rem;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
 }
 
-.footer-term {
+.footer-link {
+  color: white;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+}
+
+.footer-link:hover {
+  color: #cccccc;
+}
+
+.footer-info {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-top: 1rem;
   font-size: 0.9rem;
   color: white;
 }
 
-.footer-decorations {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-}
-
 /* 响应式设计 */
-@media (min-width: 768px) {
-  .footer-content {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (min-width: 1024px) {
-  .footer-content {
-    grid-template-columns: 1.5fr 1fr 1fr 1.5fr;
-  }
-}
-
-@media (max-width: 767px) {
+@media (max-width: 768px) {
   .footer {
-    padding: 3rem 0 2rem;
+    padding: 2rem 0 1.5rem;
   }
   
-  .footer-content {
-    gap: 3rem;
-  }
-  
-  .footer-heading {
-    font-size: 1.25rem;
-  }
-  
-  .footer-logo img {
-    height: 10px;
-  }
-  
-  .social-links {
-    justify-content: center;
-  }
-}
-
-/* 动画效果 */
-@keyframes float {
-  0% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-  100% {
-    transform: translateY(0px);
-  }
-}
-
-.decoration-left,
-.decoration-right,
-.decoration-center {
-  animation: float 8s ease-in-out infinite;
-}
-
-.decoration-right {
-  animation-delay: 2s;
-}
-
-.decoration-center {
-  animation-delay: 4s;
-}
-
-/* 响应式设计 */
-@media (min-width: 768px) {
-  .footer-top {
+  .footer-nav {
     grid-template-columns: repeat(2, 1fr);
-    text-align: left;
+    gap: 1.5rem;
   }
   
-  .footer-brand {
-    text-align: left;
+  .nav-title {
+    font-size: 1.1rem;
+  }
+  
+  .nav-link {
+    font-size: 0.9rem;
+  }
+  
+  .friendlinks-content {
+    gap: 0.8rem;
+  }
+  
+  .friendlink {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+  }
+  
+  .footer-links {
+    gap: 1rem;
+  }
+  
+  .footer-info {
+    flex-direction: column;
+    gap: 0.8rem;
+    align-items: center;
   }
 }
 
-@media (min-width: 1024px) {
-  .footer-top {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-@media (max-width: 767px) {
-  .footer-top {
-    gap: var(--spacing-xl);
+@media (max-width: 480px) {
+  .footer-nav {
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
   }
   
-  .footer-heading {
-    text-align: center;
-    font-size: 1.125rem;
+  .nav-column {
+    margin-bottom: 0.5rem;
   }
   
-  .footer-heading::after {
-    left: 50% !important;
-    transform: translateX(-50%) !important;
+  .friendlinks-content {
+    flex-direction: column;
+    align-items: flex-start;
   }
   
-  .footer-links ul,
-  .footer-contact ul {
-    text-align: center;
-  }
-  
-  .social-links {
-    justify-content: center;
-  }
-  
-  .newsletter-form {
-    max-width: 300px;
-    margin: 0 auto;
+  .friendlink {
+    padding: 0.3rem 0;
   }
 }
 </style>
