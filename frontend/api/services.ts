@@ -6,6 +6,7 @@ interface ServiceItem {
   icon: string;
   title: string;
   desc: string;
+  image?: string;
   order?: number;
   isActive?: boolean;
   createdAt?: string;
@@ -35,19 +36,22 @@ export const getServiceList = async (): Promise<ServiceItem[]> => {
         id: '1',
         icon: 'Management',
         title: '软件开发',
-        desc: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。'
+        desc: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。',
+        image: '/images/service1.jpg'
       },
       {
         id: '2',
         icon: 'Monitor',
         title: '数字化转型',
-        desc: '帮助企业实现数字化转型，优化业务流程，提升运营效率。'
+        desc: '帮助企业实现数字化转型，优化业务流程，提升运营效率。',
+        image: '/images/service2.jpg'
       },
       {
         id: '3',
         icon: 'Cloud',
         title: '云服务',
-        desc: '提供云计算解决方案，包括云迁移、云托管和云安全服务。'
+        desc: '提供云计算解决方案，包括云迁移、云托管和云安全服务。',
+        image: '/images/service3.jpg'
       }
     ];
   }

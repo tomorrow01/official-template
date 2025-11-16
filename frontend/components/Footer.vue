@@ -4,11 +4,9 @@
     <div class="footer-bg"></div>
     
     <div class="container">
-      <!-- 主要内容区 - 参考美的IoT设计 -->
-      <div class="footer-content">
-        <!-- 左侧内容区域 -->
+      <!-- 主要内容区 - 参考IoT设计 -->
+      <!-- <div class="footer-content">
         <div class="footer-main">
-          <!-- 品牌信息 -->
           <div class="footer-brand">
             <NuxtLink to="/" class="footer-logo flex items-center mb-6">
               <img 
@@ -22,7 +20,7 @@
             </NuxtLink>
           </div>
         </div>
-      </div>
+      </div> -->
       
       <!-- 导航链接区域 - 参考美的IoT的多列布局 -->
       <div class="footer-nav">
@@ -65,16 +63,15 @@
             <li><a href="#" class="nav-link text-white hover:text-gray-300">常见问题</a></li>
           </ul>
         </div>
-      </div>
-      
-      <!-- 友情链接区域 - 参考美的IoT设计 -->
-      <div class="footer-friendlinks">
-        <h4 class="friendlinks-title text-lg font-semibold mb-4 text-white">友情链接</h4>
-        <div class="friendlinks-content">
-          <a href="#" class="friendlink text-white hover:text-gray-300">美的集团</a>
-          <a href="#" class="friendlink text-white hover:text-gray-300">美的商城</a>
-          <a href="#" class="friendlink text-white hover:text-gray-300">合作伙伴1</a>
-          <a href="#" class="friendlink text-white hover:text-gray-300">合作伙伴2</a>
+        
+        <div class="nav-column">
+          <h4 class="nav-title text-lg font-semibold mb-4 text-white">友情链接</h4>
+          <ul class="nav-links space-y-3">
+            <li><a href="#" class="nav-link text-white hover:text-gray-300">集团</a></li>
+            <li><a href="#" class="nav-link text-white hover:text-gray-300">商城</a></li>
+            <li><a href="#" class="nav-link text-white hover:text-gray-300">合作伙伴1</a></li>
+            <li><a href="#" class="nav-link text-white hover:text-gray-300">合作伙伴2</a></li>
+          </ul>
         </div>
       </div>
       
@@ -82,6 +79,7 @@
       <div class="footer-divider my-8 bg-white/20 h-[1px]"></div>
       
       <!-- 底部信息 - 参考美的IoT设计 -->
+      <!-- 注意：此Footer组件中不包含登录模块 -->
       <div class="footer-bottom">
         <div class="footer-copyright text-center">
           <p class="mb-4 text-white">© 2024 明日科技. 保留所有权利.</p>
@@ -132,12 +130,14 @@
 
 /* 导航链接区域样式 */
 .footer-nav {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 2rem;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  gap: 1rem;
   margin-bottom: 2rem;
   position: relative;
   z-index: 1;
+  max-width: 100%;
 }
 
 .nav-column {
@@ -169,35 +169,7 @@
   color: #cccccc;
 }
 
-/* 友情链接区域样式 */
-.footer-friendlinks {
-  margin-bottom: 2rem;
-  position: relative;
-  z-index: 1;
-}
-
-.friendlinks-title {
-  font-weight: 600;
-  margin-bottom: 1rem;
-  color: white;
-}
-
-.friendlinks-content {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.friendlink {
-  color: white;
-  text-decoration: none;
-  padding: 0.5rem 1rem;
-  transition: color 0.3s ease;
-}
-
-.friendlink:hover {
-  color: #cccccc;
-}
+/* 友情链接区域使用与导航列相同的样式 */
 
 /* 分隔线样式 */
 .footer-divider {

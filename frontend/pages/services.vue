@@ -20,14 +20,25 @@
         <!-- 服务卡片 -->
         <div v-else-if="services.length > 0" class="services-grid">
           <div v-for="service in services" :key="service.id" class="service-card">
-            <div class="service-icon">
-              <el-icon><Message /></el-icon>
+            <!-- 服务图片 -->
+            <div v-if="service.image" class="service-image-container">
+              <img 
+                :src="getServiceImageUrl(service.image)" 
+                :alt="service.name || '服务名称'" 
+                class="service-image"
+                @error="handleImageError($event)"
+              />
             </div>
-            <h3 class="service-title">{{ service.name || '服务名称' }}</h3>
-            <p class="service-desc">{{ service.description || '服务描述内容' }}</p>
-            <el-button type="primary" size="small" @click="viewServiceDetail(service.id)">
-              了解更多
-            </el-button>
+            <div>
+              <div class="service-icon">
+                <el-icon><Message /></el-icon>
+              </div>
+              <h3 class="service-title">{{ service.name || '服务名称' }}</h3>
+              <p class="service-desc">{{ service.description || '服务描述内容' }}</p>
+              <el-button type="primary" size="small" @click="viewServiceDetail(service.id)">
+                了解更多
+              </el-button>
+            </div>
           </div>
         </div>
         
@@ -115,27 +126,39 @@ const fetchServices = async () => {
       services.value = [
         {
           id: '1',
-          name: 'Web应用开发',
-          description: '基于Vue.js和Nuxt.js构建高性能、响应式的Web应用，提供卓越的用户体验',
+          name: '企业数字化转型服务',
+          description: '为传统企业提供全面的数字化转型解决方案，包括业务流程再造、IT系统升级、数字化营销策略等',
           icon: 'Code'
         },
         {
           id: '2',
-          name: '内容管理系统',
-          description: '定制化的内容管理解决方案，帮助企业轻松管理和发布内容',
+          name: '软件开发与定制服务',
+          description: '提供高质量的软件开发和定制服务，包括企业管理系统、电子商务平台、移动应用开发等',
           icon: 'Document'
         },
         {
           id: '3',
-          name: '前端优化',
-          description: '通过性能优化、代码分割和懒加载等技术，提升网站加载速度和用户体验',
+          name: '数据分析与商业智能',
+          description: '帮助企业挖掘数据价值，提升决策效率，通过数据分析模型和可视化报表提供数据洞察',
           icon: 'Speed'
         },
         {
           id: '4',
-          name: 'UI/UX设计',
-          description: '专业的用户界面和用户体验设计，打造美观、易用的产品界面',
+          name: 'IT咨询与规划服务',
+          description: '提供专业的IT咨询和规划服务，帮助企业制定合理的IT战略和技术路线图',
           icon: 'Edit'
+        },
+        {
+          id: '5',
+          name: '云服务与基础设施',
+          description: '提供全方位的云服务和基础设施解决方案，帮助企业快速实现IT基础设施的现代化',
+          icon: 'Cloud'
+        },
+        {
+          id: '6',
+          name: '人工智能应用开发',
+          description: '专注于人工智能应用开发，为企业提供智能解决方案，提升业务效率和竞争力',
+          icon: 'Star'
         }
       ];
     }
@@ -146,27 +169,39 @@ const fetchServices = async () => {
     services.value = [
       {
         id: '1',
-        name: 'Web应用开发',
-        description: '基于Vue.js和Nuxt.js构建高性能、响应式的Web应用，提供卓越的用户体验',
+        name: '企业数字化转型服务',
+        description: '为传统企业提供全面的数字化转型解决方案，包括业务流程再造、IT系统升级、数字化营销策略等',
         icon: 'Code'
       },
       {
         id: '2',
-        name: '内容管理系统',
-        description: '定制化的内容管理解决方案，帮助企业轻松管理和发布内容',
+        name: '软件开发与定制服务',
+        description: '提供高质量的软件开发和定制服务，包括企业管理系统、电子商务平台、移动应用开发等',
         icon: 'Document'
       },
       {
         id: '3',
-        name: '前端优化',
-        description: '通过性能优化、代码分割和懒加载等技术，提升网站加载速度和用户体验',
+        name: '数据分析与商业智能',
+        description: '帮助企业挖掘数据价值，提升决策效率，通过数据分析模型和可视化报表提供数据洞察',
         icon: 'Speed'
       },
       {
         id: '4',
-        name: 'UI/UX设计',
-        description: '专业的用户界面和用户体验设计，打造美观、易用的产品界面',
+        name: 'IT咨询与规划服务',
+        description: '提供专业的IT咨询和规划服务，帮助企业制定合理的IT战略和技术路线图',
         icon: 'Edit'
+      },
+      {
+        id: '5',
+        name: '云服务与基础设施',
+        description: '提供全方位的云服务和基础设施解决方案，帮助企业快速实现IT基础设施的现代化',
+        icon: 'Cloud'
+      },
+      {
+        id: '6',
+        name: '人工智能应用开发',
+        description: '专注于人工智能应用开发，为企业提供智能解决方案，提升业务效率和竞争力',
+        icon: 'Star'
       }
     ];
   } finally {
@@ -174,9 +209,38 @@ const fetchServices = async () => {
   }
 };
 
-// 查看服务详情（暂时返回首页，后续可以实现服务详情页面）
+// 查看服务详情
+// 获取服务图片URL
+const getServiceImageUrl = (imagePath) => {
+  if (!imagePath) {
+    return '/images/service-default.jpg'; // 默认图片
+  }
+  
+  // 检查是否已经是完整URL
+  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+    return imagePath;
+  }
+  
+  // 如果是相对路径，根据路径格式处理
+  if (imagePath.startsWith('/uploads/')) {
+    // 从后端上传的图片
+    return `http://localhost:3001${imagePath}`;
+  } else if (imagePath.startsWith('/')) {
+    // 前端静态图片
+    return imagePath;
+  } else {
+    // 其他情况
+    return `http://localhost:3001/uploads/${imagePath}`;
+  }
+};
+
+// 图片加载错误处理
+const handleImageError = (event) => {
+  event.target.src = '/images/service-default.jpg';
+};
+
 const viewServiceDetail = (id) => {
-  router.push('/');
+  router.push(`/services/${id}`);
 };
 
 // 页面加载时获取服务列表
@@ -227,7 +291,7 @@ onMounted(() => {
 .service-card {
   background: var(--bg-container);
   border-radius: 12px;
-  padding: 30px;
+  overflow: hidden;
   text-align: center;
   box-shadow: var(--shadow-light);
   transition: transform 0.3s, box-shadow 0.3s;
@@ -238,10 +302,32 @@ onMounted(() => {
   box-shadow: var(--shadow-medium);
 }
 
+.service-image-container {
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+}
+
+.service-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s;
+}
+
+.service-card:hover .service-image {
+  transform: scale(1.05);
+}
+
 .service-icon {
   font-size: 48px;
   color: #667eea;
-  margin-bottom: 20px;
+  margin: 20px 0;
+}
+
+/* 服务卡片内容区域 */
+.service-card > div:last-child {
+  padding: 0 30px 30px;
 }
 
 .service-title {

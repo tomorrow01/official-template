@@ -2,7 +2,7 @@
   <nav class="navbar fixed w-full top-0 z-50 transition-all duration-300" :class="{ 'navbar-scrolled': isScrolled }">
     <div class="container">
       <NuxtLink to="/" class="logo" aria-label="官网首页">
-        <img src="/images/logo.png" alt="官网logo" class="logo-img">
+        <img src="/images/mingri-tech-logo.svg" alt="明日科技logo" class="logo-img">
       </NuxtLink>
       
       <!-- 桌面导航 -->
@@ -130,6 +130,12 @@ onUnmounted(() => {
   padding: var(--spacing-md) 0;
   box-shadow: var(--shadow-light);
   transition: all 0.3s ease-in-out;
+  /* 确保在所有情况下都固定在顶部 */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
 }
 
 .navbar-scrolled {
@@ -162,7 +168,8 @@ onUnmounted(() => {
 .logo-img {
   height: 40px;
   width: auto;
-  transition: height 0.3s ease;
+  transition: all 0.3s ease;
+  max-width: 120px;
 }
 
 /* 桌面导航 */

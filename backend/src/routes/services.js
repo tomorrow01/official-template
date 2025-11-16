@@ -30,6 +30,7 @@ const mockServices = [
     title: '网站建设',
     description: '专业的网站设计与开发，响应式布局，提升品牌形象',
     icon: 'el-icon-s-grid',
+    image: '/images/service1.jpg',
     order: 1,
     isActive: true,
     createdAt: new Date()
@@ -39,6 +40,7 @@ const mockServices = [
     title: 'APP开发',
     description: '定制化移动应用开发，原生体验，满足企业需求',
     icon: 'el-icon-mobile',
+    image: '/images/service2.jpg',
     order: 2,
     isActive: true,
     createdAt: new Date()
@@ -48,6 +50,7 @@ const mockServices = [
     title: '数据分析',
     description: '专业的数据收集与分析服务，助力企业决策',
     icon: 'el-icon-pie-chart',
+    image: '/images/service3.jpg',
     order: 3,
     isActive: true,
     createdAt: new Date()
@@ -98,7 +101,9 @@ router.get('/:id', async (req, res) => {
 router.post('/', async (req, res) => {
   try {
     if (isMongoConnected()) {
-      const service = new Service(req.body);
+      // 从请求体中提取数据，支持image字段
+      const serviceData = req.body;
+      const service = new Service(serviceData);
       const savedService = await service.save();
       sendResponse(res, 201, savedService, '服务创建成功');
     } else {
@@ -106,6 +111,7 @@ router.post('/', async (req, res) => {
       const newService = {
         _id: `mock-${Date.now()}`,
         ...req.body,
+        image: req.body.image || '/images/service-default.jpg',
         createdAt: new Date()
       };
       sendResponse(res, 201, newService, '服务创建成功（模拟数据）');
@@ -120,6 +126,7 @@ router.post('/', async (req, res) => {
 router.put('/:id', async (req, res) => {
   try {
     if (isMongoConnected()) {
+      // 允许更新image字段
       const service = await Service.findByIdAndUpdate(req.params.id, req.body, { new: true });
       if (!service) {
         return sendResponse(res, 404, null, '服务不存在');
@@ -130,6 +137,7 @@ router.put('/:id', async (req, res) => {
       const updatedService = {
         _id: req.params.id,
         ...req.body,
+        image: req.body.image || '/images/service-default.jpg',
         createdAt: new Date()
       };
       sendResponse(res, 200, updatedService, '服务更新成功（模拟数据）');

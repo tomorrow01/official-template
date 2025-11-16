@@ -25,12 +25,16 @@
             我们提供全方位的技术服务和解决方案，助力企业实现数字化转型，提升核心竞争力。
           </p>
           <div class="flex flex-wrap gap-4">
-            <el-button type="primary" class="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-full text-lg">
-              了解我们的服务
-            </el-button>
-            <el-button type="default" class="bg-white/10 hover:bg-white/20 text-white border-white/30 px-8 py-3 rounded-full text-lg">
-              查看成功案例
-            </el-button>
+            <NuxtLink to="/services">
+              <el-button type="primary" class="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-full text-lg">
+                了解我们的服务
+              </el-button>
+            </NuxtLink>
+            <NuxtLink to="/cases">
+              <el-button type="default" class="bg-white/10 hover:bg-white/20 text-white border-white/30 px-8 py-3 rounded-full text-lg">
+                查看成功案例
+              </el-button>
+            </NuxtLink>
           </div>
         </div>
       </div>
@@ -55,9 +59,11 @@
           <!-- 优势项1 -->
           <div style="flex: 0 0 100%; max-width: 300px; margin: 0 auto; text-align: center;">
             <!-- 上方图片 -->
-              <div style="width: 120px; height: 120px; background-color: rgba(22, 119, 255, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 30px; cursor: pointer; transition: transform 0.7s ease; transform: scale(1);" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
-                <img src="https://picsum.photos/seed/team/80/80" alt="专业团队" style="width: 80px; height: 80px; object-fit: contain;">
-              </div>
+              <NuxtLink to="/about">
+                <div style="width: 120px; height: 120px; background-color: rgba(22, 119, 255, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 30px; cursor: pointer; transition: transform 0.7s ease; transform: scale(1);" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                  <img src="https://picsum.photos/seed/team/80/80" alt="专业团队" style="width: 80px; height: 80px; object-fit: contain;">
+                </div>
+              </NuxtLink>
             <!-- 下方文字 -->
             <div>
               <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 15px; color: #333;">专业团队</h3>
@@ -70,9 +76,11 @@
           <!-- 优势项2 -->
           <div style="flex: 0 0 100%; max-width: 300px; margin: 0 auto; text-align: center;">
             <!-- 上方图片 -->
-              <div style="width: 120px; height: 120px; background-color: rgba(22, 119, 255, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 30px; cursor: pointer; transition: transform 0.7s ease; transform: scale(1);" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
-                <img src="https://picsum.photos/seed/custom/80/80" alt="定制服务" style="width: 80px; height: 80px; object-fit: contain;">
-              </div>
+              <NuxtLink to="/services">
+                <div style="width: 120px; height: 120px; background-color: rgba(22, 119, 255, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 30px; cursor: pointer; transition: transform 0.7s ease; transform: scale(1);" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                  <img src="https://picsum.photos/seed/custom/80/80" alt="定制服务" style="width: 80px; height: 80px; object-fit: contain;">
+                </div>
+              </NuxtLink>
             <!-- 下方文字 -->
             <div>
               <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 15px; color: #333;">定制服务</h3>
@@ -85,9 +93,11 @@
           <!-- 优势项3 -->
           <div style="flex: 0 0 100%; max-width: 300px; margin: 0 auto; text-align: center;">
             <!-- 上方图片 -->
-              <div style="width: 120px; height: 120px; background-color: rgba(22, 119, 255, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 30px; cursor: pointer; transition: transform 0.7s ease; transform: scale(1);" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
-                <img src="https://picsum.photos/seed/timer/80/80" alt="高效执行" style="width: 80px; height: 80px; object-fit: contain;">
-              </div>
+              <NuxtLink to="/cases">
+                <div style="width: 120px; height: 120px; background-color: rgba(22, 119, 255, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 30px; cursor: pointer; transition: transform 0.7s ease; transform: scale(1);" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                  <img src="https://picsum.photos/seed/timer/80/80" alt="高效执行" style="width: 80px; height: 80px; object-fit: contain;">
+                </div>
+              </NuxtLink>
             <!-- 下方文字 -->
             <div>
               <h3 style="font-size: 20px; font-weight: 600; margin-bottom: 15px; color: #333;">高效执行</h3>
@@ -113,10 +123,10 @@
         <!-- 服务卡片网格 - 强制3列布局 -->
         <div style="display: grid !important; grid-template-columns: 1fr 1fr 1fr !important; gap: 24px !important; width: 100% !important; max-width: none !important; min-width: 0 !important;">
           <!-- 每个服务项是一个独立卡片 -->
-          <a 
+          <NuxtLink 
             v-for="(service, index) in services" 
             :key="service.id" 
-            href="/services" 
+            :to="`/services/${service.id}`" 
             style="display: block !important; width: auto !important; min-width: 0 !important; border: 1px solid #e0e0e0; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: all 0.3s ease; transform: translateY(0);"
             onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.15)';"
             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)';"
@@ -135,11 +145,11 @@
               <p style="line-height: 1.6; margin: 0 0 20px 0 !important; padding: 0 !important; color: #666; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; width: 100%; box-sizing: border-box;">{{ service.desc || '为客户提供专业的技术解决方案，助力业务增长和数字化转型。' }}</p>
               
               <!-- 跳转到详情页面的按钮 -->
-              <button style="background: #1677ff; color: white; border: none; margin: 0 !important; padding: 10px 20px !important; border-radius: 4px; cursor: pointer; box-shadow: 0 2px 8px rgba(22, 119, 255, 0.3); transition: all 0.3s ease; display: inline-flex; align-items: center; font-weight: 500;">
+              <button style="background: #1677ff; color: white; border: none; margin: 0 !important; padding: 10px 20px !important; border-radius: 4px; cursor: pointer; box-shadow: 0 2px 8px rgba(22, 119, 255, 0.3); transition: all 0.3s ease; display: inline-flex; align-items: center; font-weight: 500;" @click.stop>
                 查看详情 <el-icon style="margin-left: 8px;"><ArrowRight /></el-icon>
               </button>
             </div>
-          </a>
+          </NuxtLink>
         </div>
       </div>
     </section>
@@ -159,7 +169,9 @@
           <div style="padding: 30px; flex: 1; background-color: white;">
             <h3 style="margin-bottom: 15px; font-size: 22px; font-weight: 600;">企业数字化转型案例</h3>
             <p style="line-height: 1.6; margin-bottom: 20px; color: #333;">我们帮助一家传统制造企业实现了全面的数字化转型，通过引入智能制造系统，生产效率提升了40%，成本降低了25%。</p>
-            <button style="background: #1677ff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; box-shadow: 0 2px 8px rgba(22, 119, 255, 0.3); transition: all 0.3s ease;">了解更多</button>
+            <NuxtLink to="/cases" style="text-decoration: none;">
+                <button style="background: #1677ff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; box-shadow: 0 2px 8px rgba(22, 119, 255, 0.3); transition: all 0.3s ease;">了解更多</button>
+              </NuxtLink>
           </div>
         </div>
         
@@ -272,9 +284,11 @@
         
         <!-- 查看更多按钮 -->
         <div class="articles-cta text-center mt-8">
-          <el-button type="primary" class="rounded-full bg-primary hover:bg-primary-dark px-8 py-3">
-            查看所有文章
-          </el-button>
+          <NuxtLink to="/articles">
+            <el-button type="primary" class="rounded-full bg-primary hover:bg-primary-dark px-8 py-3">
+              查看所有文章
+            </el-button>
+          </NuxtLink>
         </div>
       </div>
     </section>
@@ -332,12 +346,16 @@
           <h2 class="cta-title text-3xl md:text-4xl font-bold text-white mb-6">准备好开始您的项目了吗？</h2>
           <p class="cta-subtitle text-white/90 text-lg mb-10">联系我们，了解如何利用我们的解决方案帮助您的业务增长</p>
           <div class="cta-buttons flex flex-col sm:flex-row gap-4 justify-center">
-            <el-button type="primary" class="cta-btn bg-white text-primary hover:bg-gray-100 rounded-full px-10 py-3 text-lg">
-              立即咨询
-            </el-button>
-            <el-button type="default" class="cta-btn-outline border-2 border-white text-white hover:bg-white/10 rounded-full px-10 py-3 text-lg">
-              了解服务
-            </el-button>
+            <NuxtLink to="/contact">
+              <el-button type="primary" class="cta-btn bg-white text-primary hover:bg-gray-100 rounded-full px-10 py-3 text-lg">
+                立即咨询
+              </el-button>
+            </NuxtLink>
+            <NuxtLink to="/services">
+              <el-button type="default" class="cta-btn-outline border-2 border-white text-white hover:bg-white/10 rounded-full px-10 py-3 text-lg">
+                了解服务
+              </el-button>
+            </NuxtLink>
           </div>
         </div>
       </div>
@@ -366,6 +384,7 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 import Navbar from '@/components/Navbar.vue';
 import Footer from '@/components/Footer.vue';
+import { ArrowUp } from '@element-plus/icons-vue';
 // 暂时注释掉API导入以避免可能的错误
 // import { getBannerList } from '@/api/banner';
 // import { getCaseList } from '@/api/cases';
@@ -373,7 +392,29 @@ import Footer from '@/components/Footer.vue';
 
 const services = ref([]);
 const cases = ref([]);
-const latestArticles = ref([]);
+const latestArticles = ref([
+  {
+    id: '1',
+    title: 'Vue 3新特性解读',
+    excerpt: '深入解析Vue 3组合式API的优势，对比选项式API的性能提升与开发体验优化...',
+    createTime: '2024-07-10',
+    image: '/images/article1-placeholder.jpg'
+  },
+  {
+    id: '2',
+    title: '前端性能优化指南',
+    excerpt: '从资源加载（懒加载/预加载）到渲染优化（虚拟列表/防抖节流）的全流程实践方案...',
+    createTime: '2024-07-09',
+    image: '/images/article2-placeholder.jpg'
+  },
+  {
+    id: '3',
+    title: 'Nuxt 3实战经验分享',
+    excerpt: '使用Nuxt 3构建SEO友好的企业级应用，包含路由、状态管理、API集成等关键点...',
+    createTime: '2024-07-05',
+    image: '/images/article3-placeholder.jpg'
+  }
+]);
 const showBackToTop = ref(false);
 const loadingCases = ref(true);
 const loadingServices = ref(true);

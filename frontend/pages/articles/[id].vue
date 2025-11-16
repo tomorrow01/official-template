@@ -102,8 +102,35 @@ const fetchArticleDetail = async () => {
   } catch (err) {
     console.error('获取文章详情失败:', err);
     error.value = '获取文章详情失败，请稍后重试';
-    // 出错时使用模拟数据
-    article.value = {
+    // 根据文章ID提供不同的模拟内容
+    const mockArticles = {
+      '1': {
+        id: '1',
+        title: 'Vue 3新特性解读',
+        createTime: '2024-07-10',
+        views: 1253,
+        image: '/images/article1-placeholder.jpg',
+        content: '<p>Vue 3带来了许多激动人心的新特性，其中最引人注目的是组合式API。这种新的API设计允许开发者更好地组织组件逻辑，提高代码复用性。</p><p>在本文中，我们将深入探讨Vue 3组合式API的优势，对比选项式API的性能提升与开发体验优化。通过实际案例，我们将展示如何利用这些新特性构建更强大、更易维护的Vue应用。</p><p>Vue 3还引入了更好的TypeScript支持、更小的打包体积和更快的渲染性能，使其成为构建现代Web应用的理想选择。</p>'
+      },
+      '2': {
+        id: '2',
+        title: '前端性能优化指南',
+        createTime: '2024-07-09',
+        views: 987,
+        image: '/images/article2-placeholder.jpg',
+        content: '<p>前端性能优化是构建用户友好应用的关键。本文将介绍从资源加载（懒加载/预加载）到渲染优化（虚拟列表/防抖节流）的全流程实践方案。</p><p>我们将探讨如何优化JavaScript执行效率、减少页面重排重绘、利用缓存策略和实现高效的数据获取。这些技术将帮助你显著提升应用的加载速度和交互体验。</p><p>通过具体的代码示例和性能测试结果，我们将展示如何识别性能瓶颈并实施有效的优化措施。</p>'
+      },
+      '3': {
+        id: '3',
+        title: 'Nuxt 3实战经验分享',
+        createTime: '2024-07-05',
+        views: 764,
+        image: '/images/article3-placeholder.jpg',
+        content: '<p>Nuxt 3是基于Vue 3的新一代全栈框架，它提供了优秀的服务端渲染和静态站点生成能力。本文将分享使用Nuxt 3构建SEO友好的企业级应用的实战经验。</p><p>我们将涵盖Nuxt 3的核心概念，包括文件系统路由、组合式API集成、状态管理、API集成等关键点。同时，我们还将分享一些最佳实践，如代码分割、性能优化和错误处理策略。</p><p>通过实际项目案例，我们将展示如何利用Nuxt 3的强大功能构建高性能、易维护的Web应用。</p>'
+      }
+    };
+    // 使用对应ID的模拟文章或默认文章
+    article.value = mockArticles[articleId] || {
       id: articleId,
       title: '文章标题示例',
       createTime: new Date().toISOString(),
