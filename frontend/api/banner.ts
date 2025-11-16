@@ -6,6 +6,8 @@ import { getRequestInstance } from './request'; // 导入工厂函数
 export interface BannerResponseItem {
   _id: string; // MongoDB使用_id作为主键
   title?: string;
+  description?: string;
+  ctaText?: string;
   imageUrl: string;
   link?: string;
   order: number;
@@ -21,7 +23,16 @@ export interface BannerItem {
   image: string; // 注意：前端组件使用image而不是imageUrl
   link: string;
   title?: string;
+  description?: string; // 描述文本
+  ctaText?: string; // CTA按钮文本
   order?: number; // 排序字段，用于内部排序使用
+}
+
+/**
+ * Axios响应数据类型
+ */
+interface ApiResponse<T> {
+  data: T;
 }
 
 /**
@@ -33,9 +44,9 @@ export const getBannerList = async (): Promise<BannerItem[]> => {
     const request = getRequestInstance(); // 在函数内部动态获取实例（此时处于Vue上下文）
     console.log('正在请求轮播图数据...');
     
-    // 发送请求到后端API
-    const response = await request<BannerResponseItem[]>({
-      url: '/api/banners', // 通过代理配置转发到后端
+    // 发送请求到后端API，使用正确的响应类型定义
+    const response = await request<ApiResponse<BannerResponseItem[]>>({
+      url: '/banners', // 直接使用正确的后端路由路径
       method: 'get'
     });
     
@@ -43,22 +54,22 @@ export const getBannerList = async (): Promise<BannerItem[]> => {
     
     // 转换数据格式：将后端的imageUrl转换为前端组件需要的image
     // 并确保只返回激活状态的轮播图
-    // 注意：根据request.ts的响应拦截器，response已经是res.data了，不需要再访问.data
-    const banners: BannerItem[] = response
-      .data.filter((item: BannerResponseItem) => item.isActive)
-      .map((item: BannerResponseItem) => ({
+    const banners: BannerItem[] = response.data
+      .filter((item: BannerResponseItem): boolean => item.isActive)
+      .map((item: BannerResponseItem): BannerItem => ({
         id: item._id,
         image: item.imageUrl, // 转换字段名
         link: item.link || '/', // 提供默认值
         title: item.title,
-        // 保留order字段以便排序使用
-        order: item.order
+        description: item.description || '', // 添加描述字段
+        ctaText: item.ctaText || '', // 添加CTA按钮文本字段
+        order: item.order // 保留order字段以便排序使用
       }))
-      .sort((a, b) => a.order - b.order); // 直接使用转换后保留的order字段排序
+      .sort((a: BannerItem, b: BannerItem): number => (a.order || 0) - (b.order || 0)); // 使用安全的排序，处理可能的undefined
     
     console.log('转换后的轮播图数据:', banners);
     return banners;
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('获取轮播图数据失败:', error);
     // 返回模拟数据作为兜底
     return [

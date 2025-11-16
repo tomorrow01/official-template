@@ -28,7 +28,7 @@ export default defineNuxtConfig({
       proxy: {
         // 将前端的/api请求转发到后端3001端口
         '/api': {
-          target: process.env.API_BASE,
+          target: 'http://localhost:3000', // 修改为新的后端端口3000
           changeOrigin: true,
           rewrite: (path) => {
             const newPath = path.replace(/^\/api/, ''); 
@@ -42,8 +42,7 @@ export default defineNuxtConfig({
   // 添加类型断言解决 TS 类型检查问题
   runtimeConfig: {
     public: {
-      // apiBase:  process.env.NODE_ENV === 'production' ? process.env.API_BASE : 'http://localhost:3001' // 后端接口基地址
-      apiBase:  process.env.API_BASE // 后端接口基地址
+      apiBase: 'http://localhost:3000' // 修改为新的后端端口3000
     }
   } as any
 })

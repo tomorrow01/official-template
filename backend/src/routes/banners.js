@@ -20,19 +20,45 @@ try {
 const mockBanners = [
   {
     _id: 'mock-1',
-    title: '首页轮播1',
-    imageUrl: '/images/banner1.jpg',
-    link: '/home',
+    title: '数字化转型解决方案',
+    description: '助力企业实现全面数字化，提升运营效率与市场竞争力',
+    ctaText: '了解详情',
+    imageUrl: 'https://picsum.photos/id/1/2100/900',
+    link: '/services/digital-transformation',
     order: 1,
     isActive: true,
     createdAt: new Date()
   },
   {
     _id: 'mock-2',
-    title: '活动轮播2',
-    imageUrl: '/images/banner2.jpg',
-    link: '/activity',
+    title: '人工智能技术应用',
+    description: '利用AI技术赋能业务创新，实现智能化决策与自动化运营',
+    ctaText: '探索AI服务',
+    imageUrl: 'https://picsum.photos/id/20/2100/900',
+    link: '/services/ai-solutions',
     order: 2,
+    isActive: true,
+    createdAt: new Date()
+  },
+  {
+    _id: 'mock-3',
+    title: '企业云计算服务',
+    description: '安全可靠的云服务解决方案，灵活扩展，降低IT成本',
+    ctaText: '云服务咨询',
+    imageUrl: 'https://picsum.photos/id/3/2100/900',
+    link: '/services/cloud-computing',
+    order: 3,
+    isActive: true,
+    createdAt: new Date()
+  },
+  {
+    _id: 'mock-4',
+    title: '成功客户案例展示',
+    description: '探索我们如何帮助不同行业的客户实现业务增长与技术创新',
+    ctaText: '查看案例',
+    imageUrl: 'https://picsum.photos/id/48/2100/900',
+    link: '/cases',
+    order: 4,
     isActive: true,
     createdAt: new Date()
   }
@@ -43,20 +69,22 @@ const isMongoConnected = () => {
   return !useMockData && mongoose && mongoose.connection.readyState === 1;
 }
 
-// 获取所有轮播图（按order排序）
+// 获取所有轮播图（只返回激活状态的，按order排序）
 router.get('/', async (req, res) => {
   try {
     if (isMongoConnected()) {
-      const banners = await Banner.find().sort({ order: 1 });
+      const banners = await Banner.find({ isActive: true }).sort({ order: 1 });
       sendResponse(res, 200, banners, '轮播图列表获取成功');
     } else {
-      // 数据库连接失败，返回模拟数据
-      sendResponse(res, 200, mockBanners, '轮播图列表获取成功（模拟数据）');
+      // 数据库连接失败，返回模拟数据（只返回激活状态的）
+      const activeBanners = mockBanners.filter(banner => banner.isActive);
+      sendResponse(res, 200, activeBanners, '轮播图列表获取成功（模拟数据）');
     }
   } catch (err) {
     console.error('获取轮播图失败:', err);
     // 出错时返回模拟数据作为备用
-    sendResponse(res, 200, mockBanners, `获取轮播图失败，返回模拟数据：${err.message}`);
+    const activeBanners = mockBanners.filter(banner => banner.isActive);
+    sendResponse(res, 200, activeBanners, `获取轮播图失败，返回模拟数据：${err.message}`);
   }
 });
 

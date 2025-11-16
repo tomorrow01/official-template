@@ -101,15 +101,28 @@ export const servicesAPI = {
     console.log('创建服务返回:', response);
     return response;
   },
-  update: (id, data) => api.put(`/services/${id}`, data),
+  update: async (id, data) => {
+    const response = await api.put(`/services/${id}`, data);
+    console.log('更新服务返回:', response);
+    return response;
+  },
   delete: (id) => api.delete(`/services/${id}`)
 };
 
+// 内容管理API
 export const contentsAPI = {
   getList: () => api.get('/contents'),
   getById: (id) => api.get(`/contents/${id}`),
-  create: (data) => api.post('/contents', data),
-  update: (id, data) => api.put(`/contents/${id}`, data),
+  create: async (data) => {
+    const response = await api.post('/contents', data);
+    console.log('创建内容返回:', response);
+    return response;
+  },
+  update: async (id, data) => {
+    const response = await api.put(`/contents/${id}`, data);
+    console.log('更新内容返回:', response);
+    return response;
+  },
   delete: (id) => api.delete(`/contents/${id}`)
 };
 

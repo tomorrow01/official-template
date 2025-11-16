@@ -196,3 +196,38 @@ a:hover {
     padding: 0 var(--spacing-md);
   }
 }
+
+/* Element Plus Loading样式修复 - 强制居中对齐 */
+.el-loading-mask .el-loading-spinner {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  width: 100% !important;
+  max-width: 200px;
+  margin: 0 auto !important;
+}
+
+/* 确保loading动画居中 */
+.el-loading-spinner .circular {
+  margin: 0 auto !important;
+  display: block !important;
+}
+
+/* 确保loading文字居中 */
+.el-loading-spinner .el-loading-text {
+  white-space: nowrap !important;
+  width: auto !important;
+  text-align: center !important;
+  display: inline-block !important;
+  margin: 8px 0 0 0 !important;
+}
+
+/* 确保loading容器也居中 */
+.loading-container {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 200px;
+}

@@ -2,49 +2,8 @@
   <div class="home-container" style="margin-top: 0; padding-top: 0; position: relative;">
     <Navbar />
     
-    <!-- 英雄区域 -->
-    <section class="hero-section relative overflow-hidden" style="margin-top: -1px; padding-top: 0; top: 0; z-index: 0;">
-      <div class="absolute inset-0 z-0 overflow-hidden">
-        <img 
-          src="https://picsum.photos/id/1071/1920/1080" 
-          alt="技术创新背景" 
-          class="w-full h-full object-cover" 
-          style="transition: transform 0.7s ease; transform: scale(1);" 
-          onmouseover="this.style.transform='scale(1.1)'" 
-          onmouseout="this.style.transform='scale(1)'"
-        >
-        <div class="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40"></div>
-      </div>
-      <div class="container relative z-10 py-20 md:py-28">
-        <div class="max-w-3xl">
-          <h1 class="text-[clamp(2.5rem,5vw,4rem)] font-bold text-white leading-tight mb-6">
-            创新技术<br>
-            <span class="text-primary">引领数字化未来</span>
-          </h1>
-          <p class="text-[clamp(1rem,2vw,1.25rem)] text-white/90 mb-8 max-w-2xl">
-            我们提供全方位的技术服务和解决方案，助力企业实现数字化转型，提升核心竞争力。
-          </p>
-          <div class="flex flex-wrap gap-4">
-            <NuxtLink to="/services">
-              <el-button type="primary" class="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-full text-lg">
-                了解我们的服务
-              </el-button>
-            </NuxtLink>
-            <NuxtLink to="/cases">
-              <el-button type="default" class="bg-white/10 hover:bg-white/20 text-white border-white/30 px-8 py-3 rounded-full text-lg">
-                查看成功案例
-              </el-button>
-            </NuxtLink>
-          </div>
-        </div>
-      </div>
-      <!-- 波浪装饰 -->
-      <div class="absolute bottom-0 left-0 w-full overflow-hidden z-10">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 100" class="w-full h-auto">
-          <path fill="#ffffff" fill-opacity="1" d="M0,64L48,53.3C96,43,192,21,288,21.3C384,21,480,43,576,53.3C672,64,768,64,864,53.3C960,43,1056,21,1152,21.3C1248,21,1344,43,1392,53.3L1440,64L1440,100L1392,100C1344,100,1248,100,1152,100C1056,100,960,100,864,100C768,100,672,100,576,100C480,100,384,100,288,100C192,100,96,100,48,100L0,100Z"></path>
-        </svg>
-      </div>
-    </section>
+    <!-- 英雄区域 - 使用Banner组件替换静态图片 -->
+    <Banner :banners="banners" />
 
     <!-- 我们的优势 -->
     <section class="features-section py-12 bg-white" style="margin-bottom: 0;">
@@ -169,7 +128,7 @@
           <div style="padding: 30px; flex: 1; background-color: white;">
             <h3 style="margin-bottom: 15px; font-size: 22px; font-weight: 600;">企业数字化转型案例</h3>
             <p style="line-height: 1.6; margin-bottom: 20px; color: #333;">我们帮助一家传统制造企业实现了全面的数字化转型，通过引入智能制造系统，生产效率提升了40%，成本降低了25%。</p>
-            <NuxtLink to="/cases" style="text-decoration: none;">
+            <NuxtLink to="/cases/1" style="text-decoration: none;">
                 <button style="background: #1677ff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; box-shadow: 0 2px 8px rgba(22, 119, 255, 0.3); transition: all 0.3s ease;">了解更多</button>
               </NuxtLink>
           </div>
@@ -185,7 +144,9 @@
           <div style="padding: 30px; flex: 1; background-color: white;">
             <h3 style="margin-bottom: 15px; font-size: 22px; font-weight: 600;">电子商务平台开发案例</h3>
             <p style="line-height: 1.6; margin-bottom: 20px; color: #333;">为一家连锁零售企业打造了全渠道电子商务平台，整合线上线下业务，上线三个月内用户增长率达到200%，销售额提升35%。</p>
-            <button style="background: #1677ff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; box-shadow: 0 2px 8px rgba(22, 119, 255, 0.3); transition: all 0.3s ease;">了解更多</button>
+            <NuxtLink to="/cases/2" style="text-decoration: none;">
+              <button style="background: #1677ff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; box-shadow: 0 2px 8px rgba(22, 119, 255, 0.3); transition: all 0.3s ease;">了解更多</button>
+            </NuxtLink>
           </div>
         </div>
         
@@ -199,7 +160,9 @@
           <div style="padding: 30px; flex: 1; background-color: white;">
             <h3 style="margin-bottom: 15px; font-size: 22px; font-weight: 600;">数据智能分析系统案例</h3>
             <p style="line-height: 1.6; margin-bottom: 20px; color: #333;">为金融服务企业构建了先进的数据智能分析系统，通过大数据和人工智能技术，风险预测准确率提高了30%，决策效率提升50%。</p>
-            <button style="background: #1677ff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; box-shadow: 0 2px 8px rgba(22, 119, 255, 0.3); transition: all 0.3s ease;">了解更多</button>
+            <NuxtLink to="/cases/3" style="text-decoration: none;">
+              <button style="background: #1677ff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; box-shadow: 0 2px 8px rgba(22, 119, 255, 0.3); transition: all 0.3s ease;">了解更多</button>
+            </NuxtLink>
           </div>
         </div>
       </div>
@@ -384,14 +347,15 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 import Navbar from '@/components/Navbar.vue';
 import Footer from '@/components/Footer.vue';
+import Banner from '@/components/Banner.vue';
 import { ArrowUp } from '@element-plus/icons-vue';
-// 暂时注释掉API导入以避免可能的错误
-// import { getBannerList } from '@/api/banner';
+import { getBannerList } from '@/api/banner';
 // import { getCaseList } from '@/api/cases';
 // import { getServiceList } from '@/api/services';
 
 const services = ref([]);
 const cases = ref([]);
+const banners = ref([]);
 const latestArticles = ref([
   {
     id: '1',
@@ -420,6 +384,29 @@ const loadingCases = ref(true);
 const loadingServices = ref(true);
 const loadingArticles = ref(true);
 const error = ref(null);
+
+// 获取轮播图数据
+const fetchBanners = async () => {
+  try {
+    console.log('开始获取轮播图数据...');
+    const bannerData = await getBannerList();
+    banners.value = bannerData;
+    console.log('获取到轮播图数据:', banners.value);
+  } catch (err) {
+    console.error('获取轮播图数据失败:', err);
+    // 如果获取失败，使用静态图片作为后备
+    banners.value = [
+      {
+        id: 'fallback-1',
+        image: 'https://picsum.photos/id/1071/1920/1080',
+        link: '/',
+        title: '技术创新背景',
+        description: '我们提供全方位的技术服务和解决方案，助力企业实现数字化转型，提升核心竞争力。',
+        ctaText: '了解更多'
+      }
+    ];
+  }
+};
 
 // 获取服务数据
 const fetchServices = async () => {
@@ -769,6 +756,7 @@ const handleScroll = () => {
 
 onMounted(() => {
   // 页面加载时获取所有数据
+  fetchBanners();
   fetchCaseList();
   fetchServices();
   fetchLatestArticles();

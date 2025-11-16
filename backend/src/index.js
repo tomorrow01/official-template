@@ -12,7 +12,7 @@ const casesRouter = require('./routes/cases'); // 引入 cases 路由
 const servicesRouter = require('./routes/services'); // 引入 services 路由
 
 const app = express();
-const port = process.env.PORT || 3001; // 修改为3001端口
+const port = process.env.PORT || 3000; // 修改为3000端口以避免与前端冲突
 
 // 确保上传目录存在
 const uploadDir = path.join(__dirname, '../uploads');
