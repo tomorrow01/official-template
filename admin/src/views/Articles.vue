@@ -13,11 +13,13 @@
       element-loading-text="加载中..."
       :data="articles" 
       border
+      width="100%"
     >
-      <el-table-column prop="title" label="标题" width="300" />
-      <el-table-column prop="author" label="作者" width="120" />
-      <el-table-column prop="createTime" label="发布时间" width="180" />
-      <el-table-column prop="status" label="状态" width="80">
+      <el-table-column type="selection" width="55" />
+      <el-table-column prop="title" label="标题" min-width="300" />
+      <el-table-column prop="author" label="作者" min-width="120" />
+      <el-table-column prop="createTime" label="发布时间" min-width="180" />
+      <el-table-column prop="status" label="状态" min-width="80">
         <template #default="scope">
           <el-switch
             v-model="scope.row.status"
@@ -27,7 +29,7 @@
           />
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="150">
+      <el-table-column label="操作" width="150" fixed="right">
         <template #default="scope">
           <el-button link class="edit-btn" @click="editArticle(scope.row)">编辑</el-button>
           <el-button link class="delete-btn" @click="handleDelete(scope.row)">删除</el-button>

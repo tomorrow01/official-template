@@ -9,15 +9,18 @@
       新增服务
     </el-button>
     <el-table 
-  v-loading="loading"
-  element-loading-text="加载中..."
-  :data="services" 
-  border>
-      <el-table-column prop="title" label="服务名称" width="180" />
-      <el-table-column prop="description" label="服务描述" width="400" />
-      <el-table-column prop="icon" label="图标名称" width="150" />
-      <el-table-column prop="order" label="排序" width="100" />
-      <el-table-column prop="isActive" label="是否启用" width="100">
+      v-loading="loading"
+      element-loading-text="加载中..."
+      :data="services" 
+      border
+      width="100%"
+    >
+      <el-table-column type="selection" width="55" />
+      <el-table-column prop="title" label="服务名称" min-width="180" />
+      <el-table-column prop="description" label="服务描述" min-width="400" />
+      <el-table-column prop="icon" label="图标名称" min-width="150" />
+      <el-table-column prop="order" label="排序" min-width="100" />
+      <el-table-column prop="isActive" label="是否启用" min-width="100">
         <template #default="scope">
           <el-switch 
             v-model="scope.row.isActive" 
@@ -27,7 +30,7 @@
           />
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="150">
+      <el-table-column label="操作" width="150" fixed="right">
         <template #default="scope">
           <el-button link class="edit-btn" @click="editService(scope.row)">编辑</el-button>
           <el-button link class="delete-btn" @click="handleDelete(scope.row)">删除</el-button>

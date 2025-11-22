@@ -10,6 +10,19 @@ const api = axios.create({
   }
 });
 
+// 添加请求日志拦截器
+api.interceptors.request.use(
+  config => {
+    console.log('请求URL:', config.baseURL + config.url);
+    console.log('请求参数:', config.params || {});
+    return config;
+  },
+  error => {
+    console.error('请求错误:', error);
+    return Promise.reject(error);
+  }
+);
+
 // 请求拦截器
 api.interceptors.request.use(
   config => {
@@ -54,63 +67,76 @@ api.interceptors.response.use(
 
 // 导出API方法
 export const articlesAPI = {
-  getList: () => api.get('/articles'),
-  getById: (id) => api.get(`/articles/${id}`),
-  create: (data) => api.post('/articles', data),
-  update: (id, data) => api.put(`/articles/${id}`, data),
-  delete: (id) => api.delete(`/articles/${id}`)
+  getList: () => api.get('/api/articles'),
+  getById: (id) => api.get(`/api/articles/${id}`),
+  create: (data) => api.post('/api/articles', data),
+  update: (id, data) => api.put(`/api/articles/${id}`, data),
+  delete: (id) => api.delete(`/api/articles/${id}`)
 };
 
 export const bannersAPI = {
-  getList: () => api.get('/banners'),
-  getById: (id) => api.get(`/banners/${id}`),
+  getList: () => api.get('/api/banners'),
+  getById: (id) => api.get(`/api/banners/${id}`),
   create: async (data) => {
-    const response = await api.post('/banners', data);
+    const response = await api.post('/api/banners', data);
     console.log('创建轮播图返回:', response);
     return response;
   },
   update: async (id, data) => {
-    const response = await api.put(`/banners/${id}`, data);
+    const response = await api.put(`/api/banners/${id}`, data);
     console.log('更新轮播图返回:', response);
     return response;
   },
-  delete: (id) => api.delete(`/banners/${id}`)
+  delete: (id) => api.delete(`/api/banners/${id}`)
 };
 
 export const casesAPI = {
-  getList: () => api.get('/cases'),
-  getById: (id) => api.get(`/cases/${id}`),
+  getList: () => api.get('/api/cases'),
+  getById: (id) => api.get(`/api/cases/${id}`),
   create: async (data) => {
-    const response = await api.post('/cases', data);
+    const response = await api.post('/api/cases', data);
     console.log('创建案例返回:', response);
     return response;
   },
   update: async (id, data) => {
-    const response = await api.put(`/cases/${id}`, data);
+    const response = await api.put(`/api/cases/${id}`, data);
     console.log('更新案例返回:', response);
     return response;
   },
-  delete: (id) => api.delete(`/cases/${id}`)
+  delete: (id) => api.delete(`/api/cases/${id}`)
 };
 
 export const servicesAPI = {
-  getList: () => api.get('/services'),
-  getById: (id) => api.get(`/services/${id}`),
+  getList: () => api.get('/api/services'),
+  getById: (id) => api.get(`/api/services/${id}`),
   create: async (data) => {
-    const response = await api.post('/services', data);
+    const response = await api.post('/api/services', data);
     console.log('创建服务返回:', response);
     return response;
   },
-  update: (id, data) => api.put(`/services/${id}`, data),
-  delete: (id) => api.delete(`/services/${id}`)
+  update: (id, data) => api.put(`/api/services/${id}`, data),
+  delete: (id) => api.delete(`/api/services/${id}`)
 };
 
 export const contentsAPI = {
-  getList: () => api.get('/contents'),
-  getById: (id) => api.get(`/contents/${id}`),
-  create: (data) => api.post('/contents', data),
-  update: (id, data) => api.put(`/contents/${id}`, data),
-  delete: (id) => api.delete(`/contents/${id}`)
+  getList: () => api.get('/api/contents'),
+  getById: (id) => api.get(`/api/contents/${id}`),
+  create: (data) => api.post('/api/contents', data),
+  update: (id, data) => api.put(`/api/contents/${id}`, data),
+  delete: (id) => api.delete(`/api/contents/${id}`)
+};
+
+export const contactsAPI = {
+  getList: (params) => api.get('/api/contacts', { params }),
+  update: (id, data) => api.put(`/api/contacts/${id}`, data),
+  delete: (id) => api.delete(`/api/contacts/${id}`)
+};
+
+export const configsAPI = {
+  getList: () => api.get('/api/configs'),
+  getById: (id) => api.get(`/api/configs/${id}`),
+  update: (id, data) => api.put(`/api/configs/${id}`, data),
+  getByKey: (key) => api.get(`/api/configs/key/${key}`)
 };
 
 export default api;

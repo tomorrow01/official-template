@@ -1,6 +1,5 @@
 <template>
   <div class="about-page">
-    <Navbar />
     <!-- 页面标题 -->
     <div class="page-header">
       <div class="container">
@@ -15,8 +14,8 @@
         <div class="intro-content">
           <div class="intro-text">
             <h2 class="section-title">公司简介</h2>
-            <p>我们是一家专注于前端开发和内容管理系统解决方案的高科技企业，致力于为客户提供高质量、高性能的Web应用和数字体验。</p>
-            <p>自成立以来，我们始终坚持技术创新和客户至上的理念，不断提升服务质量和技术水平，已成功为数百个客户提供了专业的Web开发服务。</p>
+            <p>{{ configs.companyIntro }}</p>
+            <p>{{ configs.companyDetail }}</p>
           </div>
           <div class="intro-image">
             <img src="/images/case1.jpg" alt="公司办公环境" class="company-img">
@@ -33,21 +32,21 @@
             <el-icon><Star /></el-icon>
           </div>
           <h3 class="mission-title">我们的使命</h3>
-          <p class="mission-desc">通过技术创新，赋能企业数字化转型，为客户创造更大价值。</p>
+          <p class="mission-desc">{{ configs.mission }}</p>
         </div>
         <div class="mission-card">
           <div class="mission-icon">
             <el-icon><Star /></el-icon>
           </div>
           <h3 class="mission-title">我们的愿景</h3>
-          <p class="mission-desc">成为行业领先的Web应用解决方案提供商，引领技术发展潮流。</p>
+          <p class="mission-desc">{{ configs.vision }}</p>
         </div>
         <div class="mission-card">
           <div class="mission-icon">
             <el-icon><Star /></el-icon>
           </div>
           <h3 class="mission-title">我们的价值观</h3>
-          <p class="mission-desc">诚信、创新、协作、卓越，始终以客户需求为中心。</p>
+          <p class="mission-desc">{{ configs.values }}</p>
         </div>
       </div>
     </div>
@@ -58,25 +57,10 @@
         <h2 class="section-title">专业团队</h2>
         <p class="section-subtitle">我们拥有一支经验丰富、技术精湛的专业团队</p>
         <div class="team-grid">
-          <div class="team-member">
-            <img src="/images/banner1.jpg" alt="团队成员" class="team-img">
-            <h3 class="team-name">张三</h3>
-            <p class="team-role">技术总监</p>
-          </div>
-          <div class="team-member">
-            <img src="/images/banner2.jpg" alt="团队成员" class="team-img">
-            <h3 class="team-name">李四</h3>
-            <p class="team-role">产品经理</p>
-          </div>
-          <div class="team-member">
-            <img src="/images/case2.jpg" alt="团队成员" class="team-img">
-            <h3 class="team-name">王五</h3>
-            <p class="team-role">UI设计师</p>
-          </div>
-          <div class="team-member">
-            <img src="/images/logo.png" alt="团队成员" class="team-img">
-            <h3 class="team-name">赵六</h3>
-            <p class="team-role">前端开发工程师</p>
+          <div v-for="(member, index) in configs.teamMembers" :key="index" class="team-member">
+            <img :src="member.image || '/images/logo.png'" alt="团队成员" class="team-img">
+            <h3 class="team-name">{{ member.name || '未知' }}</h3>
+            <p class="team-role">{{ member.role || '未知职位' }}</p>
           </div>
         </div>
       </div>
@@ -89,6 +73,70 @@
 import { Star } from '@element-plus/icons-vue';
 import Footer from '@/components/Footer.vue';
 import Navbar from '@/components/Navbar.vue';
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
+
+// 配置数据
+const configs = ref({
+  companyIntro: '我们是一家专注于前端开发和内容管理系统解决方案的高科技企业，致力于为客户提供高质量、高性能的Web应用和数字体验。',
+  companyDetail: '自成立以来，我们始终坚持技术创新和客户至上的理念，不断提升服务质量和技术水平，已成功为数百个客户提供了专业的Web开发服务。',
+  mission: '通过技术创新，赋能企业数字化转型，为客户创造更大价值。',
+  vision: '成为行业领先的Web应用解决方案提供商，引领技术发展潮流。',
+  values: '诚信、创新、协作、卓越，始终以客户需求为中心。',
+  teamMembers: [
+    { name: '张三', role: '技术总监', image: '/images/banner1.jpg' },
+    { name: '李四', role: '产品经理', image: '/images/banner2.jpg' },
+    { name: '王五', role: 'UI设计师', image: '/images/case2.jpg' },
+    { name: '赵六', role: '前端开发工程师', image: '/images/logo.png' }
+  ]
+});
+
+// 获取配置数据
+async function fetchConfigs() {
+  try {
+    // 获取所有配置
+    const response = await axios.get('http://localhost:3001/api/configs');
+    if (response.data.code === 200 && response.data.data) {
+      response.data.data.forEach(config => {
+        switch (config.key) {
+          case 'about_company':
+            configs.value.companyIntro = config.value || configs.value.companyIntro;
+            break;
+          case 'about_company_detail':
+            configs.value.companyDetail = config.value || configs.value.companyDetail;
+            break;
+          case 'company_mission':
+            configs.value.mission = config.value || configs.value.mission;
+            break;
+          case 'company_vision':
+            configs.value.vision = config.value || configs.value.vision;
+            break;
+          case 'company_values':
+            configs.value.values = config.value || configs.value.values;
+            break;
+          case 'team_members':
+            try {
+              const members = JSON.parse(config.value);
+              if (Array.isArray(members)) {
+                configs.value.teamMembers = members;
+              }
+            } catch (e) {
+              console.error('解析团队成员数据失败:', e);
+            }
+            break;
+        }
+      });
+    }
+  } catch (error) {
+    console.error('获取配置数据失败:', error);
+    // 失败时使用默认数据
+  }
+}
+
+// 页面加载时获取配置
+onMounted(() => {
+  fetchConfigs();
+});
 </script>
 
 <style scoped>
@@ -99,7 +147,7 @@ import Navbar from '@/components/Navbar.vue';
 .page-header {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 80px 0;
+  padding: 100px 0;
   text-align: center;
 }
 

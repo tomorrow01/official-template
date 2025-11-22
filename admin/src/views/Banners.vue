@@ -13,8 +13,10 @@
       element-loading-text="加载中..."
       :data="banners" 
       border
+      width="100%"
     >
-      <el-table-column prop="imageUrl" label="轮播图" width="180">
+      <el-table-column type="selection" width="55" />
+      <el-table-column prop="imageUrl" label="轮播图" min-width="180">
         <template #default="scope">
           <el-image 
             :src="scope.row.imageUrl || scope.row.image" 
@@ -24,9 +26,9 @@
           />
         </template>
       </el-table-column>
-      <el-table-column prop="link" label="链接地址" width="250" />
-      <el-table-column prop="order" label="排序" width="80" />
-      <el-table-column prop="isActive" label="状态" width="80">
+      <el-table-column prop="link" label="链接地址" min-width="250" />
+      <el-table-column prop="order" label="排序" min-width="80" />
+      <el-table-column prop="isActive" label="状态" min-width="80">
         <template #default="scope">
           <el-switch
             v-model="scope.row.isActive"
@@ -36,7 +38,7 @@
           />
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="150">
+      <el-table-column label="操作" width="150" fixed="right">
         <template #default="scope">
           <el-button link class="edit-btn" @click="editBanner(scope.row)">编辑</el-button>
           <el-button link class="delete-btn" @click="handleDelete(scope.row)">删除</el-button>

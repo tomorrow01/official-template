@@ -1,9 +1,7 @@
 <template>
-  <div class="home-container" style="margin-top: 0; padding-top: 0; position: relative;">
-    <Navbar />
-    
+  <div class="home-container">
     <!-- 英雄区域 -->
-    <section class="hero-section relative overflow-hidden" style="margin-top: -1px; padding-top: 0; top: 0; z-index: 0;">
+    <section class="hero-section relative overflow-hidden" style="z-index: 0;">
       <div class="absolute inset-0 z-0 overflow-hidden">
         <img 
           src="https://picsum.photos/id/1071/1920/1080" 
@@ -878,20 +876,32 @@ onUnmounted(() => {
 .cases-section,
 .latest-articles,
 .team-section {
-  padding: 6rem 0;
+  padding: 4rem 0; /* 减少默认padding以缩小缝隙 */
   position: relative;
 }
 
+/* 移除顶部边框以消除视觉缝隙 */
 .services-section,
 .cases-section,
 .latest-articles,
 .team-section {
-  border-top: 1px solid var(--border-light);
+  border-top: none;
+}
+
+/* 响应式优化 - 进一步减少移动端的padding */
+@media (max-width: 768px) {
+  .features-section,
+  .services-section,
+  .cases-section,
+  .latest-articles,
+  .team-section {
+    padding: 3rem 0;
+  }
 }
 
 /* 优化英雄区域 */
 .hero-section {
-  padding: 8rem 0;
+  padding: 0 0 8rem 0;
 }
 
 /* 数据统计区域优化 */

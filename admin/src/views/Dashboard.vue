@@ -1,113 +1,223 @@
 <template>
-  <div class="dashboard-wrapper h-screen overflow-hidden">
-    <el-container class="h-full">
+  <div class="dashboard-wrapper">
+    <!-- 顶部导航栏 -->
+    <div class="top-nav">
+      <div class="nav-left">
+        <div class="logo">
+          <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
+          </svg>
+          <h1>管理后台</h1>
+        </div>
+      </div>
+      <div class="nav-right">
+        <div class="user-info">
+          <el-avatar size="small" icon="el-icon-user" class="mr-2"></el-avatar>
+          <span>{{ currentUser.username }}</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 主要内容区域 -->
+    <div class="main-container">
       <!-- 左侧导航条 -->
-      <el-aside width="220px" class="border-r">
+      <div class="sidebar">
         <div class="nav-header flex items-center justify-center py-5 text-white font-bold text-xl">
-          管理控制台
+          功能导航
         </div>
         <el-menu 
-          default-active="/dashboard/articles" 
+          default-active="/dashboard/config" 
           router 
-          class="h-full nav-menu"
+          class="nav-menu"
           background-color="#2c3e50"
           text-color="#fff"
           active-text-color="#409eff"
         >
+          <el-menu-item index="/dashboard/config">基础配置管理</el-menu-item>
           <el-menu-item index="/dashboard/articles">文章管理</el-menu-item>
           <el-menu-item index="/dashboard/banners">轮播图管理</el-menu-item>
           <el-menu-item index="/dashboard/content">内容管理</el-menu-item>
           <el-menu-item index="/dashboard/services">服务管理</el-menu-item>
           <el-menu-item index="/dashboard/cases">案例管理</el-menu-item>
+          <el-menu-item index="/dashboard/latest-news">最新动态管理</el-menu-item>
+          <el-menu-item index="/dashboard/contacts">联系我们管理</el-menu-item>
         </el-menu>
-      </el-aside>
+      </div>
 
       <!-- 右侧内容区 -->
-      <el-container class="h-full flex flex-col">
-        <el-header class="bg-container border-b py-4 px-6 flex justify-between items-center flex-shrink-0">
-          <div>
-            <h1 class="text-2xl font-bold text-primary">后台管理系统</h1>
-            <!-- 欢迎登录模块 -->
-            <div class="welcome-message mt-1 text-gray-600">
-              欢迎回来，{{ currentUser.username }}！
-            </div>
+      <div class="content-area">
+        <div class="content-header">
+          <div class="welcome-message text-gray-600">
+            欢迎回来，{{ currentUser.username }}！
           </div>
-          <!-- 主题切换下拉 -->
-          <el-select 
-            v-model="currentTheme" 
-            placeholder="选择主题"
-            @change="switchTheme"
-            class="w-40"
-          >
-            <el-option label="默认蓝" value="default"></el-option>
-            <el-option label="深主题" value="dark"></el-option>
-            <el-option label="清新绿" value="green"></el-option>
-          </el-select>
-        </el-header>
-        <el-main class="p-6 bg-container">
-          <router-view />
-        </el-main>
-      </el-container>
-    </el-container>
+        </div>
+        <div class="content-main">
+          <div class="router-view-container">
+            <router-view />
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 页脚 -->
+    <div class="footer">
+      <div>© 2023 管理后台系统. All rights reserved.</div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, onMounted, computed } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 
-// 主题管理
-const currentTheme = ref(localStorage.getItem('admin-theme') || 'default');
+
 const router = useRouter();
+const route = useRoute();
 
 // 用户信息管理
 const currentUser = ref(JSON.parse(localStorage.getItem('admin-user')) || { username: '管理员' });
-
-// 切换主题
-const switchTheme = (theme) => {
-  document.documentElement.className = `theme-${theme}`;
-  localStorage.setItem('admin-theme', theme);
-};
-
 onMounted(() => {
-  switchTheme(currentTheme.value);
+  // 移除主题相关的类名，确保使用默认主题
+  document.documentElement.className = '';
+  // 清除本地存储中的主题设置
+  localStorage.removeItem('admin-theme');
 });
 </script>
 
 <style scoped>
+/* 整体布局 */
 .dashboard-wrapper {
-  max-width: 1600px;
-  margin: 0 auto;
-  padding: 0;
-  height: 100vh;
   width: 100%;
-  background-color: #f5f7fa;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-/* 确保容器撑满高度 */
-.el-container {
-  height: 100%;
-  background-color: transparent !important;
+/* 顶部导航栏样式 */
+.top-nav {
+  height: 60px;
+  background-color: #409eff;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 100;
 }
 
-.el-aside {
-  border-right: 2px solid #34495e;
+.nav-left .logo {
+  display: flex;
+  align-items: center;
+}
+
+.nav-left .logo svg {
+  margin-right: 10px;
+  color: #fff;
+}
+
+.nav-left h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.nav-right .user-info {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+}
+
+.nav-right .user-info .el-avatar {
+  margin-right: 8px;
+}
+
+.nav-right .user-info span {
+  color: #fff;
+  font-weight: 500;
+}
+
+/* 主容器 */
+.main-container {
+  flex: 1;
+  display: flex;
+  height: calc(100vh - 60px - 40px); /* 减去顶部导航和底部页脚的高度 */
+  overflow: hidden;
+}
+
+/* 侧边栏 */
+.sidebar {
+  width: 220px;
   background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  border-right: 2px solid #34495e;
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
-  height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 内容区域 */
+.content-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #f5f7fa;
+  overflow: hidden;
+}
+
+/* 内容头部 */
+.content-header {
+  height: 50px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  background-color: #fafafa;
+  border-bottom: 1px solid #e0e0e0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.welcome-message {
+  font-size: 14px;
+  color: #606266;
+}
+
+/* 内容主体 */
+.content-main {
+  flex: 1;
+  padding: 20px;
   overflow-y: auto;
 }
 
+/* 页脚 */
+.footer {
+  height: 40px;
+  background-color: #fafafa;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: #606266;
+}
+
+/* 侧边栏头部 */
 .nav-header {
   background: #34495e;
   border-bottom: 1px solid #1a2530;
-  font-size: 1.5rem; /* text-xl 对应的实际像素值 */
+  font-size: 18px;
   font-weight: bold;
   color: white;
 }
 
+/* 导航菜单 */
 .nav-menu {
   border-right: none !important;
+  flex: 1;
+  overflow-y: auto;
 }
 
 /* 导航项美化 */
@@ -131,20 +241,13 @@ onMounted(() => {
   font-weight: 500;
 }
 
-.el-header {
-  border-bottom: 1px solid #e0e0e0;
-  background: #fafafa;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.el-main {
-  overflow-y: auto;
-  border-radius: 8px;
-  margin: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+/* 路由视图容器 */
+.router-view-container {
   background: white;
-  flex: 1;
-  min-height: 0;
+  border-radius: 8px;
+  padding: 20px;
+  min-height: 100%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 /* 现代简约字体 */
@@ -152,25 +255,5 @@ body {
   font-family: 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   font-weight: 400;
   background-color: #f5f7fa;
-}
-
-.text-primary {
-  color: #409eff;
-}
-
-.text-gray-600 {
-  color: #606266;
-}
-
-.mt-1 {
-  margin-top: 4px;
-}
-
-.space-x-4 {
-  gap: 16px;
-}
-
-.cursor-pointer {
-  cursor: pointer;
 }
 </style>

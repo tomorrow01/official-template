@@ -1,6 +1,5 @@
 <template>
   <div class="contact-page">
-    <Navbar />
     <!-- 页面标题 -->
     <div class="page-header">
       <div class="container">
@@ -91,9 +90,9 @@
               <el-form-item label="主题" prop="subject">
                 <el-input v-model="formData.subject" placeholder="请输入消息主题" />
               </el-form-item>
-              <el-form-item label="内容" prop="message">
+              <el-form-item label="内容" prop="content">
                 <el-input
-                  v-model="formData.message"
+                  v-model="formData.content"
                   type="textarea"
                   placeholder="请输入您的消息内容"
                   :rows="5"
@@ -128,6 +127,7 @@ import { Location, Phone, Message, Clock } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
 import Footer from '@/components/Footer.vue';
 import Navbar from '@/components/Navbar.vue';
+import contactService from '@/api/contacts';
 
 // 表单数据
 const formData = reactive({
@@ -135,7 +135,7 @@ const formData = reactive({
   email: '',
   phone: '',
   subject: '',
-  message: ''
+  content: ''
 });
 
 // 表单验证规则
@@ -156,7 +156,7 @@ const formRules = {
     { required: true, message: '请输入消息主题', trigger: 'blur' },
     { min: 2, max: 50, message: '主题长度在 2 到 50 个字符之间', trigger: 'blur' }
   ],
-  message: [
+  content: [
     { required: true, message: '请输入消息内容', trigger: 'blur' },
     { min: 10, max: 500, message: '内容长度在 10 到 500 个字符之间', trigger: 'blur' }
   ]
@@ -173,21 +173,23 @@ const submitForm = async () => {
     await formRef.value.validate();
     submitting.value = true;
     
-    // 模拟表单提交
-    console.log('提交表单数据:', formData);
+    // 调用API提交表单
+    await contactService.submitContactForm(formData);
     
-    // 模拟网络请求延迟
-    setTimeout(() => {
-      submitting.value = false;
-      
-      // 显示成功消息
-      ElMessage.success('表单提交成功，我们将尽快与您联系！');
-      
-      // 重置表单
-      resetForm();
-    }, 1500);
+    // 确认数据已正确提交
+    console.log('表单数据已提交:', formData);
+    
+    submitting.value = false;
+    
+    // 显示成功消息
+    ElMessage.success('表单提交成功，我们将尽快与您联系！');
+    
+    // 重置表单
+    resetForm();
   } catch (error) {
-    console.error('表单验证失败:', error);
+    submitting.value = false;
+    console.error('表单提交失败:', error);
+    // 错误消息会在API请求拦截器中自动显示
   }
 };
 
@@ -207,7 +209,7 @@ const resetForm = () => {
 .page-header {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 80px 0;
+  padding: 100px 0;
   text-align: center;
 }
 

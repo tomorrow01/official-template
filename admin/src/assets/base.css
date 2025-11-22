@@ -14,38 +14,12 @@
   --danger-light: #fff1f0;       /* 危险浅红背景 */
 }
 
-/* 深主题变量覆盖 */
-.theme-dark {
-  --primary-color: #409eff;
-  --primary-light: #303133;
-  --text-primary: #ffffff;
-  --text-secondary: #c0c4cc;
-  --bg-base: #1f2d3d;
-  --bg-container: #303133;
-  --border-color: #484848;
-  --shadow-light: 0 2px 8px rgba(0,0,0,0.15);
-}
 
-/* 绿主题变量覆盖 */
-.theme-green {
-  --primary-color: #52c41a;
-  --primary-light: #f6ffed;
-  --text-primary: #232f21;
-  --text-secondary: #597053;
-  --bg-base: #f0f9eb;
-  --bg-container: #ffffff;
-  --border-color: #e1f3d8;
-}
 
 body {
   color: var(--text-primary);
   background: var(--bg-base);
   min-height: 100vh;
-  color: var(--color-text);
-  background: var(--color-background);
-  transition:
-    color 0.5s,
-    background-color 0.5s;
   line-height: 1.6;
   font-family:
     Inter,

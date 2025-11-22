@@ -13,8 +13,10 @@
       element-loading-text="加载中..."
       :data="cases" 
       border
+      width="100%"
     >
-      <el-table-column prop="image" label="案例图片" width="200">
+      <el-table-column type="selection" width="55" />
+      <el-table-column prop="image" label="案例图片" min-width="200">
         <template #default="scope">
           <el-image 
             :src="scope.row.image" 
@@ -23,10 +25,10 @@
           />
         </template>
       </el-table-column>
-      <el-table-column prop="title" label="案例标题" width="200" />
-      <el-table-column prop="description" label="案例描述" width="300" />
-      <el-table-column prop="order" label="排序" width="100" />
-      <el-table-column prop="isActive" label="是否启用" width="100">
+      <el-table-column prop="title" label="案例标题" min-width="200" />
+      <el-table-column prop="description" label="案例描述" min-width="300" />
+      <el-table-column prop="order" label="排序" min-width="100" />
+      <el-table-column prop="isActive" label="是否启用" min-width="100">
         <template #default="scope">
           <el-switch 
             v-model="scope.row.isActive" 
@@ -36,7 +38,7 @@
           />
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="150">
+      <el-table-column label="操作" width="150" fixed="right">
         <template #default="scope">
           <el-button link class="edit-btn" @click="editCase(scope.row)">编辑</el-button>
           <el-button link class="delete-btn" @click="handleDelete(scope.row)">删除</el-button>

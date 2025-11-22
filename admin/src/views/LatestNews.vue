@@ -1,37 +1,36 @@
 <template>
   <div>
-    <h2 class="text-xl font-bold mb-4">内容管理</h2>
+    <h2 class="text-xl font-bold mb-4">最新动态管理</h2>
     <el-button 
       type="primary" 
       @click="showDialog = true" 
       class="mb-4"
     >
-      新增内容
+      新增动态
     </el-button>
     <el-table 
       v-loading="loading"
       element-loading-text="加载中..."
-      :data="contents" 
+      :data="newsList" 
       border
       width="100%"
     >
       <el-table-column type="selection" width="55" />
-      <el-table-column prop="title" label="内容标题" min-width="200" />
-      <el-table-column prop="type" label="内容类型" min-width="120" />
-      <el-table-column prop="status" label="状态" min-width="100">
+      <el-table-column prop="title" label="标题" min-width="300" />
+      <el-table-column prop="createTime" label="发布时间" min-width="180" />
+      <el-table-column prop="status" label="状态" min-width="80">
         <template #default="scope">
-          <!-- 动态绑定状态类，区分发布/草稿颜色 -->
-          <el-tag 
-            :class="scope.row.status === '发布' ? 'primary-tag' : 'secondary-tag'"
-          >
-            {{ scope.row.status }}
-          </el-tag>
+          <el-switch
+            v-model="scope.row.status"
+            active-color="var(--success-color)"
+            inactive-color="var(--danger-color)"
+            @change="toggleStatus(scope.row)"
+          />
         </template>
       </el-table-column>
-      <el-table-column prop="updateTime" label="更新时间" min-width="180" />
       <el-table-column label="操作" width="150" fixed="right">
         <template #default="scope">
-          <el-button link class="edit-btn" @click="editContent(scope.row)">编辑</el-button>
+          <el-button link class="edit-btn" @click="editNews(scope.row)">编辑</el-button>
           <el-button link class="delete-btn" @click="handleDelete(scope.row)">删除</el-button>
         </template>
       </el-table-column>
@@ -40,32 +39,26 @@
     <!-- 新增/编辑对话框 -->
     <el-dialog 
       v-model="showDialog" 
-      :title="currentId ? '编辑内容' : '新增内容'" 
+      :title="currentId ? '编辑动态' : '新增动态'" 
       width="50%"
     >
       <el-form :model="form" :rules="rules" ref="formRef">
         <el-form-item label="标题" prop="title">
-          <el-input v-model="form.title" placeholder="请输入内容标题" />
+          <el-input v-model="form.title" placeholder="请输入动态标题" />
         </el-form-item>
-        <el-form-item label="类型" prop="type">
-          <el-select v-model="form.type" placeholder="请选择类型">
-            <el-option label="公告" value="公告" />
-            <el-option label="规则" value="规则" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="状态" prop="status">
-          <el-select v-model="form.status" placeholder="请选择状态">
-            <el-option label="发布" value="发布" />
-            <el-option label="草稿" value="草稿" />
-          </el-select>
+        <el-form-item label="作者" prop="author">
+          <el-input v-model="form.author" placeholder="请输入作者名称" />
         </el-form-item>
         <el-form-item label="内容" prop="content">
           <el-input 
             v-model="form.content" 
             type="textarea" 
             :rows="6"
-            placeholder="请输入内容详情"
+            placeholder="请输入动态内容"
           />
+        </el-form-item>
+        <el-form-item label="图片链接" prop="image">
+          <el-input v-model="form.image" placeholder="请输入图片URL" />
         </el-form-item>
         <el-form-item label="排序" prop="sort">
           <el-input v-model.number="form.sort" placeholder="数值越小越靠前" />
@@ -82,42 +75,41 @@
 <script setup>
 import { ref, onMounted, nextTick } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
-import { contentsAPI } from '../utils/api';
+import { articlesAPI } from '../utils/api';
 
 // 表格数据
-const contents = ref([]);
+const newsList = ref([]);
 const loading = ref(false);
 
 // 对话框状态管理
 const showDialog = ref(false);
 const form = ref({ 
   title: '', 
-  type: '', 
-  status: '',
+  author: '', 
   content: '',
-  sort: 0
+  image: '',
+  sort: 0,
+  status: true
 });
-const currentId = ref(null); // 当前编辑的内容ID
+const currentId = ref(null); // 当前编辑的动态ID
 const formRef = ref(null);
 
 // 表单验证规则
 const rules = ref({
   title: [{ required: true, message: '请输入标题', trigger: 'blur' }],
-  type: [{ required: true, message: '请选择类型', trigger: 'change' }],
-  status: [{ required: true, message: '请选择状态', trigger: 'change' }],
   content: [{ required: true, message: '请输入内容', trigger: 'blur' }]
 });
 
-// 加载内容列表
-const loadContents = async () => {
+// 加载最新动态列表
+const loadNewsList = async () => {
   try {
     loading.value = true;
-    const response = await contentsAPI.getList();
+    const response = await articlesAPI.getList();
     // 后端返回的数据结构是{code, data, error}，需要提取data字段
-    contents.value = response.data || [];
+    newsList.value = response.data || [];
   } catch (error) {
-    ElMessage.error('加载内容列表失败');
-    console.error('Failed to load contents:', error);
+    ElMessage.error('加载最新动态列表失败');
+    console.error('Failed to load news:', error);
   } finally {
     loading.value = false;
   }
@@ -128,56 +120,81 @@ const handleSubmit = async () => {
   try {
     // 表单验证
     await nextTick();
-    if (!form.value.title || !form.value.type || !form.value.status || !form.value.content) {
+    if (!form.value.title || !form.value.content) {
       ElMessage.error('请填写完整信息');
       return;
     }
 
+    console.log('准备提交动态数据:', form.value);
+    
     if (currentId.value) {
       // 编辑：更新现有数据
-      await contentsAPI.update(currentId.value, form.value);
+      console.log('执行更新操作，ID:', currentId.value);
+      const updateResponse = await articlesAPI.update(currentId.value, form.value);
+      console.log('更新响应:', updateResponse);
       ElMessage.success('编辑成功');
     } else {
       // 新增：添加新数据
-      await contentsAPI.create(form.value);
+      console.log('执行新增操作');
+      const createResponse = await articlesAPI.create(form.value);
+      console.log('新增响应:', createResponse);
       ElMessage.success('新增成功');
     }
 
     // 重置对话框状态并重新加载列表
     resetForm();
-    loadContents();
+    loadNewsList();
   } catch (error) {
+    console.error('提交失败详情:', error);
+    if (error.response) {
+      console.error('响应状态:', error.response.status);
+      console.error('响应数据:', error.response.data);
+    }
     ElMessage.error('操作失败');
-    console.error('Failed to submit content:', error);
   }
 };
 
-// 编辑内容（填充表单数据）
-const editContent = (row) => {
+// 编辑动态（填充表单数据）
+const editNews = (row) => {
   showDialog.value = true;
   form.value = {
     title: row.title,
-    type: row.type,
-    status: row.status,
+    author: row.author || '',
     content: row.content || '',
-    sort: row.sort || 0
+    image: row.image || '',
+    sort: row.sort || 0,
+    status: row.status !== undefined ? row.status : true
   };
   // MongoDB使用_id作为唯一标识，但也可能有id字段
   currentId.value = row._id || row.id;
-  console.log('编辑内容ID:', currentId.value);
+  console.log('编辑动态ID:', currentId.value);
 };
 
-// 删除内容（带确认对话框）
+// 删除动态（带确认对话框）
 const handleDelete = async (row) => {
   try {
-    await ElMessageBox.confirm('确定删除该内容？', '提示', { type: 'warning' });
+    await ElMessageBox.confirm('确定删除该动态？', '提示', { type: 'warning' });
     const deleteId = row._id || row.id;
-    console.log('删除内容ID:', deleteId);
-    await contentsAPI.delete(deleteId);
+    console.log('删除动态ID:', deleteId);
+    await articlesAPI.delete(deleteId);
     ElMessage.success('删除成功');
-    loadContents(); // 重新加载列表
+    loadNewsList(); // 重新加载列表
   } catch (err) {
     if (err !== 'cancel') ElMessage.error('删除失败');
+  }
+};
+
+// 切换动态状态
+const toggleStatus = async (row) => {
+  try {
+    const updateId = row._id || row.id;
+    console.log('更新状态ID:', updateId);
+    await articlesAPI.update(updateId, { status: row.status });
+    ElMessage.success('状态更新成功');
+  } catch (error) {
+    ElMessage.error('状态更新失败');
+    // 回滚状态
+    row.status = !row.status;
   }
 };
 
@@ -186,17 +203,18 @@ const resetForm = () => {
   showDialog.value = false;
   form.value = { 
     title: '', 
-    type: '', 
-    status: '',
+    author: '', 
     content: '',
-    sort: 0
+    image: '',
+    sort: 0,
+    status: true
   };
   currentId.value = null;
 };
 
 // 初始加载
 onMounted(() => {
-  loadContents();
+  loadNewsList();
 });
 </script>
 
@@ -205,27 +223,13 @@ onMounted(() => {
   font-size: 1.25rem;
   font-weight: 600;
   margin-bottom: 1rem;
-  color: var(--text-primary); /* 使用全局变量 */
+  color: var(--text-primary); /* 同步主题色 */
 }
 
 .el-table {
-  border: 1px solid var(--border-color); /* 使用全局变量 */
+  border: 1px solid var(--border-color); /* 同步主题边框色 */
   border-radius: 8px;
   overflow: hidden;
-}
-
-/* 发布状态标签样式（使用主题主色） */
-.primary-tag {
-  background-color: var(--primary-light);
-  color: var(--primary-color);
-  border: none;
-}
-
-/* 草稿状态标签样式（使用次文字色） */
-.secondary-tag {
-  background-color: var(--bg-base);
-  color: var(--text-secondary);
-  border: 1px solid var(--border-color);
 }
 
 /* 编辑按钮（绿色） */
@@ -236,19 +240,5 @@ onMounted(() => {
 /* 删除按钮（红色） */
 .delete-btn {
   color: var(--danger-color);
-}
-
-/* 发布状态标签（成功绿色） */
-.primary-tag {
-  background-color: var(--success-light);
-  color: var(--success-color);
-  border: none;
-}
-
-/* 草稿状态标签（危险红色） */
-.secondary-tag {
-  background-color: var(--danger-light);
-  color: var(--danger-color);
-  border: 1px solid var(--danger-light);
 }
 </style>

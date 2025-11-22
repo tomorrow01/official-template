@@ -224,7 +224,7 @@ export default {
 .page-header {
   background: linear-gradient(135deg, #1677ff 0%, #0c56d0 100%);
   color: white;
-  padding: 60px 0;
+  padding: 100px 0;
   text-align: center;
 }
 
@@ -479,7 +479,7 @@ export default {
 /* 响应式设计 */
 @media (max-width: 768px) {
   .page-header {
-    padding: 40px 0;
+    padding: 0 0 40px 0;
   }
   
   .page-header h1 {

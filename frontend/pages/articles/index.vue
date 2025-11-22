@@ -1,7 +1,5 @@
 <template>
   <div class="articles-page">
-    <Navbar />
-    
     <!-- 页面标题 -->
     <div class="page-header">
       <div class="container">
@@ -184,7 +182,7 @@ onMounted(() => {
 
 .page-header {
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  padding: 60px 0;
+  padding: 100px 0;
   text-align: center;
   margin-bottom: 40px;
 }

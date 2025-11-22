@@ -4,6 +4,8 @@ import Dashboard from '../views/Dashboard.vue'  // 新增：导入后台主页
 import Articles from '../views/Articles.vue'    // 新增：文章管理页
 import Banners from '../views/Banners.vue'      // 新增：轮播图管理页
 import Content from '../views/Content.vue'      // 新增：内容管理页
+import LatestNews from '../views/LatestNews.vue' // 新增：最新动态管理页
+import ConfigManagement from '../views/ConfigManagement.vue'  // 新增：配置管理页
 
 const routes = [
   { path: '/', redirect: '/login' },
@@ -13,11 +15,14 @@ const routes = [
     path: '/dashboard', 
     component: Dashboard,
     children: [
+      { path: 'config', component: ConfigManagement },  // 新增：配置管理路由
       { path: 'articles', component: Articles },   // 文章管理
       { path: 'banners', component: Banners },     // 轮播图管理
-      { path: 'content', component: Content },      // 内容管理
+      { path: 'content', component: Content },     // 内容管理
       { path: 'services', component: () => import('../views/Services.vue') },     // 服务管理
-      { path: 'cases', component: () => import('../views/Cases.vue') }           // 案例管理
+      { path: 'cases', component: () => import('../views/Cases.vue') },           // 案例管理
+      { path: 'latest-news', component: LatestNews },                             // 最新动态管理
+      { path: 'contacts', component: () => import('../views/Contacts.vue') }      // 联系表单管理
     ]
   }
 ]
