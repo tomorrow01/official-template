@@ -98,15 +98,34 @@ onMounted(() => {
 
 /* 顶部导航栏样式 */
 .top-nav {
-  height: 60px;
-  background-color: #409eff;
+  height: 80px;
+  background: linear-gradient(135deg, #007bff 0%, #00bfff 40%, #8a2be2 100%);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 15px rgba(0, 191, 255, 0.3);
   z-index: 100;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 添加科技感装饰效果 */
+.top-nav::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -50%;
+  width: 200%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  animation: shine 3s infinite;
+}
+
+@keyframes shine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
 .nav-left .logo {
@@ -145,7 +164,7 @@ onMounted(() => {
 .main-container {
   flex: 1;
   display: flex;
-  height: calc(100vh - 60px - 40px); /* 减去顶部导航和底部页脚的高度 */
+  height: calc(100vh - 80px - 40px); /* 减去顶部导航和底部页脚的高度 */
   overflow: hidden;
 }
 
@@ -206,11 +225,21 @@ onMounted(() => {
 
 /* 侧边栏头部 */
 .nav-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 0;
+  margin: 0;
   background: #34495e;
   border-bottom: 1px solid #1a2530;
   font-size: 18px;
   font-weight: bold;
   color: white;
+  text-align: center;
+  width: 100%;
+  flex-shrink: 0;
+  overflow: visible;
+  text-indent: 0;
 }
 
 /* 导航菜单 */

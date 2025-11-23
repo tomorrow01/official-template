@@ -14,6 +14,7 @@ const routes = [
   { 
     path: '/dashboard', 
     component: Dashboard,
+    redirect: '/dashboard/config', // 默认重定向到配置管理
     children: [
       { path: 'config', component: ConfigManagement },  // 新增：配置管理路由
       { path: 'articles', component: Articles },   // 文章管理
