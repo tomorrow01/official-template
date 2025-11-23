@@ -74,7 +74,7 @@ import { Star } from '@element-plus/icons-vue';
 import Footer from '@/components/Footer.vue';
 import Navbar from '@/components/Navbar.vue';
 import { ref, onMounted } from 'vue';
-import axios from 'axios';
+import request from '@/api/request';
 
 // 配置数据
 const configs = ref({
@@ -95,7 +95,7 @@ const configs = ref({
 async function fetchConfigs() {
   try {
     // 获取所有配置
-    const response = await axios.get('http://localhost:3001/api/configs');
+    const response = await request.get('/api/configs');
     if (response.data.code === 200 && response.data.data) {
       response.data.data.forEach(config => {
         switch (config.key) {
@@ -269,7 +269,12 @@ onMounted(() => {
 }
 
 .team-member {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
+  min-height: 300px;
 }
 
 .team-img {

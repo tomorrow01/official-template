@@ -14,7 +14,7 @@ const contactsRouter = require('./routes/contacts'); // 引入 contacts 路由
 const configsRouter = require('./routes/configs'); // 引入 configs 路由
 
 const app = express();
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3000;
 
 // 确保上传目录存在
 const uploadDir = path.join(__dirname, '../uploads');

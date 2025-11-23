@@ -26,14 +26,14 @@ export default defineNuxtConfig({
   vite: {
     server: {
       proxy: {
-        // 将前端的/api请求转发到后端3001端口
+        // 将前端的/api请求转发到后端3000端口
         '/api': {
-          target: process.env.API_BASE,
+          target: 'http://127.0.0.1:3000',
           changeOrigin: true,
+          // 不重写路径，保持/api前缀，因为后端路由也使用/api前缀
           rewrite: (path) => {
-            const newPath = path.replace(/^\/api/, ''); 
-            console.log('代理重写前路径:', path, '重写后路径:', newPath); // 添加日志
-            return newPath;
+            console.log('代理转发路径:', path, '到目标:', 'http://127.0.0.1:3000' + path);
+            return path;
           }
         }
       }

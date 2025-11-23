@@ -13,8 +13,7 @@
           <NuxtLink to="/services" class="nav-item" active-class="nav-item-active" @click.stop>核心服务</NuxtLink>
           <NuxtLink to="/cases" class="nav-item" active-class="nav-item-active" @click.stop>客户案例</NuxtLink>
           <NuxtLink to="/articles" class="nav-item" active-class="nav-item-active" @click.stop>最新动态</NuxtLink>
-          <!-- 修复联系我们链接，使用@click.stop防止事件冒泡 -->
-          <a href="/contact" class="nav-item" @click.stop>联系我们</a>
+          <NuxtLink to="/contact" class="nav-item" active-class="nav-item-active" @click.stop>联系我们</NuxtLink>
         </div>
       </div>
       
