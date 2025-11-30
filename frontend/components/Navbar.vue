@@ -17,7 +17,7 @@
             </button>
             <div class="nav-dropdown-menu">
               <NuxtLink to="/services" class="dropdown-item" active-class="dropdown-item-active">所有服务</NuxtLink>
-              <NuxtLink 
+              <!-- <NuxtLink 
                 v-for="service in services" 
                 :key="service.id" 
                 :to="`/services/${service.id}`" 
@@ -25,7 +25,7 @@
                 active-class="dropdown-item-active"
               >
                 {{ service.title }}
-              </NuxtLink>
+              </NuxtLink> -->
             </div>
           </div>
           <NuxtLink to="/cases" class="nav-item" active-class="nav-item-active" @click.stop>客户案例</NuxtLink>

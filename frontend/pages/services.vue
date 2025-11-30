@@ -1,31 +1,50 @@
 <template>
   <div class="services-page">
-    <!-- 导航栏 -->
+    <!-- 引入公共导航 -->
     <Navbar />
     
-    <!-- 页面标题 -->
-    <div class="page-header">
-      <div class="container">
-        <h1>核心服务</h1>
-        <p>我们提供专业的Web开发和内容管理解决方案</p>
-      </div>
-    </div>
-    
-    <!-- 服务列表 -->
+    <!-- 顶部Banner -->
+  <div class="services-banner">
     <div class="container">
-      <div class="services-grid">
+      <h1>核心服务</h1>
+      <p>提供专业、高效的解决方案，满足您的多样化需求</p>
+    </div>
+  </div>
+    
+    <div class="container">
+      
+      <!-- 加载状态 -->
+      <div v-if="loadingServices" class="loading-state">
+        <div class="loading-spinner"></div>
+        <p>加载中...</p>
+      </div>
+      
+      <!-- 错误状态 -->
+      <div v-else-if="error" class="error-state">
+        <p>{{ error }}</p>
+        <button class="retry-btn" @click="fetchServices">重试</button>
+      </div>
+      
+      <!-- 服务列表 -->
+      <div v-else class="services-grid">
         <div 
           v-for="service in services" 
-          :key="service.id" 
+          :key="service._id || service.id" 
           class="service-card"
         >
           <div class="service-image">
-            <img :src="service.image" :alt="service.title" class="card-image">
+            <img 
+              :src="service.image || `https://picsum.photos/seed/service${service.id || service._id}/400/300`" 
+              :alt="service.title" 
+              class="card-image"
+              @error="handleImageError"
+            >
           </div>
           <div class="service-content">
             <h3>{{ service.title }}</h3>
-            <p>{{ service.desc || '服务描述' }}</p>
-            <NuxtLink :to="`/services/${service.id}`" class="service-btn">
+            <p>{{ service.desc || service.description || '服务描述' }}</p>
+            <NuxtLink 
+            :to="`/service-detail/${service._id || service.id}`" class="service-btn">
               查看详情 →
             </NuxtLink>
           </div>
@@ -69,96 +88,244 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import Navbar from '~/components/Navbar.vue'
 import Footer from '~/components/Footer.vue'
+import { getServiceList } from '~/api/services'
 
 // 服务数据
-const services = ref([
-  {
-    id: '1',
-    title: '软件开发',
-    desc: '提供定制化的软件开发服务，包括Web应用、移动应用和桌面应用开发',
-    image: 'https://picsum.photos/seed/software/600/400'
-  },
-  {
-    id: '2',
-    title: '网站建设',
-    desc: '专业网站设计与开发，为企业打造现代化、响应式的官方网站',
-    image: 'https://picsum.photos/seed/webdev/600/400'
-  },
-  {
-    id: '3',
-    title: 'UI/UX设计',
-    desc: '提供用户体验设计和用户界面设计服务，打造直观易用的产品',
-    image: 'https://picsum.photos/seed/design/600/400'
-  },
-  {
-    id: '4',
-    title: '数据分析',
-    desc: '专业的数据分析和可视化服务，帮助企业挖掘数据价值',
-    image: 'https://picsum.photos/seed/data/600/400'
-  },
-  {
-    id: '5',
-    title: '云计算服务',
-    desc: '提供云基础设施搭建、迁移和管理服务，确保业务弹性扩展',
-    image: 'https://picsum.photos/seed/cloud/600/400'
-  },
-  {
-    id: '6',
-    title: 'IT咨询',
-    desc: '专业的IT战略咨询服务，帮助企业实现数字化转型',
-    image: 'https://picsum.photos/seed/consulting/600/400'
+const services = ref([])
+const loadingServices = ref(false)
+const error = ref(null)
+
+// 获取服务数据
+// 图片错误处理函数
+const handleImageError = (event) => {
+  event.target.src = `https://picsum.photos/seed/serviceDefault/400/300`;
+};
+
+const fetchServices = async () => {
+  loadingServices.value = true
+  error.value = null
+  
+  try {
+    // 使用API获取服务数据
+    const response = await getServiceList()
+    
+    if (response && Array.isArray(response)) {
+      services.value = response
+    } else {
+      // 如果API返回的数据不是预期格式，使用模拟数据
+      console.warn('API返回数据格式异常，使用模拟数据')
+      services.value = [
+      {
+        _id: '1',
+        id: '1',
+        title: '软件开发',
+        desc: '为客户提供定制化的软件开发服务',
+        image: 'https://picsum.photos/seed/service1/400/300'
+      },
+      {
+        _id: '2',
+        id: '2',
+        title: '数字化转型',
+        desc: '帮助企业实现数字化转型，优化业务流程',
+        image: 'https://picsum.photos/seed/service2/400/300'
+      },
+      {
+        _id: '3',
+        id: '3',
+        title: '云服务',
+        desc: '提供云计算解决方案，包括云迁移、云托管和云安全服务',
+        image: 'https://picsum.photos/seed/service3/400/300'
+      }
+    ]
+    }
+  } catch (err) {
+    console.error('获取服务数据失败:', err)
+    error.value = '获取服务数据失败，请稍后重试'
+    
+    // 错误情况下使用模拟数据
+    services.value = [
+      {
+        _id: '1',
+        id: '1',
+        title: '软件开发',
+        desc: '为客户提供定制化的软件开发服务',
+        image: 'https://picsum.photos/seed/service1/400/300'
+      },
+      {
+        _id: '2',
+        id: '2',
+        title: '数字化转型',
+        desc: '帮助企业实现数字化转型，优化业务流程',
+        image: 'https://picsum.photos/seed/service2/400/300'
+      },
+      {
+        _id: '3',
+        id: '3',
+        title: '云服务',
+        desc: '提供云计算解决方案，包括云迁移、云托管和云安全服务',
+        image: 'https://picsum.photos/seed/service3/400/300'
+      }
+    ]
+  } finally {
+    loadingServices.value = false
   }
-])
+}
+
+// 页面加载时获取数据
+onMounted(() => {
+  fetchServices()
+})
 </script>
 
 <style scoped>
 .services-page {
+  background-color: #f5f7fa;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
 }
 
-.page-header {
-  background: #667eea;
+/* 顶部Banner */
+.services-banner {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   padding: 80px 0;
   text-align: center;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 40px;
+}
+
+.services-banner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('https://picsum.photos/seed/servicesbanner/1920/1080') center/cover no-repeat;
+  opacity: 0.2;
+  z-index: 1;
+}
+
+.services-banner .container {
+  position: relative;
+  z-index: 2;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.services-banner h1 {
+  font-size: 2.8rem;
+  margin: 0 0 20px 0;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.services-banner p {
+  font-size: 1.2rem;
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.6;
+  opacity: 0.9;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .services-banner {
+    padding: 60px 0;
+  }
+  
+  .services-banner h1 {
+    font-size: 2rem;
+  }
 }
 
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 40px 20px;
 }
 
+.page-title {
+  font-size: 2.5rem;
+  color: #333;
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+/* 加载状态 */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* 错误状态 */
+.error-state {
+  text-align: center;
+  padding: 40px;
+  color: #e74c3c;
+}
+
+.retry-btn {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 16px;
+}
+
+.retry-btn:hover {
+  background-color: #2980b9;
+}
+
+/* 服务网格 */
 .services-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
-  margin-top: 40px;
+  gap: 30px;
+  margin-bottom: 60px;
 }
 
+/* 服务卡片 */
 .service-card {
   background: white;
-  border: 1px solid #e0e0e0;
   border-radius: 12px;
   overflow: hidden;
-  text-decoration: none;
-  color: #333;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  height: 100%;
-  min-height: 350px;
-  display: flex;
-  flex-direction: column;
+  transform: translateY(0);
+}
+
+.service-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
 }
 
 .service-image {
-  width: 100%;
-  height: 180px;
+  height: 220px;
   overflow: hidden;
   background: #f0f0f0;
 }
@@ -171,154 +338,193 @@ const services = ref([
 }
 
 .service-card:hover .card-image {
-  transform: scale(1.05);
-}
-
-.service-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  transform: scale(1.08);
 }
 
 .service-content {
-  padding: 20px;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
+  padding: 25px;
+  position: relative;
 }
 
 .service-content h3 {
-  margin-top: 0;
-  margin-bottom: 10px;
-  font-size: 1.5rem;
+  font-size: 1.6rem;
+  margin-bottom: 15px;
   color: #333;
+  font-weight: 600;
+  position: relative;
+  z-index: 1;
 }
 
 .service-content p {
   color: #666;
-  margin-bottom: 15px;
-  flex: 1;
+  line-height: 1.7;
+  margin-bottom: 25px;
+  font-size: 16px;
+  position: relative;
+  z-index: 1;
 }
 
 .service-btn {
-  margin-top: 20px;
-  padding: 10px 20px;
-  background: #667eea;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  align-self: flex-start;
   display: inline-block;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
   text-decoration: none;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
 }
 
 .service-btn:hover {
-  background: #5a67d8;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
 }
 
+.service-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+}
+
+.service-btn:hover::before {
+  opacity: 1;
+}
+
+/* 优势部分 */
 .advantages-section {
-  background-color: #f8f9fa;
-  padding: 60px 0;
-  margin-top: 60px;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 100px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.advantages-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+  z-index: 1;
 }
 
 .section-title {
-  text-align: center;
-  font-size: 2rem;
-  margin-bottom: 40px;
+  font-size: 2.5rem;
   color: #333;
+  text-align: center;
+  margin-bottom: 60px;
+  font-weight: 700;
+  position: relative;
+  z-index: 2;
+}
+
+.section-title::after {
+  content: '';
+  display: block;
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  margin: 20px auto 0;
+  border-radius: 2px;
 }
 
 .advantages-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 30px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 40px;
+  position: relative;
+  z-index: 2;
 }
 
 .advantage-item {
-  text-align: center;
-  padding: 30px;
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  transition: transform 0.3s ease;
+  border-radius: 16px;
+  padding: 40px 30px;
+  text-align: center;
+  transition: all 0.4s ease;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.advantage-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
 }
 
 .advantage-item:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  transform: translateY(-12px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
 }
 
 .advantage-icon {
-  width: 80px;
-  height: 80px;
-  margin: 0 auto 20px;
+  width: 120px;
+  height: 120px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   border-radius: 50%;
-  background-color: #667eea;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin: 0 auto 30px;
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+  transition: all 0.3s ease;
+}
+
+.advantage-item:hover .advantage-icon {
+  transform: scale(1.1);
+  box-shadow: 0 15px 30px rgba(102, 126, 234, 0.6);
 }
 
 .icon-placeholder {
-  width: 40px;
-  height: 40px;
-  background-color: rgba(255, 255, 255, 0.3);
+  width: 70px;
+  height: 70px;
+  background-color: white;
   border-radius: 50%;
+  opacity: 0.9;
 }
 
 .advantage-title {
-  font-size: 1.3rem;
-  margin-bottom: 10px;
+  font-size: 1.6rem;
   color: #333;
+  margin-bottom: 16px;
+  font-weight: 600;
 }
 
 .advantage-desc {
   color: #666;
-  line-height: 1.6;
+  line-height: 1.8;
+  font-size: 16px;
 }
 
 /* 响应式设计 */
 @media (max-width: 768px) {
-  .services-grid {
-    grid-template-columns: 1fr;
-    gap: 15px;
-  }
-  
-  .advantages-grid {
-    grid-template-columns: 1fr;
-    gap: 20px;
-  }
-  
-  .page-header {
-    padding: 60px 0;
-  }
-  
-  .container {
-    padding: 15px;
+  .page-title {
+    font-size: 2rem;
   }
   
   .section-title {
     font-size: 1.8rem;
   }
-}
-
-@media (max-width: 480px) {
-  .service-card {
-    min-height: 300px;
-  }
   
-  .service-image {
-    height: 150px;
-  }
-  
-  .advantage-item {
-    padding: 20px;
+  .services-grid,
+  .advantages-grid {
+    grid-template-columns: 1fr;
   }
 }
 </style>

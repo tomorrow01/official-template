@@ -126,7 +126,7 @@
           <NuxtLink 
             v-for="(service, index) in services" 
             :key="service.id" 
-            :to="`/services/${service.id}`" 
+            :to="`/service-detail/${service.id}`" 
             style="display: block !important; width: auto !important; min-width: 0 !important; border: 1px solid #e0e0e0; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: all 0.3s ease; transform: translateY(0);"
             onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.15)';"
             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)';"
