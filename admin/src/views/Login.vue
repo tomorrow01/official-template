@@ -52,7 +52,7 @@ const handleSubmit = () => {
     localStorage.setItem('admin-user', JSON.stringify(userInfo));
     
     ElMessage.success('登录成功');
-    router.push('/dashboard/articles');  // 跳转到文章管理页（默认子路由）
+    router.push('/dashboard');  // 跳转到dashboard根路径，会触发默认重定向到配置管理页
   } else {
     ElMessage.error('用户名或密码错误');
   }

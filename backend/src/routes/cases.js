@@ -57,7 +57,11 @@ router.get('/:id', async (req, res) => {
     } else {
       // 数据库连接失败，在文件数据中查找
       const data = JSON.parse(await fs.readFile(dataPath, 'utf8'));
-      const caseItem = data.find(item => item.id === parseInt(req.params.id));
+      // 支持字符串ID和数字ID匹配
+      const caseItem = data.find(item => 
+        item.id.toString() === req.params.id || 
+        (item._id && item._id.toString() === req.params.id)
+      );
       if (!caseItem) {
         return sendResponse(res, 404, null, '案例不存在（文件数据）');
       }

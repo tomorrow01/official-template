@@ -104,6 +104,9 @@ console.log('挂载 /api/services 路由');
 app.use('/api/services', servicesRouter);
 console.log('挂载 /api/contacts 路由');
 app.use('/api/contacts', contactsRouter);
+// 添加不带/api前缀的路由用于处理表单提交
+console.log('挂载 /contacts 路由');
+app.use('/contacts', contactsRouter);
 console.log('挂载 /api/configs 路由');
 app.use('/api/configs', configsRouter);
 console.log('所有路由挂载完成');

@@ -4,7 +4,7 @@ import { ElMessage } from 'element-plus';
 
 // 创建默认的Axios实例
 const request: AxiosInstance = axios.create({
-  baseURL: '', // 空字符串让请求使用前端服务器作为基础，通过代理转发
+  baseURL: '', // 使用相对路径，确保通过代理转发
   timeout: 10000, // 请求超时时间
   headers: { 'Content-Type': 'application/json' }, // 默认请求头
   validateStatus: (status) => status >= 200 && status < 500, // 仅将5xx错误视为网络错误

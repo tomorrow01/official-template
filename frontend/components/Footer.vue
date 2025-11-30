@@ -3,7 +3,7 @@
     <!-- 背景 -->
     <div class="footer-bg"></div>
     
-    <div class="container">
+    <div class="footer-container">
       <!-- 主要内容区 - 参考IoT设计 -->
       <!-- <div class="footer-content">
         <div class="footer-main">
@@ -104,11 +104,22 @@
 </script>
 
 <style scoped>
+  /* 容器样式，限制内容最大宽度但不限制背景 */
+  .footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    position: relative;
+    z-index: 1;
+  }
 .footer {
   position: relative;
+  width: 100%;
   color: white;
   padding: 3rem 0 2rem;
   background-color: #0a0a0a;
+  left: 0;
+  right: 0;
 }
 
 .footer-bg {

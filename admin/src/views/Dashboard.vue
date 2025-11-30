@@ -24,7 +24,7 @@
     <div class="main-container">
       <!-- 左侧导航条 -->
       <div class="sidebar">
-        <div class="nav-header flex items-center justify-center py-5 text-white font-bold text-xl">
+        <div class="nav-header flex items-center justify-start py-5 pl-20 text-white font-bold text-xl">
           功能导航
         </div>
         <el-menu 

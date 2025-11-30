@@ -22,18 +22,20 @@
           <p class="text-[clamp(1rem,2vw,1.25rem)] text-white/90 mb-8 max-w-2xl">
             我们提供全方位的技术服务和解决方案，助力企业实现数字化转型，提升核心竞争力。
           </p>
-          <div class="flex flex-wrap gap-4">
-            <NuxtLink to="/services">
-              <el-button type="primary" class="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-full text-lg">
-                了解我们的服务
-              </el-button>
-            </NuxtLink>
-            <NuxtLink to="/cases">
-              <el-button type="default" class="bg-white/10 hover:bg-white/20 text-white border-white/30 px-8 py-3 rounded-full text-lg">
-                查看成功案例
-              </el-button>
-            </NuxtLink>
-          </div>
+          <ClientOnly>
+            <div class="flex flex-wrap gap-4">
+              <NuxtLink to="/services">
+                <el-button type="primary" class="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-full text-lg">
+                  了解我们的服务
+                </el-button>
+              </NuxtLink>
+              <NuxtLink to="/cases">
+                <el-button type="default" class="bg-white/10 hover:bg-white/20 text-white border-white/30 px-8 py-3 rounded-full text-lg">
+                  查看成功案例
+                </el-button>
+              </NuxtLink>
+            </div>
+          </ClientOnly>
         </div>
       </div>
       <!-- 波浪装饰 -->
@@ -140,12 +142,14 @@
               <h3 style="font-size: 20px; font-weight: 600; margin: 0 0 15px 0 !important; padding: 0 !important; color: #333; width: 100%; box-sizing: border-box;">{{ service.title }}</h3>
               
               <!-- 详情 -->
-              <p style="line-height: 1.6; margin: 0 0 20px 0 !important; padding: 0 !important; color: #666; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; width: 100%; box-sizing: border-box;">{{ service.desc || '为客户提供专业的技术解决方案，助力业务增长和数字化转型。' }}</p>
+              <p style="line-height: 1.6; margin: 0 0 20px 0 !important; padding: 0 !important; color: #666; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; width: 100%; box-sizing: border-box;">{{ service.description || service.desc || '为客户提供专业的技术解决方案，助力业务增长和数字化转型。' }}</p>
               
               <!-- 跳转到详情页面的按钮 -->
-              <button style="background: #1677ff; color: white; border: none; margin: 0 !important; padding: 10px 20px !important; border-radius: 4px; cursor: pointer; box-shadow: 0 2px 8px rgba(22, 119, 255, 0.3); transition: all 0.3s ease; display: inline-flex; align-items: center; font-weight: 500;" @click.stop>
-                查看详情 <el-icon style="margin-left: 8px;"><ArrowRight /></el-icon>
-              </button>
+              <ClientOnly>
+                <button style="background: #1677ff; color: white; border: none; margin: 0 !important; padding: 10px 20px !important; border-radius: 4px; cursor: pointer; box-shadow: 0 2px 8px rgba(22, 119, 255, 0.3); transition: all 0.3s ease; display: inline-flex; align-items: center; font-weight: 500;" @click.stop>
+                  查看详情 <el-icon style="margin-left: 8px;"><ArrowRight /></el-icon>
+                </button>
+              </ClientOnly>
             </div>
           </NuxtLink>
         </div>
@@ -267,15 +271,17 @@
                 {{ article.excerpt || '这是一篇关于技术趋势和解决方案的文章，包含最新的行业动态和专业分析。' }}
               </p>
               <!-- 底部信息区域 -->
-              <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div style="display: flex; align-items: center; color: #1677ff; font-size: 14px; font-weight: 500; transition: transform 0.3s ease;" class="group-hover:translate-x-2">
-                  阅读全文 <el-icon style="margin-left: 8px;"><ArrowRight /></el-icon>
-                </div>
-                <div style="display: flex; align-items: center; color: #999; font-size: 13px;">
-                  <el-icon style="margin-right: 4px; font-size: 12px;"><Calendar /></el-icon>
-                  <span>{{ article.createTime || '2024-01-01' }}</span>
-                </div>
-              </div>
+              <ClientOnly>
+                  <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; color: #1677ff; font-size: 14px; font-weight: 500; transition: transform 0.3s ease;" class="group-hover:translate-x-2">
+                      阅读全文 <el-icon style="margin-left: 8px;"><ArrowRight /></el-icon>
+                    </div>
+                    <div style="display: flex; align-items: center; color: #999; font-size: 13px;">
+                      <el-icon style="margin-right: 4px; font-size: 12px;"><Calendar /></el-icon>
+                      <span>{{ article.createTime || '2024-01-01' }}</span>
+                    </div>
+                  </div>
+                </ClientOnly>
             </div>
           </NuxtLink>
         </div>
@@ -283,9 +289,11 @@
         <!-- 查看更多按钮 -->
         <div class="articles-cta text-center mt-8">
           <NuxtLink to="/articles">
-            <el-button type="primary" class="rounded-full bg-primary hover:bg-primary-dark px-8 py-3">
-              查看所有文章
-            </el-button>
+            <ClientOnly>
+              <el-button type="primary" class="rounded-full bg-primary hover:bg-primary-dark px-8 py-3">
+                查看所有文章
+              </el-button>
+            </ClientOnly>
           </NuxtLink>
         </div>
       </div>
@@ -321,9 +329,11 @@
             <h3 class="team-name text-lg font-semibold text-center">{{ getTeamMemberName(i) }}</h3>
             <p class="team-position text-gray-500 text-center mb-3">{{ getTeamMemberPosition(i) }}</p>
             <div class="team-social flex justify-center space-x-3">
-              <a href="#" class="text-gray-400 hover:text-primary transition-colors"><el-icon><Link /></el-icon></a>
-              <a href="#" class="text-gray-400 hover:text-primary transition-colors"><el-icon><ChatLineRound /></el-icon></a>
-              <a href="#" class="text-gray-400 hover:text-primary transition-colors"><el-icon><Share /></el-icon></a>
+              <ClientOnly>
+                <a href="#" class="text-gray-400 hover:text-primary transition-colors"><el-icon><Link /></el-icon></a>
+                <a href="#" class="text-gray-400 hover:text-primary transition-colors"><el-icon><ChatLineRound /></el-icon></a>
+                <a href="#" class="text-gray-400 hover:text-primary transition-colors"><el-icon><Share /></el-icon></a>
+              </ClientOnly>
             </div>
           </div>
         </div>
@@ -344,16 +354,18 @@
           <h2 class="cta-title text-3xl md:text-4xl font-bold text-white mb-6">准备好开始您的项目了吗？</h2>
           <p class="cta-subtitle text-white/90 text-lg mb-10">联系我们，了解如何利用我们的解决方案帮助您的业务增长</p>
           <div class="cta-buttons flex flex-col sm:flex-row gap-4 justify-center">
-            <NuxtLink to="/contact">
-              <el-button type="primary" class="cta-btn bg-white text-primary hover:bg-gray-100 rounded-full px-10 py-3 text-lg">
-                立即咨询
-              </el-button>
-            </NuxtLink>
-            <NuxtLink to="/services">
-              <el-button type="default" class="cta-btn-outline border-2 border-white text-white hover:bg-white/10 rounded-full px-10 py-3 text-lg">
-                了解服务
-              </el-button>
-            </NuxtLink>
+            <ClientOnly>
+              <NuxtLink to="/contact">
+                <el-button type="primary" class="cta-btn bg-white text-primary hover:bg-gray-100 rounded-full px-10 py-3 text-lg">
+                  立即咨询
+                </el-button>
+              </NuxtLink>
+              <NuxtLink to="/services">
+                <el-button type="default" class="cta-btn-outline border-2 border-white text-white hover:bg-white/10 rounded-full px-10 py-3 text-lg">
+                  了解服务
+                </el-button>
+              </NuxtLink>
+            </ClientOnly>
           </div>
         </div>
       </div>
@@ -363,15 +375,17 @@
     
     <!-- 回到顶部按钮 -->
     <div class="quick-nav fixed bottom-6 right-6 z-50">
-      <el-button 
-        type="primary" 
-        circle 
-        class="back-to-top bg-primary hover:bg-primary-dark shadow-lg p-4 transition-all duration-300"
-        @click="backToTop"
-        :class="{ 'opacity-100': showBackToTop, 'opacity-0': !showBackToTop, 'pointer-events': showBackToTop ? 'auto' : 'none' }"
-      >
-        <el-icon class="text-lg"><ArrowUp /></el-icon>
-      </el-button>
+      <ClientOnly>
+        <el-button 
+          type="primary" 
+          circle 
+          class="back-to-top bg-primary hover:bg-primary-dark shadow-lg p-4 transition-all duration-300"
+          @click="backToTop"
+          :class="{ 'opacity-100': showBackToTop, 'opacity-0': !showBackToTop, 'pointer-events': showBackToTop ? 'auto' : 'none' }"
+        >
+          <el-icon class="text-lg"><ArrowUp /></el-icon>
+        </el-button>
+      </ClientOnly>
     </div>
   </div>
 </template>
@@ -386,7 +400,7 @@ import { ArrowUp } from '@element-plus/icons-vue';
 // 暂时注释掉API导入以避免可能的错误
 // import { getBannerList } from '@/api/banner';
 // import { getCaseList } from '@/api/cases';
-// import { getServiceList } from '@/api/services';
+import { getServiceList } from '@/api/services';
 
 const services = ref([]);
 const cases = ref([]);
@@ -425,135 +439,143 @@ const fetchServices = async () => {
   error.value = null;
   try {
     console.log('开始获取服务数据...');
-    // 直接使用模拟数据避免API调用可能的问题
-    // const res = await getServiceList();
-    // services.value = Array.isArray(res) ? res : (res.data || []);
-    
-    // 使用模拟数据
-    services.value = [
-      {
-        id: '1',
-        icon: 'Management',
-        title: '软件开发',
-        desc: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。'
-      },
-      {
-        id: '2',
-        icon: 'Monitor',
-        title: '数字化转型',
-        desc: '帮助企业实现数字化转型，优化业务流程，提升运营效率。'
-      },
-      {
-        id: '3',
-        icon: 'Cloud',
-        title: '云服务',
-        desc: '提供云计算解决方案，包括云迁移、云托管和云安全服务。'
-      },
-      {
-        id: '4',
-        icon: 'StarFilled',
-        title: '人工智能',
-        desc: '利用人工智能技术为企业提供智能决策支持和自动化解决方案。'
-      },
-      {
-        id: '5',
-        icon: 'Histogram',
-        title: '大数据分析',
-        desc: '通过大数据分析帮助企业挖掘数据价值，优化业务决策。'
-      },
-      {
-        id: '6',
-        icon: 'Briefcase',
-        title: 'IT咨询',
-        desc: '提供专业的IT战略咨询服务，帮助企业制定技术发展规划。'
-      }
-    ];
-    console.log('使用模拟服务数据:', services.value);
+    // 使用API获取数据
+    const res = await getServiceList();
+    services.value = Array.isArray(res) ? res : (res.data || []);
     
     // 如果没有数据，使用模拟数据
     if (!services.value.length) {
       services.value = [
         {
+          _id: '1',
           id: '1',
           icon: 'Management',
           title: '软件开发',
-          desc: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。'
+          description: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。',
+          desc: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。',
+          order: 1,
+          isActive: true
         },
         {
+          _id: '2',
           id: '2',
           icon: 'Monitor',
           title: '数字化转型',
-          desc: '帮助企业实现数字化转型，优化业务流程，提升运营效率。'
+          description: '帮助企业实现数字化转型，优化业务流程，提升运营效率。',
+          desc: '帮助企业实现数字化转型，优化业务流程，提升运营效率。',
+          order: 2,
+          isActive: true
         },
         {
+          _id: '3',
           id: '3',
           icon: 'Cloud',
           title: '云服务',
-          desc: '提供云计算解决方案，包括云迁移、云托管和云安全服务。'
+          description: '提供云计算解决方案，包括云迁移、云托管和云安全服务。',
+          desc: '提供云计算解决方案，包括云迁移、云托管和云安全服务。',
+          order: 3,
+          isActive: true
         },
         {
+          _id: '4',
           id: '4',
           icon: 'StarFilled',
           title: '人工智能',
-          desc: '利用人工智能技术为企业提供智能决策支持和自动化解决方案。'
+          description: '利用人工智能技术为企业提供智能决策支持和自动化解决方案。',
+          desc: '利用人工智能技术为企业提供智能决策支持和自动化解决方案。',
+          order: 4,
+          isActive: true
         },
         {
+          _id: '5',
           id: '5',
           icon: 'Histogram',
           title: '大数据分析',
-          desc: '通过大数据分析帮助企业挖掘数据价值，优化业务决策。'
+          description: '通过大数据分析帮助企业挖掘数据价值，优化业务决策。',
+          desc: '通过大数据分析帮助企业挖掘数据价值，优化业务决策。',
+          order: 5,
+          isActive: true
         },
         {
+          _id: '6',
           id: '6',
           icon: 'Briefcase',
           title: 'IT咨询',
-          desc: '提供专业的IT战略咨询服务，帮助企业制定技术发展规划。'
+          description: '提供专业的IT战略咨询服务，帮助企业制定技术发展规划。',
+          desc: '提供专业的IT战略咨询服务，帮助企业制定技术发展规划。',
+          order: 6,
+          isActive: true
         }
       ];
+      console.log('使用模拟服务数据:', services.value);
     }
   } catch (err) {
-    console.error('获取服务数据失败:', err);
-    error.value = '获取服务数据失败，请稍后重试';
-    // 提供默认服务数据
-    services.value = [
-      {
-        id: '1',
-        icon: 'Management',
-        title: '软件开发',
-        desc: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。'
-      },
-      {
-        id: '2',
-        icon: 'Monitor',
-        title: '数字化转型',
-        desc: '帮助企业实现数字化转型，优化业务流程，提升运营效率。'
-      },
-      {
-        id: '3',
-        icon: 'Cloud',
-        title: '云服务',
-        desc: '提供云计算解决方案，包括云迁移、云托管和云安全服务。'
-      },
-      {
-        id: '4',
-        icon: 'StarFilled',
-        title: '人工智能',
-        desc: '利用人工智能技术为企业提供智能决策支持和自动化解决方案。'
-      },
-      {
-        id: '5',
-        icon: 'Histogram',
-        title: '大数据分析',
-        desc: '通过大数据分析帮助企业挖掘数据价值，优化业务决策。'
-      },
-      {
-        id: '6',
-        icon: 'Briefcase',
-        title: 'IT咨询',
-        desc: '提供专业的IT战略咨询服务，帮助企业制定技术发展规划。'
-      }
-    ];
-  } finally {
+      console.error('获取服务数据失败:', err);
+      error.value = '获取服务数据失败，请稍后重试';
+      // 提供默认服务数据，与后端保持一致
+      services.value = [
+        {
+          _id: '1',
+          id: '1',
+          icon: 'Management',
+          title: '软件开发',
+          description: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。',
+          desc: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。',
+          order: 1,
+          isActive: true
+        },
+        {
+          _id: '2',
+          id: '2',
+          icon: 'Monitor',
+          title: '数字化转型',
+          description: '帮助企业实现数字化转型，优化业务流程，提升运营效率。',
+          desc: '帮助企业实现数字化转型，优化业务流程，提升运营效率。',
+          order: 2,
+          isActive: true
+        },
+        {
+          _id: '3',
+          id: '3',
+          icon: 'Cloud',
+          title: '云服务',
+          description: '提供云计算解决方案，包括云迁移、云托管和云安全服务。',
+          desc: '提供云计算解决方案，包括云迁移、云托管和云安全服务。',
+          order: 3,
+          isActive: true
+        },
+        {
+          _id: '4',
+          id: '4',
+          icon: 'StarFilled',
+          title: '人工智能',
+          description: '利用人工智能技术为企业提供智能决策支持和自动化解决方案。',
+          desc: '利用人工智能技术为企业提供智能决策支持和自动化解决方案。',
+          order: 4,
+          isActive: true
+        },
+        {
+          _id: '5',
+          id: '5',
+          icon: 'Histogram',
+          title: '大数据分析',
+          description: '通过大数据分析帮助企业挖掘数据价值，优化业务决策。',
+          desc: '通过大数据分析帮助企业挖掘数据价值，优化业务决策。',
+          order: 5,
+          isActive: true
+        },
+        {
+          _id: '6',
+          id: '6',
+          icon: 'Briefcase',
+          title: 'IT咨询',
+          description: '提供专业的IT战略咨询服务，帮助企业制定技术发展规划。',
+          desc: '提供专业的IT战略咨询服务，帮助企业制定技术发展规划。',
+          order: 6,
+          isActive: true
+        }
+      ];
+    } finally {
     loadingServices.value = false;
   }
 };
@@ -601,8 +623,7 @@ const fetchCaseList = async () => {
           id: '3',
           description: '对现有电商系统进行全面升级，提升用户体验和系统性能，销售额增长45%。'
         }
-      ];
-    }
+      ];}
   } catch (err) {
     console.error('获取客户案例数据失败:', err);
     error.value = '获取客户案例数据失败，请稍后重试';

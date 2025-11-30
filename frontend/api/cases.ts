@@ -2,9 +2,11 @@ import { getRequestInstance } from './request';
 
 // 为案例数据定义正确的类型
 export interface CaseItem {
-  id: string;
+  _id?: string;
+  id?: string;
   image: string;
   description: string;
+  publishTime: string;
   order: number;
   isActive: boolean;
 }
@@ -16,4 +18,16 @@ export const getCaseList = () => {
     url: '/api/cases',
     method: 'get'
   });
+};
+
+// 获取单个案例详情
+export const getCaseDetail = async (caseId: string) => {
+  try {
+    const request = getRequestInstance();
+    const response = await request.get(`/api/cases/${caseId}`);
+    return response;
+  } catch (error) {
+    console.error(`获取案例详情失败 (ID: ${caseId}):`, error);
+    throw error;
+  }
 };

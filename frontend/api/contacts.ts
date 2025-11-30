@@ -38,10 +38,17 @@ class ContactService {
    */
   async submitContactForm(formData: ContactFormData): Promise<ApiResponse<ContactResponse>> {
     try {
+      // 使用'/api/contacts'路径，确保通过代理转发到后端
+      console.log('发送请求到: /api/contacts');
       const response = await request.post<ApiResponse<ContactResponse>>('/api/contacts', formData);
-      return response.data;
+      console.log('收到响应:', response);
+      return response;
     } catch (error) {
       console.error('提交联系表单失败:', error);
+      if (error.response) {
+        console.error('错误状态码:', error.response.status);
+        console.error('错误响应数据:', error.response.data);
+      }
       throw error;
     }
   }

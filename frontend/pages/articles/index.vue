@@ -176,33 +176,59 @@ onMounted(() => {
 <style scoped>
 .articles-page {
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+  background-color: #f9f9f9;
 }
 
+/* 页面标题 Banner */
 .page-header {
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  padding: 100px 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 80px 0;
   text-align: center;
-  margin-bottom: 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+.page-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('https://picsum.photos/seed/articlebanner/1920/1080');
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  opacity: 0.2;
+  z-index: 1;
+}
+
+.page-header .container {
+  position: relative;
+  z-index: 2;
 }
 
 .page-header h1 {
-  font-size: 36px;
-  margin-bottom: 10px;
-  color: #333;
+  font-size: 2.8rem;
+  margin-bottom: 15px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
 }
 
 .page-header p {
-  font-size: 18px;
-  color: #666;
+  font-size: 1.2rem;
+  opacity: 0.9;
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.6;
 }
 
 .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
-  flex: 1;
+  box-sizing: border-box;
 }
 
 .loading-container,
@@ -216,7 +242,7 @@ onMounted(() => {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 24px;
-  margin-bottom: 40px;
+  margin: 40px 0;
 }
 
 .article-card {
@@ -290,15 +316,16 @@ onMounted(() => {
 /* 响应式设计 */
 @media (max-width: 768px) {
   .page-header {
-    padding: 40px 0;
+    padding: 60px 0;
   }
   
   .page-header h1 {
-    font-size: 28px;
+    font-size: 2rem;
   }
   
   .page-header p {
-    font-size: 16px;
+    font-size: 1rem;
+    padding: 0 20px;
   }
   
   .articles-grid {

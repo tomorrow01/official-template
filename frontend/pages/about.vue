@@ -96,8 +96,12 @@ async function fetchConfigs() {
   try {
     // 获取所有配置
     const response = await request.get('/api/configs');
-    if (response.data.code === 200 && response.data.data) {
+    // 检查响应是否存在且包含必要的数据结构
+    if (response && response.data && response.data.code === 200 && response.data.data && Array.isArray(response.data.data)) {
       response.data.data.forEach(config => {
+        // 确保config对象有效
+        if (!config || !config.key) return;
+        
         switch (config.key) {
           case 'about_company':
             configs.value.companyIntro = config.value || configs.value.companyIntro;
@@ -116,7 +120,7 @@ async function fetchConfigs() {
             break;
           case 'team_members':
             try {
-              const members = JSON.parse(config.value);
+              const members = config.value ? JSON.parse(config.value) : null;
               if (Array.isArray(members)) {
                 configs.value.teamMembers = members;
               }
@@ -129,7 +133,7 @@ async function fetchConfigs() {
     }
   } catch (error) {
     console.error('获取配置数据失败:', error);
-    // 失败时使用默认数据
+    // 失败时使用默认数据，确保不会出现undefined错误
   }
 }
 
@@ -140,26 +144,63 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.about-page {
-  background: var(--bg-base);
+:root {
+  --text-primary: #333;
+  --text-secondary: #666;
+  --text-tertiary: #999;
+  --bg-container: #fff;
+  --shadow-light: 0 4px 12px rgba(0,0,0,0.1);
+  --border-color: #eee;
 }
 
+.about-page {
+  min-height: 100vh;
+  background-color: #f9f9f9;
+}
+
+/* 页面标题 Banner */
 .page-header {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 100px 0;
+  padding: 80px 0;
   text-align: center;
+  position: relative;
+  overflow: hidden;
 }
 
-.page-title {
-  font-size: 40px;
+.page-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('https://picsum.photos/seed/aboutbanner/1920/1080');
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  opacity: 0.2;
+  z-index: 1;
+}
+
+.page-header .container {
+  position: relative;
+  z-index: 2;
+}
+
+.page-header h1 {
+  font-size: 2.8rem;
+  margin-bottom: 20px;
   font-weight: 700;
-  margin-bottom: 16px;
+  letter-spacing: -0.5px;
 }
 
-.page-subtitle {
-  font-size: 18px;
+.page-header p {
+  font-size: 1.2rem;
   opacity: 0.9;
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.6;
 }
 
 .container {
@@ -304,7 +345,12 @@ onMounted(() => {
   }
   
   .page-title {
-    font-size: 32px;
+    font-size: 2rem;
+  }
+  
+  .page-subtitle {
+    font-size: 1rem;
+    padding: 0 20px;
   }
   
   .intro-content {

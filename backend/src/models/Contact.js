@@ -18,7 +18,7 @@ const ContactSchema = new Schema({
   },
   phone: {
     type: String,
-    required: true,
+    required: false,
     trim: true,
     match: /^1[3-9]\d{9}$/
   },

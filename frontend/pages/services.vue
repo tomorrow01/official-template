@@ -1,5 +1,7 @@
 <template>
   <div class="services-page">
+    <!-- 导航栏 -->
+    <Navbar />
     <!-- 页面标题 -->
     <div class="page-header">
       <div class="container">
@@ -23,7 +25,7 @@
             <div v-if="service.image" class="service-image-container">
               <img 
                 :src="getServiceImageUrl(service.image)" 
-                :alt="service.name || '服务名称'" 
+                :alt="service.title || '服务名称'" 
                 class="service-image"
                 @error="handleImageError($event)"
               />
@@ -32,7 +34,7 @@
               <div class="service-icon">
                 <el-icon><Message /></el-icon>
               </div>
-              <h3 class="service-title">{{ service.name || '服务名称' }}</h3>
+              <h3 class="service-title">{{ service.title || '服务名称' }}</h3>
               <p class="service-desc">{{ service.description || '服务描述内容' }}</p>
               <el-button type="primary" size="small" @click="viewServiceDetail(service.id)">
                 了解更多
@@ -55,28 +57,28 @@
         <div class="advantages-grid">
           <div class="advantage-item">
             <div class="advantage-icon">
-              <el-icon><Message /></el-icon>
+              <el-icon v-if="true"><Message /></el-icon>
             </div>
             <h3 class="advantage-title">专业团队</h3>
             <p class="advantage-desc">拥有多年行业经验的技术专家团队，为您提供专业的解决方案</p>
           </div>
           <div class="advantage-item">
             <div class="advantage-icon">
-              <el-icon><Message /></el-icon>
+              <el-icon v-if="true"><Message /></el-icon>
             </div>
             <h3 class="advantage-title">技术创新</h3>
             <p class="advantage-desc">紧跟技术前沿，持续创新，为客户提供最先进的技术解决方案</p>
           </div>
           <div class="advantage-item">
             <div class="advantage-icon">
-              <el-icon><Message /></el-icon>
+              <el-icon v-if="true"><Message /></el-icon>
             </div>
             <h3 class="advantage-title">高效响应</h3>
             <p class="advantage-desc">快速响应客户需求，提供及时、高效的技术支持和服务</p>
           </div>
           <div class="advantage-item">
             <div class="advantage-icon">
-              <el-icon><Message /></el-icon>
+              <el-icon v-if="true"><Message /></el-icon>
             </div>
             <h3 class="advantage-title">质量保障</h3>
             <p class="advantage-desc">严格的质量控制流程，确保每一个项目都达到最高标准</p>
@@ -92,16 +94,11 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { Message } from '@element-plus/icons-vue';
-import { getServiceList } from '@/api/services';
-import Footer from '@/components/Footer.vue';
-import Navbar from '@/components/Navbar.vue';
+import { getServiceList } from '~/api/services';
+import Footer from '~/components/Footer.vue';
+import Navbar from '~/components/Navbar.vue';
 
-const Service = {
-  id: String,
-  name: String,
-  description: String,
-  icon: String
-}
+// 服务数据类型定义 - 使用类型断言方式
 
 const router = useRouter();
 const services = ref([]);
@@ -125,31 +122,31 @@ const fetchServices = async () => {
       services.value = [
         {
           id: '1',
-          name: '企业数字化转型服务',
+          title: '企业数字化转型服务',
           description: '为传统企业提供全面的数字化转型解决方案，包括业务流程再造、IT系统升级、数字化营销策略等',
           icon: 'Code'
         },
         {
           id: '2',
-          name: '软件开发与定制服务',
+          title: '软件开发与定制服务',
           description: '提供高质量的软件开发和定制服务，包括企业管理系统、电子商务平台、移动应用开发等',
           icon: 'Document'
         },
         {
           id: '3',
-          name: '数据分析与商业智能',
+          title: '数据分析与商业智能',
           description: '帮助企业挖掘数据价值，提升决策效率，通过数据分析模型和可视化报表提供数据洞察',
           icon: 'Speed'
         },
         {
           id: '4',
-          name: 'IT咨询与规划服务',
+          title: 'IT咨询与规划服务',
           description: '提供专业的IT咨询和规划服务，帮助企业制定合理的IT战略和技术路线图',
           icon: 'Edit'
         },
         {
           id: '5',
-          name: '云服务与基础设施',
+          title: '云服务与基础设施',
           description: '提供全方位的云服务和基础设施解决方案，帮助企业快速实现IT基础设施的现代化',
           icon: 'Cloud'
         },
@@ -250,25 +247,53 @@ onMounted(() => {
 
 <style scoped>
 .services-page {
-  background: var(--bg-base);
+  min-height: 100vh;
+  background-color: #f9f9f9;
 }
 
+/* 页面标题 Banner */
 .page-header {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 0 0 80px 0;
+  padding: 80px 0;
   text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.page-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('https://picsum.photos/seed/servicebanner/1920/1080');
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  opacity: 0.2;
+  z-index: 1;
+}
+
+.page-header .container {
+  position: relative;
+  z-index: 2;
 }
 
 .page-title {
-  font-size: 40px;
+  font-size: 2.8rem;
+  margin-bottom: 15px;
   font-weight: 700;
-  margin-bottom: 16px;
+  letter-spacing: -0.5px;
 }
 
 .page-subtitle {
-  font-size: 18px;
+  font-size: 1.2rem;
   opacity: 0.9;
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.6;
 }
 
 .container {
@@ -327,8 +352,45 @@ onMounted(() => {
 .page-header {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 100px 0;
+  padding: 80px 0;
   text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.page-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: url('https://picsum.photos/seed/servicesbanner/1920/1080') center/cover no-repeat;
+  opacity: 0.2;
+  z-index: 1;
+}
+
+.page-header .container {
+  position: relative;
+  z-index: 2;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.page-header h1 {
+  font-size: 2.8rem;
+  margin-bottom: 20px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+.page-header p {
+  font-size: 1.2rem;
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.6;
+  opacity: 0.9;
 }
 
 /* 服务卡片内容区域 */
@@ -406,9 +468,14 @@ onMounted(() => {
     padding: 60px 0;
   }
   
-  .page-title {
-    font-size: 32px;
-  }
+  .page-header h1 {
+  font-size: 2rem;
+}
+
+.page-header p {
+  font-size: 1rem;
+  padding: 0 20px;
+}
   
   .services-grid,
   .advantages-grid {

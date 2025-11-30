@@ -1,49 +1,47 @@
 import { defineNuxtConfig } from 'nuxt/config'
 
 export default defineNuxtConfig({
-  modules: [
-    '@element-plus/nuxt'
-  ],
-  elementPlus: {
-    icon: 'ElIcon',
-    importStyle: 'scss'
+  // 只保留最基本的配置
+  devServer: {
+    port: 3001 // 设置Nuxt开发服务器端口为3001
   },
+  // 运行时配置
+  runtimeConfig: {
+    public: {
+      apiBase: '' // 开发环境使用空字符串，确保通过代理转发
+    }
+  },
+  // Element Plus 模块配置
+  modules: ['@element-plus/nuxt'],
+  // Element Plus 配置
+  elementPlus: {
+    // 可以在这里添加Element Plus的配置选项
+  },
+  // 保留基本CSS
   css: [
-    '~/assets/css/main.css',  // 全局样式
-    'element-plus/dist/index.css'  // Element Plus样式
+    '~/assets/css/main.css'  // 全局样式
   ],
+  // 基本head配置
   app: {
     head: {
-      title: '官网标题',
+      title: '官方网站',
       meta: [
+        { name: 'charset', content: 'utf-8' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
         { name: 'description', content: '官网描述' }
-      ],
-      link: [
-        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
       ]
     }
   },
+  // 确保API代理仍然工作
   vite: {
     server: {
-      proxy: {
-        // 将前端的/api请求转发到后端3000端口
+      proxy: {       
+        // 保留原有的API路径代理
         '/api': {
           target: 'http://127.0.0.1:3000',
-          changeOrigin: true,
-          // 不重写路径，保持/api前缀，因为后端路由也使用/api前缀
-          rewrite: (path) => {
-            console.log('代理转发路径:', path, '到目标:', 'http://127.0.0.1:3000' + path);
-            return path;
-          }
+          changeOrigin: true
         }
       }
     }
-  },
-  // 添加类型断言解决 TS 类型检查问题
-  runtimeConfig: {
-    public: {
-      // apiBase:  process.env.NODE_ENV === 'production' ? process.env.API_BASE : 'http://localhost:3001' // 后端接口基地址
-      apiBase:  process.env.API_BASE // 后端接口基地址
-    }
-  } as any
+  }
 })

@@ -5,6 +5,7 @@ import Articles from '../views/Articles.vue'    // 新增：文章管理页
 import Banners from '../views/Banners.vue'      // 新增：轮播图管理页
 import Content from '../views/Content.vue'      // 新增：内容管理页
 import LatestNews from '../views/LatestNews.vue' // 新增：最新动态管理页
+import CasesManagement from '../views/CasesManagement.vue' // 新增：客户案例管理页
 import ConfigManagement from '../views/ConfigManagement.vue'  // 新增：配置管理页
 
 const routes = [
@@ -21,7 +22,7 @@ const routes = [
       { path: 'banners', component: Banners },     // 轮播图管理
       { path: 'content', component: Content },     // 内容管理
       { path: 'services', component: () => import('../views/Services.vue') },     // 服务管理
-      { path: 'cases', component: () => import('../views/Cases.vue') },           // 案例管理
+      { path: 'cases', name: 'CasesManagement', component: CasesManagement, meta: { title: '客户案例管理' } },           // 客户案例管理
       { path: 'latest-news', component: LatestNews },                             // 最新动态管理
       { path: 'contacts', component: () => import('../views/Contacts.vue') }      // 联系表单管理
     ]
