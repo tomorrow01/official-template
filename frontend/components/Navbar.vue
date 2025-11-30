@@ -10,7 +10,24 @@
         <div class="nav-menu">
           <NuxtLink to="/" class="nav-item" active-class="nav-item-active" @click.stop>首页</NuxtLink>
           <NuxtLink to="/about" class="nav-item" active-class="nav-item-active" @click.stop>关于我们</NuxtLink>
-          <NuxtLink to="/services" class="nav-item" active-class="nav-item-active" @click.stop>核心服务</NuxtLink>
+          <div class="nav-dropdown" @click.stop>
+            <button class="nav-item nav-dropdown-toggle" :class="{ 'nav-item-active': $route.path.startsWith('/services') }">
+              核心服务
+              <span class="dropdown-arrow"></span>
+            </button>
+            <div class="nav-dropdown-menu">
+              <NuxtLink to="/services" class="dropdown-item" active-class="dropdown-item-active">所有服务</NuxtLink>
+              <NuxtLink 
+                v-for="service in services" 
+                :key="service.id" 
+                :to="`/services/${service.id}`" 
+                class="dropdown-item" 
+                active-class="dropdown-item-active"
+              >
+                {{ service.title }}
+              </NuxtLink>
+            </div>
+          </div>
           <NuxtLink to="/cases" class="nav-item" active-class="nav-item-active" @click.stop>客户案例</NuxtLink>
           <NuxtLink to="/articles" class="nav-item" active-class="nav-item-active" @click.stop>最新动态</NuxtLink>
           <NuxtLink to="/contact" class="nav-item" active-class="nav-item-active" @click.stop>联系我们</NuxtLink>
@@ -44,7 +61,27 @@
           <div class="mobile-nav-menu">
             <NuxtLink to="/" class="mobile-nav-item" active-class="nav-item-active" @click="toggleMenu">首页</NuxtLink>
             <NuxtLink to="/about" class="mobile-nav-item" active-class="nav-item-active" @click="toggleMenu">关于我们</NuxtLink>
-            <NuxtLink to="/services" class="mobile-nav-item" active-class="nav-item-active" @click="toggleMenu">核心服务</NuxtLink>
+            <div class="mobile-nav-dropdown">
+              <button class="mobile-nav-item mobile-dropdown-toggle" :class="{ 'nav-item-active': $route.path.startsWith('/services') }" @click="toggleServiceDropdown">
+                核心服务
+                <span class="dropdown-arrow" :class="{ 'rotate': serviceDropdownOpen }">▼</span>
+              </button>
+              <transition name="dropdown">
+                <div v-if="serviceDropdownOpen" class="mobile-dropdown-menu">
+                  <NuxtLink to="/services" class="dropdown-item" active-class="dropdown-item-active" @click="toggleMenu">所有服务</NuxtLink>
+                  <NuxtLink 
+                    v-for="service in services" 
+                    :key="service.id" 
+                    :to="`/services/${service.id}`" 
+                    class="dropdown-item" 
+                    active-class="dropdown-item-active"
+                    @click="toggleMenu"
+                  >
+                    {{ service.title }}
+                  </NuxtLink>
+                </div>
+              </transition>
+            </div>
             <NuxtLink to="/cases" class="mobile-nav-item" active-class="nav-item-active" @click="toggleMenu">客户案例</NuxtLink>
             <NuxtLink to="/articles" class="mobile-nav-item" active-class="nav-item-active" @click="toggleMenu">最新动态</NuxtLink>
             <NuxtLink to="/contact" class="mobile-nav-item" active-class="nav-item-active" @click="toggleMenu">联系我们</NuxtLink>
@@ -58,10 +95,14 @@
 <script setup>
 import { onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
+import { getServiceList } from '@/api/services';
 
 const router = useRouter();
 const isScrolled = ref(false);
 const mobileMenuOpen = ref(false);
+const services = ref([]);
+const loadingServices = ref(false);
+const serviceDropdownOpen = ref(false);
 
 // 处理滚动事件，改变导航栏样式
 const handleScroll = () => {
@@ -71,12 +112,19 @@ const handleScroll = () => {
 // 切换移动端菜单
 const toggleMenu = () => {
   mobileMenuOpen.value = !mobileMenuOpen.value;
+  // 关闭服务下拉菜单
+  serviceDropdownOpen.value = false;
   // 防止滚动穿透
   if (typeof document !== 'undefined') {
     document.body.style.overflow = mobileMenuOpen.value ? 'hidden' : '';
     document.body.style.paddingRight = mobileMenuOpen.value ? '15px' : ''; // 防止内容跳动
     document.documentElement.style.overflow = mobileMenuOpen.value ? 'hidden' : '';
   }
+};
+
+// 切换服务下拉菜单
+const toggleServiceDropdown = () => {
+  serviceDropdownOpen.value = !serviceDropdownOpen.value;
 };
 
 // 监听路由变化，自动关闭移动端菜单
@@ -90,6 +138,25 @@ watch(() => router.currentRoute.value.path, () => {
     }
   }
 });
+
+// 获取核心服务数据
+const fetchServices = async () => {
+  loadingServices.value = true;
+  try {
+    const res = await getServiceList();
+    services.value = Array.isArray(res) ? res : (res.data || []);
+  } catch (error) {
+    console.error('获取核心服务数据失败:', error);
+    // 使用模拟数据
+    services.value = [
+      { id: '1', title: '软件开发', icon: 'Management' },
+      { id: '2', title: '数字化转型', icon: 'Monitor' },
+      { id: '3', title: '云服务', icon: 'Cloud' }
+    ];
+  } finally {
+    loadingServices.value = false;
+  }
+};
 
 // 监听窗口大小变化，在桌面端时自动关闭移动端菜单
 const handleResize = () => {
@@ -107,6 +174,8 @@ onMounted(() => {
     window.addEventListener('resize', handleResize);
     // 初始化滚动状态
     handleScroll();
+    // 获取核心服务数据
+    fetchServices();
   }
 });
 
@@ -181,6 +250,126 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
+}
+
+/* 导航下拉菜单 */
+.nav-dropdown {
+  position: relative;
+}
+
+.nav-dropdown-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dropdown-arrow {
+  display: inline-block;
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid #333;
+  transition: transform 0.3s ease;
+}
+
+.nav-dropdown:hover .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.nav-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  min-width: 180px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+  z-index: 100;
+  margin-top: 4px;
+}
+
+.nav-dropdown:hover .nav-dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdown-item {
+  display: block;
+  padding: 12px 16px;
+  color: #333;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 0.3s ease;
+}
+
+.dropdown-item:hover,
+.dropdown-item-active {
+  background-color: #f5f5f5;
+  color: var(--primary-color);
+}
+
+/* 移动端下拉菜单 */
+.mobile-nav-dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.mobile-dropdown-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-md) 0;
+}
+
+.mobile-dropdown-toggle .dropdown-arrow {
+  font-size: 12px;
+  transition: transform 0.3s ease;
+}
+
+.mobile-dropdown-toggle .dropdown-arrow.rotate {
+  transform: rotate(180deg);
+}
+
+.mobile-dropdown-menu {
+  background-color: rgba(255, 255, 255, 0.95);
+  border-radius: 4px;
+  margin: 0 0 var(--spacing-md) 0;
+}
+
+.mobile-dropdown-menu .dropdown-item {
+  padding: 10px 20px;
+  font-size: 14px;
+  color: #666;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.mobile-dropdown-menu .dropdown-item:last-child {
+  border-bottom: none;
+}
+
+/* 下拉菜单过渡效果 */
+.dropdown-enter-active,
+.dropdown-leave-active {
+  transition: all 0.3s ease;
+}
+
+.dropdown-enter-from,
+.dropdown-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
 }
 
 .nav-item {

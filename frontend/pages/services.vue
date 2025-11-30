@@ -18,35 +18,57 @@
           <el-loading v-loading="loading" element-loading-text="正在加载服务..." />
         </div>
         
-        <!-- 服务卡片 -->
-        <div v-else-if="services.length > 0" class="services-grid">
-          <div v-for="service in services" :key="service.id" class="service-card">
-            <!-- 服务图片 -->
-            <div v-if="service.image" class="service-image-container">
-              <img 
-                :src="getServiceImageUrl(service.image)" 
-                :alt="service.title || '服务名称'" 
-                class="service-image"
-                @error="handleImageError($event)"
-              />
-            </div>
-            <div>
-              <div class="service-icon">
-                <el-icon><Message /></el-icon>
-              </div>
-              <h3 class="service-title">{{ service.title || '服务名称' }}</h3>
-              <p class="service-desc">{{ service.description || '服务描述内容' }}</p>
-              <el-button type="primary" size="small" @click="viewServiceDetail(service.id)">
-                了解更多
-              </el-button>
-            </div>
+      <!-- 服务卡片网格 - 与首页核心服务模块保持一致的样式 -->
+      <div style="display: grid !important; grid-template-columns: 1fr 1fr 1fr !important; gap: 24px !important; width: 100% !important; max-width: none !important; min-width: 0 !important;">
+        <!-- 每个服务项是一个独立卡片 -->
+        <NuxtLink 
+          v-for="(service, index) in services" 
+          :key="service.id" 
+          :to="`/services/${service.id}`" 
+          style="display: block !important; width: auto !important; min-width: 0 !important; border: 1px solid #e0e0e0; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: all 0.3s ease; transform: translateY(0);"
+          onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.15)'"
+          onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)'"
+          class="bg-white rounded-xl overflow-hidden"
+        >
+          <!-- 卡片内部：图片在上 -->
+          <div class="h-52 overflow-hidden">
+            <img 
+              :src="getServiceImage(index)" 
+              alt="服务图片" 
+              style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease; transform: scale(1);" 
+              onmouseover="this.style.transform='scale(1.1)'" 
+              onmouseout="this.style.transform='scale(1)'"
+            >
           </div>
-        </div>
+          
+          <!-- 卡片内部：标题和详情在下 -->
+          <div style="padding: 24px !important; width: 100%; box-sizing: border-box;">
+            <!-- 标题 -->
+            <h3 style="font-size: 20px; font-weight: 600; margin: 0 0 15px 0 !important; padding: 0 !important; color: #333; width: 100%; box-sizing: border-box;">{{ service.title }}</h3>
+            
+            <!-- 详情 -->
+            <p style="line-height: 1.6; margin: 0 0 20px 0 !important; padding: 0 !important; color: #666; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; width: 100%; box-sizing: border-box;">{{ service.description || service.desc || '为客户提供专业的技术解决方案，助力业务增长和数字化转型。' }}</p>
+            
+            <!-- 跳转到详情页面的按钮 -->
+              <ClientOnly>
+                <button style="background: #1677ff; color: white; border: none; margin: 0 !important; padding: 10px 20px !important; border-radius: 4px; cursor: pointer; box-shadow: 0 2px 8px rgba(22, 119, 255, 0.3); transition: all 0.3s ease; display: inline-flex; align-items: center; font-weight: 500;">
+                  查看详情
+                </button>
+              </ClientOnly>
+          </div>
+        </NuxtLink>
+      </div>
         
         <!-- 无数据状态 -->
-        <div v-else class="empty-container">
-          <el-empty description="暂无服务数据" />
-        </div>
+          <div v-if="services.length === 0" class="empty-container">
+            <div style="text-align: center; padding: 60px 20px;">
+              <div style="width: 100px; height: 100px; margin: 0 auto 20px; background: #f5f7fa; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                <span style="font-size: 48px; color: #dcdfe6;">📋</span>
+              </div>
+              <h3 style="font-size: 18px; color: #606266; margin-bottom: 10px;">暂无服务数据</h3>
+              <p style="color: #909399;">服务正在加载中，请稍候再试</p>
+            </div>
+          </div>
       </div>
     </div>
     
@@ -57,28 +79,28 @@
         <div class="advantages-grid">
           <div class="advantage-item">
             <div class="advantage-icon">
-              <el-icon v-if="true"><Message /></el-icon>
+              <div class="icon-placeholder"></div>
             </div>
             <h3 class="advantage-title">专业团队</h3>
             <p class="advantage-desc">拥有多年行业经验的技术专家团队，为您提供专业的解决方案</p>
           </div>
           <div class="advantage-item">
             <div class="advantage-icon">
-              <el-icon v-if="true"><Message /></el-icon>
+              <div class="icon-placeholder"></div>
             </div>
             <h3 class="advantage-title">技术创新</h3>
             <p class="advantage-desc">紧跟技术前沿，持续创新，为客户提供最先进的技术解决方案</p>
           </div>
           <div class="advantage-item">
             <div class="advantage-icon">
-              <el-icon v-if="true"><Message /></el-icon>
+              <div class="icon-placeholder"></div>
             </div>
             <h3 class="advantage-title">高效响应</h3>
             <p class="advantage-desc">快速响应客户需求，提供及时、高效的技术支持和服务</p>
           </div>
           <div class="advantage-item">
             <div class="advantage-icon">
-              <el-icon v-if="true"><Message /></el-icon>
+              <div class="icon-placeholder"></div>
             </div>
             <h3 class="advantage-title">质量保障</h3>
             <p class="advantage-desc">严格的质量控制流程，确保每一个项目都达到最高标准</p>
@@ -93,7 +115,6 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { Message } from '@element-plus/icons-vue';
 import { getServiceList } from '~/api/services';
 import Footer from '~/components/Footer.vue';
 import Navbar from '~/components/Navbar.vue';
@@ -111,135 +132,166 @@ const fetchServices = async () => {
   error.value = null;
   try {
     console.log('开始获取服务数据...');
+    // 使用API获取数据
     const res = await getServiceList();
+    console.log('服务API返回结果:', res);
     
-    // 正确提取数据，确保数据格式一致
-    services.value = Array.isArray(res) ? res : (res.data || []);
-    console.log('获取到的服务数据:', services.value);
+    // 精确处理后端返回的{code, data, error}格式，与首页保持一致
+    if (typeof res === 'object' && res !== null && res.data && Array.isArray(res.data)) {
+      console.log(`成功获取到${res.data.length}个服务数据`);
+      services.value = res.data;
+    } else {
+      console.warn('服务数据格式不正确，使用空数组');
+      services.value = [];
+    }
     
-    // 如果没有数据，使用模拟数据
+    // 如果没有数据，使用模拟数据 - 确保与首页保持一致
     if (!services.value.length) {
+      console.log('未获取到服务数据，使用模拟数据');
       services.value = [
         {
+          _id: '1',
           id: '1',
-          title: '企业数字化转型服务',
-          description: '为传统企业提供全面的数字化转型解决方案，包括业务流程再造、IT系统升级、数字化营销策略等',
-          icon: 'Code'
+          icon: 'Management',
+          title: '软件开发',
+          description: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。',
+          desc: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。',
+          order: 1,
+          isActive: true
         },
         {
+          _id: '2',
           id: '2',
-          title: '软件开发与定制服务',
-          description: '提供高质量的软件开发和定制服务，包括企业管理系统、电子商务平台、移动应用开发等',
-          icon: 'Document'
+          icon: 'Monitor',
+          title: '数字化转型',
+          description: '帮助企业实现数字化转型，优化业务流程，提升运营效率。',
+          desc: '帮助企业实现数字化转型，优化业务流程，提升运营效率。',
+          order: 2,
+          isActive: true
         },
         {
+          _id: '3',
           id: '3',
-          title: '数据分析与商业智能',
-          description: '帮助企业挖掘数据价值，提升决策效率，通过数据分析模型和可视化报表提供数据洞察',
-          icon: 'Speed'
+          icon: 'Cloud',
+          title: '云服务',
+          description: '提供云计算解决方案，包括云迁移、云托管和云安全服务。',
+          desc: '提供云计算解决方案，包括云迁移、云托管和云安全服务。',
+          order: 3,
+          isActive: true
         },
         {
+          _id: '4',
           id: '4',
-          title: 'IT咨询与规划服务',
-          description: '提供专业的IT咨询和规划服务，帮助企业制定合理的IT战略和技术路线图',
-          icon: 'Edit'
+          icon: 'StarFilled',
+          title: '人工智能',
+          description: '利用人工智能技术为企业提供智能决策支持和自动化解决方案。',
+          desc: '利用人工智能技术为企业提供智能决策支持和自动化解决方案。',
+          order: 4,
+          isActive: true
         },
         {
+          _id: '5',
           id: '5',
-          title: '云服务与基础设施',
-          description: '提供全方位的云服务和基础设施解决方案，帮助企业快速实现IT基础设施的现代化',
-          icon: 'Cloud'
+          icon: 'Histogram',
+          title: '大数据分析',
+          description: '通过大数据分析帮助企业挖掘数据价值，优化业务决策。',
+          desc: '通过大数据分析帮助企业挖掘数据价值，优化业务决策。',
+          order: 5,
+          isActive: true
         },
         {
+          _id: '6',
           id: '6',
-          name: '人工智能应用开发',
-          description: '专注于人工智能应用开发，为企业提供智能解决方案，提升业务效率和竞争力',
-          icon: 'Star'
+          icon: 'Briefcase',
+          title: 'IT咨询',
+          description: '提供专业的IT战略咨询服务，帮助企业制定技术发展规划。',
+          desc: '提供专业的IT战略咨询服务，帮助企业制定技术发展规划。',
+          order: 6,
+          isActive: true
         }
       ];
+      console.log('使用模拟服务数据，与首页保持一致:', services.value);
     }
   } catch (err) {
-    console.error('获取服务数据失败:', err);
-    error.value = '获取服务数据失败，请稍后重试';
-    // 出错时使用模拟数据
-    services.value = [
-      {
-        id: '1',
-        name: '企业数字化转型服务',
-        description: '为传统企业提供全面的数字化转型解决方案，包括业务流程再造、IT系统升级、数字化营销策略等',
-        icon: 'Code'
-      },
-      {
-        id: '2',
-        name: '软件开发与定制服务',
-        description: '提供高质量的软件开发和定制服务，包括企业管理系统、电子商务平台、移动应用开发等',
-        icon: 'Document'
-      },
-      {
-        id: '3',
-        name: '数据分析与商业智能',
-        description: '帮助企业挖掘数据价值，提升决策效率，通过数据分析模型和可视化报表提供数据洞察',
-        icon: 'Speed'
-      },
-      {
-        id: '4',
-        name: 'IT咨询与规划服务',
-        description: '提供专业的IT咨询和规划服务，帮助企业制定合理的IT战略和技术路线图',
-        icon: 'Edit'
-      },
-      {
-        id: '5',
-        name: '云服务与基础设施',
-        description: '提供全方位的云服务和基础设施解决方案，帮助企业快速实现IT基础设施的现代化',
-        icon: 'Cloud'
-      },
-      {
-        id: '6',
-        name: '人工智能应用开发',
-        description: '专注于人工智能应用开发，为企业提供智能解决方案，提升业务效率和竞争力',
-        icon: 'Star'
-      }
-    ];
+      console.error('获取服务数据失败:', err);
+      error.value = '获取服务数据失败，请稍后重试';
+      // 提供默认服务数据，确保与首页完全一致
+      console.log('请求失败，使用模拟数据');
+      services.value = [
+        {
+          _id: '1',
+          id: '1',
+          icon: 'Management',
+          title: '软件开发',
+          description: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。',
+          desc: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。',
+          order: 1,
+          isActive: true
+        },
+        {
+          _id: '2',
+          id: '2',
+          icon: 'Monitor',
+          title: '数字化转型',
+          description: '帮助企业实现数字化转型，优化业务流程，提升运营效率。',
+          desc: '帮助企业实现数字化转型，优化业务流程，提升运营效率。',
+          order: 2,
+          isActive: true
+        },
+        {
+          _id: '3',
+          id: '3',
+          icon: 'Cloud',
+          title: '云服务',
+          description: '提供云计算解决方案，包括云迁移、云托管和云安全服务。',
+          desc: '提供云计算解决方案，包括云迁移、云托管和云安全服务。',
+          order: 3,
+          isActive: true
+        },
+        {
+          _id: '4',
+          id: '4',
+          icon: 'StarFilled',
+          title: '人工智能',
+          description: '利用人工智能技术为企业提供智能决策支持和自动化解决方案。',
+          desc: '利用人工智能技术为企业提供智能决策支持和自动化解决方案。',
+          order: 4,
+          isActive: true
+        },
+        {
+          _id: '5',
+          id: '5',
+          icon: 'Histogram',
+          title: '大数据分析',
+          description: '通过大数据分析帮助企业挖掘数据价值，优化业务决策。',
+          desc: '通过大数据分析帮助企业挖掘数据价值，优化业务决策。',
+          order: 5,
+          isActive: true
+        },
+        {
+          _id: '6',
+          id: '6',
+          icon: 'Briefcase',
+          title: 'IT咨询',
+          description: '提供专业的IT战略咨询服务，帮助企业制定技术发展规划。',
+          desc: '提供专业的IT战略咨询服务，帮助企业制定技术发展规划。',
+          order: 6,
+          isActive: true
+        }
+      ];
+      console.log('使用模拟服务数据，与首页完全一致:', services.value);
   } finally {
     loading.value = false;
   }
 };
 
 // 查看服务详情
-// 获取服务图片URL
-const getServiceImageUrl = (imagePath) => {
-  if (!imagePath) {
-    return '/images/service-default.jpg'; // 默认图片
-  }
-  
-  // 检查是否已经是完整URL
-  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-    return imagePath;
-  }
-  
-  // 如果是相对路径，根据路径格式处理
-  if (imagePath.startsWith('/uploads/')) {
-    // 从后端上传的图片
-    return `http://localhost:3001${imagePath}`;
-  } else if (imagePath.startsWith('/')) {
-    // 前端静态图片
-    return imagePath;
-  } else {
-    // 其他情况
-    return `http://localhost:3001/uploads/${imagePath}`;
-  }
+// 获取服务图片 - 与首页核心服务模块使用相同的图片逻辑
+const getServiceImage = (index) => {
+  const imageIds = [180, 239, 24, 119, 96, 101];
+  return `https://picsum.photos/id/${imageIds[index % imageIds.length]}/600/400`;
 };
-
-// 图片加载错误处理
-const handleImageError = (event) => {
-  event.target.src = '/images/service-default.jpg';
-};
-
-const viewServiceDetail = (id) => {
-  router.push(`/services/${id}`);
-};
-
-// 页面加载时获取服务列表
+// 查看服务详情 - 现在使用NuxtLink直接导航，此函数保留作为备用 页面加载时获取服务列表
 onMounted(() => {
   fetchServices();
 });
@@ -437,10 +489,33 @@ onMounted(() => {
 }
 
 .advantage-icon {
-  font-size: 36px;
-  color: #667eea;
-  margin-bottom: 20px;
-}
+    margin-bottom: 20px;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+  }
+  
+  .icon-placeholder {
+    width: 40px;
+    height: 40px;
+    background: white;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .icon-placeholder::before {
+    content: '✓';
+    color: #667eea;
+    font-size: 24px;
+    font-weight: bold;
+  }
 
 .advantage-title {
   font-size: 18px;

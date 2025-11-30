@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2 class="text-xl font-bold mb-4">服务管理</h2>
+    <h2 class="text-xl font-bold mb-4">核心服务管理</h2>
     <el-button 
       type="primary" 
       @click="showDialog = true" 

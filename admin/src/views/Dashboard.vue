@@ -39,7 +39,7 @@
           <el-menu-item index="/dashboard/articles">文章管理</el-menu-item>
           <el-menu-item index="/dashboard/banners">轮播图管理</el-menu-item>
           <el-menu-item index="/dashboard/content">内容管理</el-menu-item>
-          <el-menu-item index="/dashboard/services">服务管理</el-menu-item>
+          <el-menu-item index="/dashboard/services">核心服务管理</el-menu-item>
           <el-menu-item index="/dashboard/cases">案例管理</el-menu-item>
           <el-menu-item index="/dashboard/latest-news">最新动态管理</el-menu-item>
           <el-menu-item index="/dashboard/contacts">联系我们管理</el-menu-item>

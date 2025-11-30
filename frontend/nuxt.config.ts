@@ -1,4 +1,5 @@
 import { defineNuxtConfig } from 'nuxt/config'
+import { resolve } from 'path'
 
 export default defineNuxtConfig({
   // 只保留最基本的配置

@@ -32,20 +32,61 @@ export const getServiceList = async (params?: any): Promise<ServiceItem[]> => {
       params
     });
     
-    if (!response) {
-      throw new Error('空响应');
-    }
+    const responseData = response.data;
+    console.log('API响应原始数据:', JSON.stringify(responseData));
     
     // 处理可能的不同响应格式
     let serviceData: any[] = [];
     
-    // 检查响应是否包含data字段且为数组
-    if (Array.isArray(response.data)) {
-      serviceData = response.data;
-    } 
-    // 检查是否为嵌套结构
-    else if (response.data && Array.isArray(response.data.data)) {
-      serviceData = response.data.data;
+    // 情况1: 响应是 { code, data, error } 格式（后端实际返回格式）
+    if (typeof responseData === 'object' && responseData !== null) {
+      // 检查是否有data字段
+      if (responseData.data) {
+        // 如果data字段本身就是数组
+        if (Array.isArray(responseData.data)) {
+          serviceData = responseData.data;
+        }
+        // 如果data字段是对象，可能包含数组数据
+        else if (typeof responseData.data === 'object' && Array.isArray(responseData.data.data)) {
+          serviceData = responseData.data.data;
+        }
+      }
+    }
+    // 情况2: 响应本身就是数组（兼容性处理）
+    else if (Array.isArray(responseData)) {
+      serviceData = responseData;
+    }
+    
+    // 如果没有获取到数据，使用模拟数据
+    if (!Array.isArray(serviceData) || serviceData.length === 0) {
+      console.warn('未获取到服务数据，使用模拟数据');
+      const mockData: ServiceItem[] = [
+        {
+          _id: '1',
+          id: '1',
+          icon: 'Management',
+          title: '软件开发',
+          description: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。',
+          desc: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。'
+        },
+        {
+          _id: '2',
+          id: '2',
+          icon: 'Monitor',
+          title: '数字化转型',
+          description: '帮助企业实现数字化转型，优化业务流程，提升运营效率。',
+          desc: '帮助企业实现数字化转型，优化业务流程，提升运营效率。'
+        },
+        {
+          _id: '3',
+          id: '3',
+          icon: 'Cloud',
+          title: '云服务',
+          description: '提供云计算解决方案，包括云迁移、云托管和云安全服务。',
+          desc: '提供云计算解决方案，包括云迁移、云托管和云安全服务。'
+        }
+      ];
+      return mockData;
     }
     
     // 转换数据结构，确保字段一致性
@@ -65,35 +106,32 @@ export const getServiceList = async (params?: any): Promise<ServiceItem[]> => {
     });
   } catch (error) {
     console.error('获取服务列表失败:', error);
+    // 在catch中返回模拟数据
+    return [
+      {
+        _id: '1',
+        id: '1',
+        icon: 'Management',
+        title: '软件开发',
+        description: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。',
+        desc: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。'
+      },
+      {
+        _id: '2',
+        id: '2',
+        icon: 'Monitor',
+        title: '数字化转型',
+        description: '帮助企业实现数字化转型，优化业务流程，提升运营效率。',
+        desc: '帮助企业实现数字化转型，优化业务流程，提升运营效率。'
+      },
+      {
+        _id: '3',
+        id: '3',
+        icon: 'Cloud',
+        title: '云服务',
+        description: '提供云计算解决方案，包括云迁移、云托管和云安全服务。',
+        desc: '提供云计算解决方案，包括云迁移、云托管和云安全服务。'
+      }
+    ];
   }
-  
-  // 返回模拟数据作为备用
-  const mockData: ServiceItem[] = [
-    {
-      _id: '1',
-      id: '1',
-      icon: 'Management',
-      title: '软件开发',
-      description: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。',
-      desc: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。'
-    },
-    {
-      _id: '2',
-      id: '2',
-      icon: 'Monitor',
-      title: '数字化转型',
-      description: '帮助企业实现数字化转型，优化业务流程，提升运营效率。',
-      desc: '帮助企业实现数字化转型，优化业务流程，提升运营效率。'
-    },
-    {
-      _id: '3',
-      id: '3',
-      icon: 'Cloud',
-      title: '云服务',
-      description: '提供云计算解决方案，包括云迁移、云托管和云安全服务。',
-      desc: '提供云计算解决方案，包括云迁移、云托管和云安全服务。'
-    }
-  ];
-  
-  return mockData;
 };

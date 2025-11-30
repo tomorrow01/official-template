@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 // 从环境变量获取数据库配置
 // 使用127.0.0.1（IPv4）而不是localhost，解决某些环境下的连接问题
-const dbUri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/official_website';
+const dbUri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/official-template';
 console.log('MongoDB连接字符串:', dbUri);
 console.log('提示：如果连接失败，请确保MongoDB服务已启动，或检查连接字符串配置');
 

@@ -146,8 +146,8 @@
               
               <!-- 跳转到详情页面的按钮 -->
               <ClientOnly>
-                <button style="background: #1677ff; color: white; border: none; margin: 0 !important; padding: 10px 20px !important; border-radius: 4px; cursor: pointer; box-shadow: 0 2px 8px rgba(22, 119, 255, 0.3); transition: all 0.3s ease; display: inline-flex; align-items: center; font-weight: 500;" @click.stop>
-                  查看详情 <el-icon style="margin-left: 8px;"><ArrowRight /></el-icon>
+                <button style="background: #1677ff; color: white; border: none; margin: 0 !important; padding: 10px 20px !important; border-radius: 4px; cursor: pointer; box-shadow: 0 2px 8px rgba(22, 119, 255, 0.3); transition: all 0.3s ease; display: inline-flex; align-items: center; font-weight: 500;">
+                  查看详情
                 </button>
               </ClientOnly>
             </div>
@@ -403,6 +403,11 @@ import { ArrowUp } from '@element-plus/icons-vue';
 import { getServiceList } from '@/api/services';
 
 const services = ref([]);
+// 页面加载时获取服务数据
+onMounted(async () => {
+  console.log('页面挂载，开始获取服务数据...');
+  await fetchServices();
+});
 const cases = ref([]);
 const latestArticles = ref([
   {
@@ -441,7 +446,16 @@ const fetchServices = async () => {
     console.log('开始获取服务数据...');
     // 使用API获取数据
     const res = await getServiceList();
-    services.value = Array.isArray(res) ? res : (res.data || []);
+    console.log('服务API返回结果:', res);
+    
+    // 精确处理后端返回的{code, data, error}格式
+    if (typeof res === 'object' && res !== null && res.data && Array.isArray(res.data)) {
+      console.log(`成功获取到${res.data.length}个服务数据`);
+      services.value = res.data;
+    } else {
+      console.warn('服务数据格式不正确，使用空数组');
+      services.value = [];
+    }
     
     // 如果没有数据，使用模拟数据
     if (!services.value.length) {

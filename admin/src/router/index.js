@@ -21,7 +21,7 @@ const routes = [
       { path: 'articles', component: Articles },   // 文章管理
       { path: 'banners', component: Banners },     // 轮播图管理
       { path: 'content', component: Content },     // 内容管理
-      { path: 'services', component: () => import('../views/Services.vue') },     // 服务管理
+      { path: 'services', name: 'ServicesManagement', component: () => import('../views/Services.vue'), meta: { title: '核心服务管理' } },     // 核心服务管理
       { path: 'cases', name: 'CasesManagement', component: CasesManagement, meta: { title: '客户案例管理' } },           // 客户案例管理
       { path: 'latest-news', component: LatestNews },                             // 最新动态管理
       { path: 'contacts', component: () => import('../views/Contacts.vue') }      // 联系表单管理
