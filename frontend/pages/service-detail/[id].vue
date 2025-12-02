@@ -211,8 +211,21 @@ export default {
 .hero-header {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 60px 0;
+  padding: 80px 0;
   text-align: center;
+  position: relative;
+  overflow: hidden;
+  background-image: url('https://picsum.photos/seed/service-header/1920/600');
+  background-size: cover;
+  background-position: center;
+  background-blend-mode: overlay;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .hero-header {
+    padding: 60px 0;
+  }
 }
 
 .hero-title {
