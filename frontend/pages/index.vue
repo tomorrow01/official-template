@@ -187,7 +187,9 @@
           <div style="padding: 30px; flex: 1; background-color: white;">
             <h3 style="margin-bottom: 15px; font-size: 22px; font-weight: 600;">电子商务平台开发案例</h3>
             <p style="line-height: 1.6; margin-bottom: 20px; color: #333;">为一家连锁零售企业打造了全渠道电子商务平台，整合线上线下业务，上线三个月内用户增长率达到200%，销售额提升35%。</p>
-            <button style="background: #1677ff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; box-shadow: 0 2px 8px rgba(22, 119, 255, 0.3); transition: all 0.3s ease;">了解更多</button>
+            <NuxtLink to="/cases/2" style="text-decoration: none;">
+              <button style="background: #1677ff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; box-shadow: 0 2px 8px rgba(22, 119, 255, 0.3); transition: all 0.3s ease;">了解更多</button>
+            </NuxtLink>
           </div>
         </div>
         
@@ -201,7 +203,9 @@
           <div style="padding: 30px; flex: 1; background-color: white;">
             <h3 style="margin-bottom: 15px; font-size: 22px; font-weight: 600;">数据智能分析系统案例</h3>
             <p style="line-height: 1.6; margin-bottom: 20px; color: #333;">为金融服务企业构建了先进的数据智能分析系统，通过大数据和人工智能技术，风险预测准确率提高了30%，决策效率提升50%。</p>
-            <button style="background: #1677ff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; box-shadow: 0 2px 8px rgba(22, 119, 255, 0.3); transition: all 0.3s ease;">了解更多</button>
+            <NuxtLink to="/cases/3" style="text-decoration: none;">
+              <button style="background: #1677ff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; box-shadow: 0 2px 8px rgba(22, 119, 255, 0.3); transition: all 0.3s ease;">了解更多</button>
+            </NuxtLink>
           </div>
         </div>
       </div>
