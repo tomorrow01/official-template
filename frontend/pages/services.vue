@@ -59,21 +59,21 @@
         <div class="advantages-grid">
           <div class="advantage-item">
             <div class="advantage-icon">
-              <div class="icon-placeholder"></div>
+              <img src="https://picsum.photos/seed/team/100/100" alt="专业团队" class="advantage-image">
             </div>
             <h3 class="advantage-title">专业团队</h3>
             <p class="advantage-desc">拥有多年行业经验的技术专家团队，为您提供专业的解决方案</p>
           </div>
           <div class="advantage-item">
             <div class="advantage-icon">
-              <div class="icon-placeholder"></div>
+              <img src="https://picsum.photos/seed/delivery/100/100" alt="高效交付" class="advantage-image">
             </div>
             <h3 class="advantage-title">高效交付</h3>
             <p class="advantage-desc">采用敏捷开发方法，确保项目按时交付，满足客户需求</p>
           </div>
           <div class="advantage-item">
             <div class="advantage-icon">
-              <div class="icon-placeholder"></div>
+              <img src="https://picsum.photos/seed/support/100/100" alt="持续支持" class="advantage-image">
             </div>
             <h3 class="advantage-title">持续支持</h3>
             <p class="advantage-desc">提供7×24小时技术支持，确保系统稳定运行</p>
@@ -497,6 +497,15 @@ onMounted(() => {
   background-color: white;
   border-radius: 50%;
   opacity: 0.9;
+}
+
+.advantage-image {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 50%;
+  background-color: white;
+  padding: 5px;
 }
 
 .advantage-title {
