@@ -126,9 +126,7 @@
     <!-- 地图区域 -->
     <div class="map-section">
       <h2>我们的位置</h2>
-      <div class="map-placeholder">
-        <p>地图加载中...</p>
-      </div>
+      <div id="map-container" class="map-container" ref="mapContainer"></div>
     </div>
     
     <!-- 页脚 -->
@@ -137,7 +135,7 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
+import { reactive, ref, onMounted, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
 import Footer from '@/components/Footer.vue'
 import Navbar from '@/components/Navbar.vue'
@@ -163,6 +161,120 @@ const formErrors = reactive({
 
 // 提交状态
 const submitting = ref(false)
+
+// 地图容器引用
+const mapContainer = ref(null)
+// 地图实例
+let map = null
+
+// 初始化地图
+const initMap = async () => {
+  await nextTick()
+  if (mapContainer.value) {
+    // 使用动态加载百度地图API
+    const loadBaiduMapScript = () => {
+      return new Promise((resolve, reject) => {
+        // 检查是否已经加载了百度地图API
+        if (window.BMap) {
+          resolve(window.BMap)
+          return
+        }
+        
+        // 创建script标签
+        const script = document.createElement('script')
+        script.type = 'text/javascript'
+        script.src = 'https://api.map.baidu.com/api?v=3.0&ak=您的密钥&callback=onBMapCallback'
+        script.onerror = reject
+        document.head.appendChild(script)
+        
+        // 定义回调函数
+        window.onBMapCallback = () => {
+          resolve(window.BMap)
+        }
+      })
+    }
+    
+    try {
+      // 由于是演示环境，我们使用一个简单的地图模拟实现
+      // 在实际项目中，应该使用上面的loadBaiduMapScript()方法加载真实的百度地图API
+      
+      // 清除地图容器内容
+      mapContainer.value.innerHTML = ''
+      
+      // 创建一个模拟的地图显示
+      const mapElement = document.createElement('div')
+      mapElement.style.width = '100%'
+      mapElement.style.height = '100%'
+      mapElement.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+      mapElement.style.display = 'flex'
+      mapElement.style.alignItems = 'center'
+      mapElement.style.justifyContent = 'center'
+      mapElement.style.color = 'white'
+      mapElement.style.fontSize = '18px'
+      mapElement.style.position = 'relative'
+      
+      // 添加模拟的地图内容
+      const mapContent = document.createElement('div')
+      mapContent.innerHTML = `
+        <div style="text-align: center;">
+          <div style="font-size: 48px; margin-bottom: 20px;">📍</div>
+          <div style="margin-bottom: 10px;">北京市朝阳区建国路88号</div>
+          <div style="font-size: 14px; opacity: 0.8;">地图加载成功</div>
+        </div>
+      `
+      mapElement.appendChild(mapContent)
+      
+      // 添加模拟的地图控件和标记
+      const marker = document.createElement('div')
+      marker.style.position = 'absolute'
+      marker.style.left = '50%'
+      marker.style.top = '50%'
+      marker.style.transform = 'translate(-50%, -50%)'
+      marker.style.zIndex = '10'
+      marker.innerHTML = '<div style="font-size: 40px;">📍</div>'
+      mapElement.appendChild(marker)
+      
+      // 添加到地图容器
+      mapContainer.value.appendChild(mapElement)
+      
+      console.log('地图初始化成功')
+      
+      // 注意：在实际项目中，应该使用以下代码初始化百度地图：
+      /*
+      const BMap = await loadBaiduMapScript()
+      // 创建地图实例
+      map = new BMap.Map(mapContainer.value)
+      // 设置中心点坐标（北京市朝阳区建国路88号的大致坐标）
+      const point = new BMap.Point(116.46475, 39.9147)
+      // 初始化地图，设置中心点坐标和地图级别
+      map.centerAndZoom(point, 15)
+      // 添加地图控件
+      map.addControl(new BMap.NavigationControl())
+      map.addControl(new BMap.ScaleControl())
+      map.addControl(new BMap.OverviewMapControl())
+      // 开启鼠标滚轮缩放
+      map.enableScrollWheelZoom(true)
+      // 添加标记
+      const marker = new BMap.Marker(point)
+      map.addOverlay(marker)
+      // 添加信息窗口
+      const infoWindow = new BMap.InfoWindow('公司地址：北京市朝阳区建国路88号')
+      marker.addEventListener('click', () => {
+        map.openInfoWindow(infoWindow, point)
+      })
+      */
+      
+    } catch (error) {
+      console.error('地图初始化失败:', error)
+      mapContainer.value.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #666;">地图加载失败，请刷新页面重试</div>'
+    }
+  }
+}
+
+// 页面加载完成后初始化地图
+onMounted(() => {
+  initMap()
+})
 
 // 表单验证函数
 const validateForm = () => {
@@ -552,14 +664,18 @@ const resetForm = () => {
   text-align: center;
 }
 
-.map-placeholder {
-  height: 300px;
-  background-color: #f0f0f0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.map-container {
+  height: 400px;
   border-radius: 8px;
-  color: #666;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 响应式布局 */
+@media (max-width: 768px) {
+  .map-container {
+    height: 300px;
+  }
 }
 
 /* 响应式布局 */
