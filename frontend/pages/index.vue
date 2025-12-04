@@ -161,49 +161,16 @@
       <div style="max-width: 1100px; margin: 0 auto; padding: 50px 20px;">
         <h2 style="text-align: center; margin-bottom: 30px;">成功合作案例</h2>
         
-        <!-- 案例1 -->
-        <div style="display: flex; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); overflow: hidden; margin-bottom: 30px;">
+        <div v-for="(item, index) in cases" :key="item.id" style="display: flex; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); overflow: hidden; margin-bottom: 30px;">
           <!-- 左侧图片 -->
           <div style="width: 350px; height: 250px; overflow: hidden;">
-            <img src="https://picsum.photos/seed/case1/350/250" alt="企业数字化转型案例" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease; transform: scale(1);" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+            <img :src="item.image || getCaseImage(index)" :alt="getCaseTitle(index)" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease; transform: scale(1);" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
           </div>
           <!-- 右侧内容 -->
           <div style="padding: 30px; flex: 1; background-color: white;">
-            <h3 style="margin-bottom: 15px; font-size: 22px; font-weight: 600;">企业数字化转型案例</h3>
-            <p style="line-height: 1.6; margin-bottom: 20px; color: #333;">我们帮助一家传统制造企业实现了全面的数字化转型，通过引入智能制造系统，生产效率提升了40%，成本降低了25%。</p>
-            <NuxtLink to="/cases" style="text-decoration: none;">
-                <button style="background: #1677ff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; box-shadow: 0 2px 8px rgba(22, 119, 255, 0.3); transition: all 0.3s ease;">了解更多</button>
-              </NuxtLink>
-          </div>
-        </div>
-        
-        <!-- 案例2 -->
-        <div style="display: flex; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); overflow: hidden; margin-bottom: 30px;">
-          <!-- 左侧图片 -->
-          <div style="width: 350px; height: 250px; overflow: hidden;">
-            <img src="https://picsum.photos/seed/case2/350/250" alt="电子商务平台开发案例" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease; transform: scale(1);" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
-          </div>
-          <!-- 右侧内容 -->
-          <div style="padding: 30px; flex: 1; background-color: white;">
-            <h3 style="margin-bottom: 15px; font-size: 22px; font-weight: 600;">电子商务平台开发案例</h3>
-            <p style="line-height: 1.6; margin-bottom: 20px; color: #333;">为一家连锁零售企业打造了全渠道电子商务平台，整合线上线下业务，上线三个月内用户增长率达到200%，销售额提升35%。</p>
-            <NuxtLink to="/cases/2" style="text-decoration: none;">
-              <button style="background: #1677ff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; box-shadow: 0 2px 8px rgba(22, 119, 255, 0.3); transition: all 0.3s ease;">了解更多</button>
-            </NuxtLink>
-          </div>
-        </div>
-        
-        <!-- 案例3 -->
-        <div style="display: flex; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); overflow: hidden;">
-          <!-- 左侧图片 -->
-          <div style="width: 350px; height: 250px; overflow: hidden;">
-            <img src="https://picsum.photos/seed/case3/350/250" alt="数据智能分析系统案例" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease; transform: scale(1);" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
-          </div>
-          <!-- 右侧内容 -->
-          <div style="padding: 30px; flex: 1; background-color: white;">
-            <h3 style="margin-bottom: 15px; font-size: 22px; font-weight: 600;">数据智能分析系统案例</h3>
-            <p style="line-height: 1.6; margin-bottom: 20px; color: #333;">为金融服务企业构建了先进的数据智能分析系统，通过大数据和人工智能技术，风险预测准确率提高了30%，决策效率提升50%。</p>
-            <NuxtLink to="/cases/3" style="text-decoration: none;">
+            <h3 style="margin-bottom: 15px; font-size: 22px; font-weight: 600;">{{ getCaseTitle(index) }}</h3>
+            <p style="line-height: 1.6; margin-bottom: 20px; color: #333;">{{ item.description }}</p>
+            <NuxtLink :to="`/cases/${item.id}`" style="text-decoration: none;">
               <button style="background: #1677ff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; box-shadow: 0 2px 8px rgba(22, 119, 255, 0.3); transition: all 0.3s ease;">了解更多</button>
             </NuxtLink>
           </div>
@@ -401,9 +368,9 @@ import { ref, onMounted, onUnmounted } from 'vue';
 import Navbar from '@/components/Navbar.vue';
 import Footer from '@/components/Footer.vue';
 import { ArrowUp } from '@element-plus/icons-vue';
-// 暂时注释掉API导入以避免可能的错误
+// 导入API模块
 // import { getBannerList } from '@/api/banner';
-// import { getCaseList } from '@/api/cases';
+import { getCaseList } from '@/api/cases';
 import { getServiceList } from '@/api/services';
 
 const services = ref([]);
@@ -452,14 +419,25 @@ const fetchServices = async () => {
     const res = await getServiceList();
     console.log('服务API返回结果:', res);
     
-    // 精确处理后端返回的{code, data, error}格式
-    if (typeof res === 'object' && res !== null && res.data && Array.isArray(res.data)) {
-      console.log(`成功获取到${res.data.length}个服务数据`);
-      services.value = res.data;
+    // 精确处理后端返回的数据格式
+    if (Array.isArray(res)) {
+      console.log(`成功获取到${res.length}个服务数据`);
+      services.value = res;
+    } else if (typeof res === 'object' && res !== null && res.data) {
+      // 处理嵌套的数据格式
+      services.value = Array.isArray(res.data) ? res.data : [];
+      console.log(`成功获取到${services.value.length}个服务数据`);
     } else {
       console.warn('服务数据格式不正确，使用空数组');
       services.value = [];
     }
+    
+    // 确保每个服务项都有必要的属性
+    services.value = services.value.map(service => ({
+      ...service,
+      desc: service.desc || service.description || '',
+      isActive: service.isActive !== false // 默认激活
+    }));
     
     // 如果没有数据，使用模拟数据
     if (!services.value.length) {
@@ -528,72 +506,72 @@ const fetchServices = async () => {
       console.log('使用模拟服务数据:', services.value);
     }
   } catch (err) {
-      console.error('获取服务数据失败:', err);
-      error.value = '获取服务数据失败，请稍后重试';
-      // 提供默认服务数据，与后端保持一致
-      services.value = [
-        {
-          _id: '1',
-          id: '1',
-          icon: 'Management',
-          title: '软件开发',
-          description: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。',
-          desc: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。',
-          order: 1,
-          isActive: true
-        },
-        {
-          _id: '2',
-          id: '2',
-          icon: 'Monitor',
-          title: '数字化转型',
-          description: '帮助企业实现数字化转型，优化业务流程，提升运营效率。',
-          desc: '帮助企业实现数字化转型，优化业务流程，提升运营效率。',
-          order: 2,
-          isActive: true
-        },
-        {
-          _id: '3',
-          id: '3',
-          icon: 'Cloud',
-          title: '云服务',
-          description: '提供云计算解决方案，包括云迁移、云托管和云安全服务。',
-          desc: '提供云计算解决方案，包括云迁移、云托管和云安全服务。',
-          order: 3,
-          isActive: true
-        },
-        {
-          _id: '4',
-          id: '4',
-          icon: 'StarFilled',
-          title: '人工智能',
-          description: '利用人工智能技术为企业提供智能决策支持和自动化解决方案。',
-          desc: '利用人工智能技术为企业提供智能决策支持和自动化解决方案。',
-          order: 4,
-          isActive: true
-        },
-        {
-          _id: '5',
-          id: '5',
-          icon: 'Histogram',
-          title: '大数据分析',
-          description: '通过大数据分析帮助企业挖掘数据价值，优化业务决策。',
-          desc: '通过大数据分析帮助企业挖掘数据价值，优化业务决策。',
-          order: 5,
-          isActive: true
-        },
-        {
-          _id: '6',
-          id: '6',
-          icon: 'Briefcase',
-          title: 'IT咨询',
-          description: '提供专业的IT战略咨询服务，帮助企业制定技术发展规划。',
-          desc: '提供专业的IT战略咨询服务，帮助企业制定技术发展规划。',
-          order: 6,
-          isActive: true
-        }
-      ];
-    } finally {
+    console.error('获取服务数据失败:', err);
+    error.value = '获取服务数据失败，请稍后重试';
+    // 提供默认服务数据，与后端保持一致
+    services.value = [
+      {
+        _id: '1',
+        id: '1',
+        icon: 'Management',
+        title: '软件开发',
+        description: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。',
+        desc: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。',
+        order: 1,
+        isActive: true
+      },
+      {
+        _id: '2',
+        id: '2',
+        icon: 'Monitor',
+        title: '数字化转型',
+        description: '帮助企业实现数字化转型，优化业务流程，提升运营效率。',
+        desc: '帮助企业实现数字化转型，优化业务流程，提升运营效率。',
+        order: 2,
+        isActive: true
+      },
+      {
+        _id: '3',
+        id: '3',
+        icon: 'Cloud',
+        title: '云服务',
+        description: '提供云计算解决方案，包括云迁移、云托管和云安全服务。',
+        desc: '提供云计算解决方案，包括云迁移、云托管和云安全服务。',
+        order: 3,
+        isActive: true
+      },
+      {
+        _id: '4',
+        id: '4',
+        icon: 'StarFilled',
+        title: '人工智能',
+        description: '利用人工智能技术为企业提供智能决策支持和自动化解决方案。',
+        desc: '利用人工智能技术为企业提供智能决策支持和自动化解决方案。',
+        order: 4,
+        isActive: true
+      },
+      {
+        _id: '5',
+        id: '5',
+        icon: 'Histogram',
+        title: '大数据分析',
+        description: '通过大数据分析帮助企业挖掘数据价值，优化业务决策。',
+        desc: '通过大数据分析帮助企业挖掘数据价值，优化业务决策。',
+        order: 5,
+        isActive: true
+      },
+      {
+        _id: '6',
+        id: '6',
+        icon: 'Briefcase',
+        title: 'IT咨询',
+        description: '提供专业的IT战略咨询服务，帮助企业制定技术发展规划。',
+        desc: '提供专业的IT战略咨询服务，帮助企业制定技术发展规划。',
+        order: 6,
+        isActive: true
+      }
+    ];
+  } finally {
     loadingServices.value = false;
   }
 };
@@ -604,44 +582,60 @@ const fetchCaseList = async () => {
   error.value = null;
   try {
     console.log('开始获取客户案例数据...');
-    // 直接使用模拟数据避免API调用可能的问题
-    // const res = await getCaseList();
+    // 使用API获取数据
+    const res = await getCaseList();
+    console.log('案例API返回结果:', res);
     
-    // 正确提取数据，确保数据格式一致
-    // cases.value = Array.isArray(res) ? res : (res.data || []).filter(item => item && item.isActive !== false);
-    // 使用模拟数据
-    cases.value = [
-      {
-        id: '1',
-        description: '通过实施智能制造解决方案，帮助企业提升生产效率30%，降低运营成本25%。'
-      },
-      {
-        id: '2',
-        description: '为金融机构打造安全可靠的交易平台，支持日均交易量超过10万笔。'
-      },
-      {
-        id: '3',
-        description: '对现有电商系统进行全面升级，提升用户体验和系统性能，销售额增长45%。'
-      }
-    ];
-    console.log('使用模拟客户案例数据:', cases.value);
+    // 处理可能的不同响应格式
+    let caseData = [];
+    
+    if (Array.isArray(res)) {
+      caseData = res;
+    } else if (typeof res === 'object' && res !== null && res.data) {
+      // 处理嵌套的数据格式
+      caseData = Array.isArray(res.data) ? res.data : [];
+    }
+    
+    // 过滤激活的案例并确保数据格式一致
+    cases.value = caseData
+      .filter(item => item && item.isActive !== false)
+      .map(item => ({
+        id: item._id || item.id || String(item.id || Date.now()),
+        description: item.description || '',
+        image: item.image || '',
+        publishTime: item.publishTime || item.createTime || new Date().toISOString(),
+        order: item.order || 0
+      }));
+    
+    console.log(`成功获取到${cases.value.length}个客户案例数据`, cases.value);
     
     // 如果没有数据，使用模拟数据
     if (!cases.value.length) {
       cases.value = [
         {
           id: '1',
-          description: '通过实施智能制造解决方案，帮助企业提升生产效率30%，降低运营成本25%。'
+          description: '通过实施智能制造解决方案，帮助企业提升生产效率30%，降低运营成本25%。',
+          image: 'https://picsum.photos/id/239/800/600',
+          publishTime: '2024-01-15',
+          order: 1
         },
         {
           id: '2',
-          description: '为金融机构打造安全可靠的交易平台，支持日均交易量超过10万笔。'
+          description: '为金融机构打造安全可靠的交易平台，支持日均交易量超过10万笔。',
+          image: 'https://picsum.photos/id/24/800/600',
+          publishTime: '2024-02-20',
+          order: 2
         },
         {
           id: '3',
-          description: '对现有电商系统进行全面升级，提升用户体验和系统性能，销售额增长45%。'
+          description: '对现有电商系统进行全面升级，提升用户体验和系统性能，销售额增长45%。',
+          image: 'https://picsum.photos/id/119/800/600',
+          publishTime: '2024-03-10',
+          order: 3
         }
-      ];}
+      ];
+      console.log('使用模拟客户案例数据:', cases.value);
+    }
   } catch (err) {
     console.error('获取客户案例数据失败:', err);
     error.value = '获取客户案例数据失败，请稍后重试';
@@ -649,15 +643,24 @@ const fetchCaseList = async () => {
     cases.value = [
       {
         id: '1',
-        description: '通过实施智能制造解决方案，帮助企业提升生产效率30%，降低运营成本25%。'
+        description: '通过实施智能制造解决方案，帮助企业提升生产效率30%，降低运营成本25%。',
+        image: 'https://picsum.photos/id/239/800/600',
+        publishTime: '2024-01-15',
+        order: 1
       },
       {
         id: '2',
-        description: '为金融机构打造安全可靠的交易平台，支持日均交易量超过10万笔。'
+        description: '为金融机构打造安全可靠的交易平台，支持日均交易量超过10万笔。',
+        image: 'https://picsum.photos/id/24/800/600',
+        publishTime: '2024-02-20',
+        order: 2
       },
       {
         id: '3',
-        description: '对现有电商系统进行全面升级，提升用户体验和系统性能，销售额增长45%。'
+        description: '对现有电商系统进行全面升级，提升用户体验和系统性能，销售额增长45%。',
+        image: 'https://picsum.photos/id/119/800/600',
+        publishTime: '2024-03-10',
+        order: 3
       }
     ];
   } finally {
@@ -752,7 +755,7 @@ const getServiceImage = (index) => {
   return `https://picsum.photos/id/${imageIds[index % imageIds.length]}/600/400`;
 };
 
-// 获取案例图片
+// 获取案例图片（作为备用）
 const getCaseImage = (index) => {
   const imageIds = [239, 24, 119];
   return `https://picsum.photos/id/${imageIds[index % imageIds.length]}/800/600`;
@@ -760,12 +763,13 @@ const getCaseImage = (index) => {
 
 // 获取案例标题
 const getCaseTitle = (index) => {
+  // 优先使用案例数据中的标题，如果没有则使用默认标题
   const titles = [
     '某大型制造企业数字化转型项目',
     '金融科技平台开发项目',
     '电商系统升级改造项目'
   ];
-  return titles[index % titles.length];
+  return cases.value[index]?.title || titles[index % titles.length];
 };
 
 // 获取团队成员姓名

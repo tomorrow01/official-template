@@ -57,10 +57,10 @@
         <h2 class="section-title">专业团队</h2>
         <p class="section-subtitle">我们拥有一支经验丰富、技术精湛的专业团队</p>
         <div class="team-grid">
-          <div v-for="(member, index) in configs.teamMembers" :key="index" class="team-member">
-            <img :src="member.image || '/images/logo.png'" alt="团队成员" class="team-img">
-            <h3 class="team-name">{{ member.name || '未知' }}</h3>
-            <p class="team-role">{{ member.role || '未知职位' }}</p>
+          <div v-for="(member, index) in configs.teamMembers" :key="member.name || index" class="team-member">
+            <img :src="member.image" alt="团队成员" class="team-img">
+            <h3 class="team-name">{{ member.name }}</h3>
+            <p class="team-role">{{ member.role }}</p>
           </div>
         </div>
       </div>
@@ -96,9 +96,10 @@ async function fetchConfigs() {
   try {
     // 获取所有配置
     const response = await request.get('/api/configs');
-    // 检查响应是否存在且包含必要的数据结构
-    if (response && response.data && response.data.code === 200 && response.data.data && Array.isArray(response.data.data)) {
-      response.data.data.forEach(config => {
+    
+    // 响应拦截器已经处理了code检查，这里直接使用response
+    if (response && Array.isArray(response)) {
+      response.forEach(config => {
         // 确保config对象有效
         if (!config || !config.key) return;
         
@@ -120,9 +121,19 @@ async function fetchConfigs() {
             break;
           case 'team_members':
             try {
-              const members = config.value ? JSON.parse(config.value) : null;
+              // 检查config.value是否已经是对象，如果是则直接使用，否则尝试解析
+              let members = config.value;
+              if (typeof members === 'string') {
+                members = JSON.parse(members);
+              }
               if (Array.isArray(members)) {
-                configs.value.teamMembers = members;
+                // 确保每个成员对象都有必要的属性，避免渲染错误
+                configs.value.teamMembers = members.map(member => ({
+                  name: member.name || '未知',
+                  role: member.role || '未知职位',
+                  // 检查图片路径，如果是以/team/开头的，使用默认图片，否则使用提供的路径
+                  image: (member.image && member.image.startsWith('/team/')) ? '/images/logo.png' : (member.image || '/images/logo.png')
+                }));
               }
             } catch (e) {
               console.error('解析团队成员数据失败:', e);
