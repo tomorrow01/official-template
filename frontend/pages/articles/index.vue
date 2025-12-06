@@ -1,5 +1,6 @@
 <template>
   <div class="articles-page">
+    
     <!-- 页面标题 -->
     <div class="page-header">
       <div class="container">
@@ -63,7 +64,6 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import Navbar from '@/components/Navbar.vue';
 import Footer from '@/components/Footer.vue';
 import { getArticleList } from '@/api/articles';
 
@@ -187,6 +187,8 @@ onMounted(() => {
   text-align: center;
   position: relative;
   overflow: hidden;
+  margin-top: 0;
+  z-index: 1;
 }
 
 .page-header::before {

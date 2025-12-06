@@ -1,11 +1,16 @@
+<script setup>
+// 重新导入Navbar组件
+import Navbar from '@/components/Navbar.vue'
+</script>
+
 <template>
-  <div>
-    <NuxtRouteAnnouncer />  <!-- 保留路由提示组件（辅助功能） -->
-    <Navbar />  <!-- 添加全局导航条组件 -->
+  <div class="app-container">
+    <!-- 重新添加Navbar组件 -->
+    <Navbar />
     <div class="page-content">
-      <NuxtPage />  <!-- 替换为路由页面组件，自动加载 pages/index.vue 作为首页 -->
+      <NuxtRouteAnnouncer />
+      <NuxtPage />
     </div>
-    <!-- <NuxtWelcome /> -->
   </div>
 </template>
 
