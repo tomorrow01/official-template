@@ -2,7 +2,7 @@
   <nav class="navbar fixed w-full top-0 z-50 transition-all duration-300" :class="{ 'navbar-scrolled': isScrolled }">
     <div class="container">
       <NuxtLink to="/" class="logo" aria-label="官网首页">
-        <img src="/images/mingri-tech-logo.svg" alt="明日科技logo" class="logo-img">
+        <img :src="companyLogo || '/images/mingri-tech-logo.svg'" alt="明日科技logo" class="logo-img">
       </NuxtLink>
       
       <!-- 桌面导航 -->
@@ -96,6 +96,7 @@
 import { onMounted, onUnmounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { getServiceList } from '@/api/services';
+import request from '@/api/request';
 
 const router = useRouter();
 const isScrolled = ref(false);
@@ -103,6 +104,7 @@ const mobileMenuOpen = ref(false);
 const services = ref([]);
 const loadingServices = ref(false);
 const serviceDropdownOpen = ref(false);
+const companyLogo = ref('');
 
 // 处理滚动事件，改变导航栏样式
 const handleScroll = () => {
@@ -158,6 +160,25 @@ const fetchServices = async () => {
   }
 };
 
+// 获取公司logo
+const fetchCompanyLogo = async () => {
+  try {
+    const response = await request.get('/api/configs/key/company_logo');
+    // 检查响应格式并获取logo数据
+    if (response && response.value) {
+      companyLogo.value = response.value;
+    } else if (response && response.data && response.data.value) {
+      companyLogo.value = response.data.value;
+    } else if (response && response.value) {
+      companyLogo.value = response.value;
+    }
+  } catch (error) {
+    console.error('获取公司logo失败:', error);
+    // 使用默认logo
+    companyLogo.value = '';
+  }
+};
+
 // 监听窗口大小变化，在桌面端时自动关闭移动端菜单
 const handleResize = () => {
   if (typeof window !== 'undefined' && window.innerWidth >= 768 && mobileMenuOpen.value) {
@@ -176,6 +197,8 @@ onMounted(() => {
     handleScroll();
     // 获取核心服务数据
     fetchServices();
+    // 获取公司logo
+    fetchCompanyLogo();
   }
 });
 

@@ -21,6 +21,7 @@
             <img src="/images/case1.jpg" alt="公司办公环境" class="company-img">
           </div>
         </div>
+
       </div>
     </div>
     
@@ -83,6 +84,7 @@ const configs = ref({
   mission: '通过技术创新，赋能企业数字化转型，为客户创造更大价值。',
   vision: '成为行业领先的Web应用解决方案提供商，引领技术发展潮流。',
   values: '诚信、创新、协作、卓越，始终以客户需求为中心。',
+  companyLogo: '',
   teamMembers: [
     { name: '张三', role: '技术总监', image: '/images/banner1.jpg' },
     { name: '李四', role: '产品经理', image: '/images/banner2.jpg' },
@@ -109,6 +111,9 @@ async function fetchConfigs() {
             break;
           case 'about_company_detail':
             configs.value.companyDetail = config.value || configs.value.companyDetail;
+            break;
+          case 'company_logo':
+            configs.value.companyLogo = config.value || configs.value.companyLogo;
             break;
           case 'company_mission':
             configs.value.mission = config.value || configs.value.mission;
@@ -243,6 +248,26 @@ onMounted(() => {
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 20px;
+}
+
+.section-subtitle {
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.company-logo {
+  margin-top: 40px;
+  text-align: center;
+}
+
+.logo-img {
+  max-width: 300px;
+  max-height: 200px;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: var(--shadow-light);
 }
 
 .intro-text p {

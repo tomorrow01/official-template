@@ -28,7 +28,7 @@ const mockServices = [
   {
     _id: 'mock-1',
     title: '网站建设',
-    description: '专业的网站设计与开发，响应式布局，提升品牌形象',
+    content: '专业的网站设计与开发，响应式布局，提升品牌形象',
     icon: 'el-icon-s-grid',
     image: '/images/service1.jpg',
     order: 1,
@@ -38,7 +38,7 @@ const mockServices = [
   {
     _id: 'mock-2',
     title: 'APP开发',
-    description: '定制化移动应用开发，原生体验，满足企业需求',
+    content: '定制化移动应用开发，原生体验，满足企业需求',
     icon: 'el-icon-mobile',
     image: '/images/service2.jpg',
     order: 2,
@@ -48,7 +48,7 @@ const mockServices = [
   {
     _id: 'mock-3',
     title: '数据分析',
-    description: '专业的数据收集与分析服务，助力企业决策',
+    content: '专业的数据收集与分析服务，助力企业决策',
     icon: 'el-icon-pie-chart',
     image: '/images/service3.jpg',
     order: 3,

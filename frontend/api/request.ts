@@ -2,9 +2,28 @@ import axios from 'axios';
 import type { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
 import { ElMessage } from 'element-plus';
 
+// 定义API响应接口
+interface ApiResponse<T> {
+  code: number;
+  message: string;
+  data: T;
+}
+
+// 扩展AxiosInstance类型，使post等方法返回响应数据而不是AxiosResponse
+interface CustomAxiosInstance extends AxiosInstance {
+  <T = any>(config: InternalAxiosRequestConfig): Promise<T>;
+  request<T = any>(config: InternalAxiosRequestConfig): Promise<T>;
+  get<T = any>(url: string, config?: InternalAxiosRequestConfig): Promise<T>;
+  delete<T = any>(url: string, config?: InternalAxiosRequestConfig): Promise<T>;
+  head<T = any>(url: string, config?: InternalAxiosRequestConfig): Promise<T>;
+  post<T = any>(url: string, data?: any, config?: InternalAxiosRequestConfig): Promise<T>;
+  put<T = any>(url: string, data?: any, config?: InternalAxiosRequestConfig): Promise<T>;
+  patch<T = any>(url: string, data?: any, config?: InternalAxiosRequestConfig): Promise<T>;
+}
+
 // 创建默认的Axios实例
-const request: AxiosInstance = axios.create({
-  baseURL: '', // 使用相对路径，确保通过代理转发
+const request: CustomAxiosInstance = axios.create({
+  baseURL: import.meta.env.NUXT_PUBLIC_API_BASE,
   timeout: 10000, // 请求超时时间
   headers: { 'Content-Type': 'application/json' }, // 默认请求头
   validateStatus: (status) => status >= 200 && status < 500, // 仅将5xx错误视为网络错误

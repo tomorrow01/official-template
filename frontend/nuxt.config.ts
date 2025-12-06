@@ -9,7 +9,7 @@ export default defineNuxtConfig({
   // 运行时配置
   runtimeConfig: {
     public: {
-      apiBase: '' // 开发环境使用空字符串，确保通过代理转发
+      apiBase: process.env.NUXT_PUBLIC_API_BASE || ''
     }
   },
   // Element Plus 模块配置
@@ -36,7 +36,7 @@ export default defineNuxtConfig({
   // 确保API代理仍然工作
   vite: {
     server: {
-      proxy: {       
+      proxy: {
         // 保留原有的API路径代理
         '/api': {
           target: 'http://127.0.0.1:3000',

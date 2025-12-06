@@ -156,10 +156,15 @@
       </div>
     </section>
 
-    <!-- 客户案例 - 左图右文布局（添加边框和阴影效果） -->
-    <div>
-      <div style="max-width: 1100px; margin: 0 auto; padding: 50px 20px;">
-        <h2 style="text-align: center; margin-bottom: 30px;">成功合作案例</h2>
+    <!-- 成功合作案例 -->
+    <section class="cases-section py-12 bg-white">
+      <div class="container">
+        <!-- 区块标题 -->
+        <div class="section-header text-center mb-12 max-w-3xl mx-auto">
+          <span class="section-tag text-primary font-medium">成功案例</span>
+          <h2 class="section-title text-3xl md:text-4xl font-bold mt-2 mb-4">成功合作案例</h2>
+          <p class="section-subtitle text-gray-600">我们为众多企业提供了专业的技术解决方案，助力业务增长</p>
+        </div>
         
         <div v-for="(item, index) in cases" :key="item.id" style="display: flex; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); overflow: hidden; margin-bottom: 30px;">
           <!-- 左侧图片 -->
@@ -176,7 +181,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </section>
 
     <!-- 数据统计 -->
     <section class="stats-section py-16 bg-gradient-to-r from-primary to-secondary text-white">
@@ -372,42 +377,23 @@ import { ArrowUp } from '@element-plus/icons-vue';
 // import { getBannerList } from '@/api/banner';
 import { getCaseList } from '@/api/cases';
 import { getServiceList } from '@/api/services';
+import { getArticleList } from '@/api/articles';
 
 const services = ref([]);
-// 页面加载时获取服务数据
+// 页面加载时获取数据
 onMounted(async () => {
-  console.log('页面挂载，开始获取服务数据...');
-  await fetchServices();
+  console.log('页面挂载，开始获取数据...');
+  await Promise.all([fetchServices(), fetchLatestArticles()]);
 });
 const cases = ref([]);
-const latestArticles = ref([
-  {
-    id: '1',
-    title: 'Vue 3新特性解读',
-    excerpt: '深入解析Vue 3组合式API的优势，对比选项式API的性能提升与开发体验优化...',
-    createTime: '2024-07-10',
-    image: '/images/article1-placeholder.jpg'
-  },
-  {
-    id: '2',
-    title: '前端性能优化指南',
-    excerpt: '从资源加载（懒加载/预加载）到渲染优化（虚拟列表/防抖节流）的全流程实践方案...',
-    createTime: '2024-07-09',
-    image: '/images/article2-placeholder.jpg'
-  },
-  {
-    id: '3',
-    title: 'Nuxt 3实战经验分享',
-    excerpt: '使用Nuxt 3构建SEO友好的企业级应用，包含路由、状态管理、API集成等关键点...',
-    createTime: '2024-07-05',
-    image: '/images/article3-placeholder.jpg'
-  }
-]);
+const latestArticles = ref([]);
 const showBackToTop = ref(false);
 const loadingCases = ref(true);
 const loadingServices = ref(true);
 const loadingArticles = ref(true);
 const error = ref(null);
+
+
 
 // 获取服务数据
 const fetchServices = async () => {
@@ -674,47 +660,22 @@ const fetchLatestArticles = async () => {
   error.value = null;
   try {
     console.log('开始获取最新文章数据...');
-    // 由于没有单独的获取最新文章API，这里我们调用通用的文章API并限制返回数量
-    try {
-      const request = (await import('@/api/request')).getRequestInstance();
-      const response = await request.get('/api/articles?limit=3');
-      const articles = response.data.data || [];
-      
-      // 格式化文章数据以匹配前端组件期望的格式
-      latestArticles.value = articles.map(article => ({
-        id: article._id || article.id,
-        title: article.title,
-        excerpt: article.content ? article.content.substring(0, 100) + '...' : '',
-        createTime: article.createTime || article.createdAt,
-        image: ''
-      }));
-    } catch (apiError) {
-      console.warn('API调用失败，使用模拟数据');
-      // 使用模拟数据
-      latestArticles.value = [
-        {
-          id: '1',
-          title: '2024年企业数字化转型趋势分析',
-          excerpt: '随着技术的快速发展，企业数字化转型已成为必然趋势。本文深入分析了2024年数字化转型的主要方向和策略。',
-          createTime: '2024-03-15',
-          image: ''
-        },
-        {
-          id: '2',
-          title: '人工智能在企业决策中的应用',
-          excerpt: '人工智能技术正在改变企业的决策方式，从数据中提取有价值的洞察，帮助企业做出更明智的决策。',
-          createTime: '2024-03-10',
-          image: ''
-        },
-        {
-          id: '3',
-          title: '云计算如何提升企业IT效率',
-          excerpt: '云计算技术为企业带来了灵活性和可扩展性，本文介绍了如何利用云服务优化IT基础设施。',
-          createTime: '2024-03-05',
-          image: ''
-        }
-      ];
-    }
+    // 使用API获取最新文章数据
+    const res = await getArticleList({ page: 1, limit: 3 });
+    
+    // 正确提取数据
+    const data = res.data || res;
+    const articleList = Array.isArray(data.records || data.list || data) ? 
+      (data.records || data.list || data) : [];
+    
+    // 格式化文章数据
+    latestArticles.value = articleList.map(article => ({
+      id: article._id || article.id,
+      title: article.title,
+      excerpt: article.excerpt || (article.content ? article.content.substring(0, 150) + '...' : ''),
+      createTime: article.createTime || article.createdAt,
+      image: article.image || `/images/article${Math.floor(Math.random() * 10)}-placeholder.jpg`
+    }));
     
     console.log('获取到的最新文章数据:', latestArticles.value);
   } catch (err) {

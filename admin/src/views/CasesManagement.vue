@@ -16,7 +16,7 @@
       width="100%"
     >
       <el-table-column type="selection" width="55" />
-      <el-table-column prop="description" label="案例描述" min-width="300" />
+      <el-table-column prop="title" label="标题" min-width="300" />
       <el-table-column prop="publishTime" label="发布时间" min-width="180" />
       <el-table-column prop="order" label="排序" min-width="80">
         <template #default="scope">
@@ -48,8 +48,16 @@
       width="50%"
     >
       <el-form :model="form" :rules="rules" ref="formRef">
-        <el-form-item label="案例描述" prop="description">
-          <el-input v-model="form.description" placeholder="请输入案例描述" />
+        <el-form-item label="标题" prop="title">
+          <el-input v-model="form.title" placeholder="请输入案例标题" />
+        </el-form-item>
+        <el-form-item label="内容" prop="content">
+          <el-input 
+            v-model="form.content" 
+            type="textarea" 
+            :rows="6"
+            placeholder="请输入案例内容"
+          />
         </el-form-item>
         <el-form-item label="图片链接" prop="image">
           <el-input v-model="form.image" placeholder="请输入图片URL" />
@@ -86,7 +94,8 @@ const loading = ref(false);
 // 对话框状态管理
 const showDialog = ref(false);
 const form = ref({ 
-  description: '', 
+  title: '', 
+  content: '',
   image: '',
   publishTime: new Date(),
   order: 0,
@@ -97,7 +106,8 @@ const formRef = ref(null);
 
 // 表单验证规则
 const rules = ref({
-  description: [{ required: true, message: '请输入案例描述', trigger: 'blur' }],
+  title: [{ required: true, message: '请输入标题', trigger: 'blur' }],
+  content: [{ required: true, message: '请输入内容', trigger: 'blur' }],
   image: [{ required: true, message: '请输入图片URL', trigger: 'blur' }],
   publishTime: [{ required: true, message: '请选择发布时间', trigger: 'change' }]
 });
@@ -122,7 +132,7 @@ const handleSubmit = async () => {
   try {
     // 表单验证
     await nextTick();
-    if (!form.value.description || !form.value.image) {
+    if (!form.value.title || !form.value.content || !form.value.image) {
       ElMessage.error('请填写完整信息');
       return;
     }
@@ -166,7 +176,8 @@ const handleSubmit = async () => {
 const editCase = (row) => {
   showDialog.value = true;
   form.value = {
-    description: row.description || '',
+    title: row.title || '',
+    content: row.content || '',
     image: row.image || '',
     publishTime: row.publishTime ? new Date(row.publishTime) : new Date(),
     order: row.order || 0,
@@ -220,7 +231,8 @@ const updateOrder = async (row) => {
 // 重置表单
 const resetForm = () => {
   form.value = {
-    description: '',
+    title: '',
+    content: '',
     image: '',
     publishTime: new Date(),
     order: 0,

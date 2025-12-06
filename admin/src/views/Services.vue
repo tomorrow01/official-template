@@ -17,7 +17,7 @@
     >
       <el-table-column type="selection" width="55" />
       <el-table-column prop="title" label="服务名称" min-width="180" />
-      <el-table-column prop="description" label="服务描述" min-width="400" />
+      <el-table-column prop="content" label="内容" min-width="400" />
       <el-table-column prop="icon" label="图标名称" min-width="150" />
       <el-table-column prop="order" label="排序" min-width="100" />
       <el-table-column prop="isActive" label="是否启用" min-width="100">
@@ -48,8 +48,8 @@
         <el-form-item label="服务名称" prop="title">
           <el-input v-model="form.title" placeholder="请输入服务名称" />
         </el-form-item>
-        <el-form-item label="服务描述" prop="description">
-          <el-input v-model="form.description" type="textarea" placeholder="请输入服务描述" :rows="3" />
+        <el-form-item label="内容" prop="content">
+          <el-input v-model="form.content" type="textarea" placeholder="请输入内容" :rows="3" />
         </el-form-item>
         <el-form-item label="图标名称" prop="icon">
           <el-input v-model="form.icon" placeholder="请输入Element Plus图标名称，如：el-icon-s-grid" />
@@ -80,13 +80,13 @@ const loading = ref(false);
 
 // 对话框状态管理
 const showDialog = ref(false);
-const form = ref({ title: '', description: '', icon: '', order: 1, isActive: true });
+const form = ref({ title: '', content: '', icon: '', order: 1, isActive: true });
 const currentId = ref(null); // 当前编辑的服务ID
 
 // 表单验证规则
 const rules = ref({
-  title: [{ required: true, message: '请输入服务名称', trigger: 'blur' }],
-  description: [{ required: true, message: '请输入服务描述', trigger: 'blur' }],
+  title: [{ required: true, message: '请输入标题', trigger: 'blur' }],
+  content: [{ required: true, message: '请输入内容', trigger: 'blur' }],
   icon: [{ required: true, message: '请输入图标名称', trigger: 'blur' }],
   order: [{ required: true, message: '请输入排序值', trigger: 'blur' }]
 });
@@ -112,7 +112,7 @@ const loadServices = async () => {
     services.value = serviceData.map(service => ({
       _id: service._id || service.id || `temp-${Date.now()}-${Math.random()}`,
       title: service.title || '',
-      description: service.description || '',
+      content: service.content || service.description || '',
       icon: service.icon || '',
       order: service.order || 0,
       isActive: service.isActive !== undefined ? service.isActive : true
@@ -124,10 +124,10 @@ const loadServices = async () => {
     ElMessage.error('加载服务数据失败');
     // 使用模拟数据作为备用
     services.value = [
-      {
+      {        
         _id: '1',
         title: '网站建设',
-        description: '专业的网站设计与开发，响应式布局，提升品牌形象',
+        content: '专业的网站设计与开发，响应式布局，提升品牌形象',
         icon: 'el-icon-s-grid',
         order: 1,
         isActive: true
@@ -135,7 +135,7 @@ const loadServices = async () => {
       {
         _id: '2',
         title: 'APP开发',
-        description: '定制化移动应用开发，原生体验，满足企业需求',
+        content: '定制化移动应用开发，原生体验，满足企业需求',
         icon: 'el-icon-mobile',
         order: 2,
         isActive: true
@@ -143,7 +143,7 @@ const loadServices = async () => {
       {
         _id: '3',
         title: '数据分析',
-        description: '专业的数据收集与分析服务，助力企业决策',
+        content: '专业的数据收集与分析服务，助力企业决策',
         icon: 'el-icon-pie-chart',
         order: 3,
         isActive: true
@@ -157,7 +157,7 @@ const loadServices = async () => {
 // 新增/编辑提交逻辑
 const handleSubmit = async () => {
   // 表单验证
-  if (!form.value.title || !form.value.description || !form.value.icon || !form.value.order) {
+  if (!form.value.title || !form.value.content || !form.value.icon || !form.value.order) {
     ElMessage.error('请填写完整信息');
     return;
   }
@@ -182,7 +182,7 @@ const handleSubmit = async () => {
 
     // 重置对话框状态
     showDialog.value = false;
-    form.value = { title: '', description: '', icon: '', order: 1, isActive: true };
+    form.value = { title: '', content: '', icon: '', order: 1, isActive: true };
     currentId.value = null;
     // 重新加载列表确保数据一致性
     loadServices();
@@ -197,7 +197,7 @@ const editService = (row) => {
   showDialog.value = true;
   form.value = {
     title: row.title,
-    description: row.description,
+    content: row.content || row.description || '',
     icon: row.icon,
     order: row.order,
     isActive: row.isActive || true

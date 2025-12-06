@@ -6,7 +6,7 @@
     "value": "我们是一家专注于前端开发和内容管理系统解决方案的高科技企业，致力于为客户提供高质量、高性能的Web应用和数字体验测试。",
     "description": "关于我们页面的公司简介内容",
     "createTime": "2025-11-22T12:52:36.959Z",
-    "updateTime": "2025-12-04T08:44:48.985Z"
+    "updateTime": "2025-12-06T06:41:01.042Z"
   },
   {
     "id": 2,
@@ -15,7 +15,7 @@
     "value": "自成立以来，我们始终坚持以客户为中心，不断创新和完善我们的服务体系。我们的团队由行业资深专家组成，能够为客户提供专业、高效的解决方案。未来，我们将继续秉承诚信、专业、创新的理念，为客户创造更大的价值。",
     "description": "关于我们页面的公司详细介绍内容",
     "createTime": "2025-11-22T12:52:36.959Z",
-    "updateTime": "2025-12-04T08:44:48.988Z"
+    "updateTime": "2025-12-06T06:41:01.049Z"
   },
   {
     "id": 3,
@@ -24,7 +24,7 @@
     "value": "为客户创造价值，为员工创造机会，为社会创造效益测试",
     "description": "关于我们页面的企业使命内容",
     "createTime": "2025-11-22T12:52:36.959Z",
-    "updateTime": "2025-12-04T08:44:48.991Z"
+    "updateTime": "2025-12-06T06:41:01.054Z"
   },
   {
     "id": 4,
@@ -33,7 +33,7 @@
     "value": "成为行业领先的服务提供商，引领行业发展测试",
     "description": "关于我们页面的企业愿景内容",
     "createTime": "2025-11-22T12:52:36.959Z",
-    "updateTime": "2025-12-04T08:44:48.994Z"
+    "updateTime": "2025-12-06T06:41:01.059Z"
   },
   {
     "id": 5,
@@ -42,15 +42,24 @@
     "value": "诚信、专业、创新、协作测试",
     "description": "关于我们页面的企业价值观内容",
     "createTime": "2025-11-22T12:52:36.959Z",
-    "updateTime": "2025-12-04T08:44:49.001Z"
+    "updateTime": "2025-12-06T06:41:01.063Z"
   },
   {
     "id": 6,
     "key": "team_members",
     "name": "团队成员",
-    "value": "[{\"name\":\"张三\",\"role\":\"总经理\",\"image\":\"/team/1.jpg\"},{\"name\":\"李四\",\"role\":\"技术总监\",\"image\":\"/team/2.jpg\"},{\"name\":\"王五\",\"role\":\"市场经理\",\"image\":\"/team/3.jpg\"},{\"name\":\"赵六\",\"role\":\"设计总监\",\"image\":\"/team/4.jpg\"}]",
+    "value": "[{\"name\":\"张三1\",\"role\":\"总经理\",\"image\":\"/images/team.jpeg\"},{\"name\":\"李四1\",\"role\":\"技术总监\",\"image\":\"/images/team.jpeg\"},{\"name\":\"王五1\",\"role\":\"市场经理\",\"image\":\"/images/team.jpeg\"},{\"name\":\"赵六1\",\"role\":\"设计总监\",\"image\":\"/images/team.jpeg\"},{\"name\":\"测试\",\"role\":\"测试\",\"image\":\"/images/team.jpeg\"}]",
     "description": "关于我们页面的团队成员信息",
     "createTime": "2025-11-22T12:52:36.959Z",
-    "updateTime": "2025-12-04T08:44:49.005Z"
+    "updateTime": "2025-12-06T06:41:01.072Z"
+  },
+  {
+    "id": 7,
+    "key": "company_logo",
+    "name": "公司Logo",
+    "value": "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjQwIiB2aWV3Qm94PSIwIDAgMTIwIDQwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogIDwhLS0g6IOM5pmv5b2i54q2IC0tPgogIDxyZWN0IHg9IjAiIHk9IjAiIHdpZHRoPSIxMjAiIGhlaWdodD0iNDAiIHJ4PSIyMCIgZmlsbD0iIzE2NzdGRiIvPgogIDwhLS0g5piO5pel56eR5oqA5paH5a2XIC0tPgogIDx0ZXh0IHg9IjYwIiB5PSIyNiIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE2IiBmb250LXdlaWdodD0iYm9sZCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiPuaYjuaXpeenkeaKgDwvdGV4dD4KICA8IS0tIOeCuee8gOWFg+e0oCAtLT4KICA8Y2lyY2xlIGN4PSIyNSIgY3k9IjIwIiByPSIzIiBmaWxsPSJ3aGl0ZSIgb3BhY2l0eT0iMC44Ii8+CiAgPGNpcmNsZSBjeD0iOTUiIGN5PSIyMCIgcj0iMyIgZmlsbD0id2hpdGUiIG9wYWNpdHk9IjAuOCIvPgo8L3N2Zz4=",
+    "description": "网站顶部显示的公司Logo图片路径",
+    "createTime": "2025-12-04T08:44:49.010Z",
+    "updateTime": "2025-12-06T06:41:01.068Z"
   }
 ]

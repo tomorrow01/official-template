@@ -36,6 +36,9 @@ const insertDefaultData = async () => {
     const Service = require('../models/Service');
     const Case = require('../models/Case');
     const Article = require('../models/Article');
+    const Config = require('../models/Config');
+    const fs = require('fs').promises;
+    const path = require('path');
     
     // 插入默认轮播图数据
     const bannerCount = await Banner.countDocuments();
@@ -143,6 +146,27 @@ const insertDefaultData = async () => {
       ];
       await Article.insertMany(defaultArticles);
       console.log('默认文章数据插入成功');
+    }
+    
+    // 同步配置数据到数据库
+    const configCount = await Config.countDocuments();
+    if (configCount === 0) {
+      // 读取本地配置文件
+      const configPath = path.join(__dirname, '../data/configs.json');
+      const configData = JSON.parse(await fs.readFile(configPath, 'utf8'));
+      
+      // 转换数据格式并插入到数据库
+      const configsToInsert = configData.map(config => ({
+        key: config.key,
+        name: config.name,
+        value: config.value,
+        description: config.description,
+        createTime: new Date(config.createTime),
+        updateTime: new Date(config.updateTime)
+      }));
+      
+      await Config.insertMany(configsToInsert);
+      console.log('配置数据同步到数据库成功');
     }
   } catch (err) {
     console.error('插入默认数据失败:', err.message);

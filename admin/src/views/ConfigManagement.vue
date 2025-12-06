@@ -9,6 +9,27 @@
       <el-tabs v-model="activeTab" type="border-card">
         <el-tab-pane label="关于我们" name="about">
           <div class="config-section">
+            <h3>公司Logo</h3>
+            <div class="logo-uploader">
+              <el-upload
+                class="avatar-uploader"
+                :show-file-list="false"
+                :on-change="handleLogoChange"
+                :before-upload="beforeLogoUpload"
+                style="display: block; margin-bottom: 20px;"
+              >
+                <img v-if="aboutConfigs.logo" :src="aboutConfigs.logo" class="logo-preview" alt="公司Logo" />
+                <div v-else class="avatar-uploader-icon">
+                  <span>+</span>
+                </div>
+              </el-upload>
+              <el-button v-if="aboutConfigs.logo" type="danger" size="small" @click="removeLogo">
+                移除Logo
+              </el-button>
+            </div>
+          </div>
+
+          <div class="config-section">
             <h3>公司简介</h3>
             <el-input
               v-model="aboutConfigs.companyIntro"
@@ -145,6 +166,7 @@
 
 <script>
 import { configsAPI } from '../utils/api';
+import api from '../utils/api';
 import { ElMessage } from 'element-plus';
 
 export default {
@@ -158,7 +180,8 @@ export default {
         mission: '',
         vision: '',
         values: '',
-        teamMembers: []
+        teamMembers: [],
+        logo: ''
       },
       configIds: {},
       lastUpdateTime: '',
@@ -203,6 +226,9 @@ export default {
               case 'company_values':
                 this.aboutConfigs.values = config.value || '';
                 break;
+              case 'company_logo':
+                this.aboutConfigs.logo = config.value || '';
+                break;
               case 'team_members':
                 try {
                   this.aboutConfigs.teamMembers = JSON.parse(config.value) || [];
@@ -229,17 +255,18 @@ export default {
         { key: 'company_mission', value: this.aboutConfigs.mission },
         { key: 'company_vision', value: this.aboutConfigs.vision },
         { key: 'company_values', value: this.aboutConfigs.values },
+        { key: 'company_logo', value: this.aboutConfigs.logo },
         { key: 'team_members', value: JSON.stringify(this.aboutConfigs.teamMembers) }
       ];
       
       try {
         // 逐个更新配置项
         for (const config of configUpdates) {
-          if (this.configIds[config.key]) {
-            await configsAPI.update(this.configIds[config.key], {
-              value: config.value
-            });
-          }
+          // 无论id是否存在，都尝试更新配置
+          // 确保即使是新增的配置项也能被保存
+          await configsAPI.update(this.configIds[config.key], {
+            value: config.value
+          });
         }
         
         ElMessage.success('配置保存成功');
@@ -262,6 +289,40 @@ export default {
     
     removeTeamMember(index) {
       this.aboutConfigs.teamMembers.splice(index, 1);
+    },
+    
+    // 上传前检查
+    beforeLogoUpload(file) {
+      const isImage = /^image\//.test(file.type);
+      const isLt5M = file.size / 1024 / 1024 < 5;
+      if (!isImage) {
+        ElMessage.error('只允许上传图片文件!');
+      }
+      if (!isLt5M) {
+        ElMessage.error('文件大小不能超过5MB!');
+      }
+      return isImage && isLt5M;
+    },
+    
+    // 处理logo选择
+    handleLogoChange(file) {
+      // 添加标志位防止重复触发toast
+      if (file.status === 'ready') {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          this.aboutConfigs.logo = e.target.result;
+          ElMessage.success('Logo已加载，可以保存配置了');
+        };
+        reader.onerror = () => {
+          ElMessage.error('图片加载失败');
+        };
+        reader.readAsDataURL(file.raw);
+      }
+    },
+    
+    // 移除logo
+    removeLogo() {
+      this.aboutConfigs.logo = '';
     }
   }
 };
@@ -326,6 +387,38 @@ export default {
 .team-input {
   flex: 1;
   min-width: 200px;
+}
+
+.logo-uploader .avatar-uploader {
+  display: flex;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.logo-preview {
+  width: 150px;
+  height: 150px;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+.avatar-uploader-icon {
+  width: 150px;
+  height: 150px;
+  line-height: 150px;
+  border: 2px dashed #409EFF;
+  border-radius: 6px;
+  text-align: center;
+  color: #409EFF;
+  font-size: 36px;
+  background-color: #f5f7fa;
+  transition: all 0.3s;
+}
+
+.avatar-uploader-icon:hover {
+  border-color: #66b1ff;
+  background-color: #ecf5ff;
+  color: #66b1ff;
 }
 
 .action-buttons {

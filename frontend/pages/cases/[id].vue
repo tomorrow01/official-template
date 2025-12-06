@@ -1,9 +1,10 @@
 <template>
   <div class="simple-case-detail">
     <!-- 页面标题 -->
-    <div class="page-header">
+  <div class="page-header case-detail-header">
       <div class="container">
-        <h1 class="page-title">客户案例详情</h1>
+        <h1>客户案例详情</h1>
+        <p>探索我们如何帮助各行各业的客户实现业务增长和数字化转型</p>
       </div>
     </div>
     
@@ -91,23 +92,34 @@ console.log('案例详情页加载，ID:', route.params.id);
   min-height: 100vh;
 }
 
-.page-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 60px 0;
-  text-align: center;
+.page-header, .case-detail-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: white !important;
+  padding: 80px 0 !important;
+  text-align: center !important;
+  position: relative !important;
+  overflow: hidden !important;
 }
 
-.page-title {
-  font-size: 36px;
+.page-header h1 {
+  font-size: 2.8rem;
+  margin-bottom: 20px;
   font-weight: 700;
-  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.page-header p {
+  font-size: 1.2rem;
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.6;
+  opacity: 0.9;
 }
 
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 40px 20px;
+  padding: 0 20px;
 }
 
 .back-link {
@@ -126,7 +138,7 @@ console.log('案例详情页加载，ID:', route.params.id);
 .case-content {
   background: white;
   border-radius: 12px;
-  padding: 40px;
+  padding: 60px 40px;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 }
 
@@ -171,16 +183,21 @@ console.log('案例详情页加载，ID:', route.params.id);
 }
 
 @media (max-width: 768px) {
-  .page-header {
-    padding: 40px 0;
+  .page-header, .case-detail-header {
+    padding: 60px 0 !important;
   }
   
-  .page-title {
-    font-size: 28px;
+  .page-header h1 {
+    font-size: 2rem;
+  }
+  
+  .page-header p {
+    font-size: 1rem;
+    padding: 0 20px;
   }
   
   .container {
-    padding: 20px;
+    padding: 0 15px;
   }
   
   .case-content {
