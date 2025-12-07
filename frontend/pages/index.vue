@@ -120,8 +120,8 @@
           <p class="section-subtitle text-gray-600">我们提供全方位的技术服务，助力企业数字化转型</p>
         </div>
         
-        <!-- 服务卡片网格 - 强制3列布局 -->
-        <div style="display: grid !important; grid-template-columns: 1fr 1fr 1fr !important; gap: 24px !important; width: 100% !important; max-width: none !important; min-width: 0 !important;">
+        <!-- 服务卡片网格 - 响应式布局 -->
+        <div class="services-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; width: 100%; max-width: none; min-width: 0;">
           <!-- 每个服务项是一个独立卡片 -->
           <NuxtLink 
             v-for="(service, index) in services" 
@@ -166,9 +166,9 @@
           <p class="section-subtitle text-gray-600">我们为众多企业提供了专业的技术解决方案，助力业务增长</p>
         </div>
         
-        <div v-for="(item, index) in cases" :key="item.id" style="display: flex; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); overflow: hidden; margin-bottom: 30px;">
+        <div v-for="(item, index) in cases" :key="item.id" class="case-item" style="display: flex; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); overflow: hidden; margin-bottom: 30px; flex-wrap: wrap;">
           <!-- 左侧图片 -->
-          <div style="width: 350px; height: 250px; overflow: hidden;">
+          <div class="case-image" style="width: 350px; height: 250px; overflow: hidden; flex-shrink: 0;">
             <img :src="item.image || getCaseImage(index)" :alt="getCaseTitle(index)" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease; transform: scale(1);" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
           </div>
           <!-- 右侧内容 -->
@@ -218,7 +218,7 @@
         </div>
         
         <!-- 文章网格 -->
-        <div class="article-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;">
+        <div class="article-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
           <NuxtLink 
             v-for="(article, index) in latestArticles" 
             :key="article.id" 
@@ -1303,6 +1303,26 @@ onUnmounted(() => {
   
   .case-image {
     max-height: 200px;
+  }
+  
+  /* 移动端响应式：核心服务卡片一行显示一个 */
+  .services-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* 移动端响应式：成功案例垂直排列 */
+  .case-item {
+    flex-direction: column !important;
+  }
+  
+  .case-item .case-image {
+    width: 100% !important;
+    height: 200px !important;
+  }
+  
+  /* 移动端响应式：最新动态卡片一行显示一个 */
+  .article-grid {
+    grid-template-columns: 1fr !important;
   }
 }
 </style>
