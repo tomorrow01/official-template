@@ -12,9 +12,11 @@ const casesRouter = require('./routes/cases'); // 引入 cases 路由
 const servicesRouter = require('./routes/services'); // 引入 services 路由
 const contactsRouter = require('./routes/contacts'); // 引入 contacts 路由
 const configsRouter = require('./routes/configs'); // 引入 configs 路由
+const authRouter = require('./routes/auth'); // 引入认证路由
 
 const app = express();
-const port = process.env.PORT || 3000;
+// 修改默认端口为3001，避免与前端Nuxt服务器的3000端口冲突
+const port = process.env.PORT || 3001;
 
 // 确保上传目录存在
 const uploadDir = path.join(__dirname, '../uploads');
@@ -38,8 +40,54 @@ app.get('/', (req, res) => {
   res.json({ success: true, message: '服务正常运行' });
 });
 
-app.get('/api', (req, res) => {
+app.get('/api/health', (req, res) => {
   res.json({ success: true, message: 'API服务正常运行' });
+});
+
+// 简单测试路由
+app.get('/api/test', (req, res) => {
+  console.log('测试路由收到请求');
+  res.json({ success: true, message: '测试路由正常工作' });
+});
+
+// 直接实现认证路由
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    console.log('登录请求体:', req.body);
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+      return res.status(400).json({ code: 400, data: null, error: '用户名和密码不能为空' });
+    }
+
+    // 使用模拟数据进行验证
+    if (username === 'admin' && password === '123456') {
+      const jwt = require('jsonwebtoken');
+      const token = jwt.sign(
+        { userId: 'mock_user_id', username: 'admin', role: 'admin' },
+        'your_jwt_secret_key',
+        { expiresIn: '24h' }
+      );
+
+      res.status(200).json({
+        code: 200,
+        data: {
+          token,
+          user: {
+            _id: 'mock_user_id',
+            username: 'admin',
+            role: 'admin'
+          }
+        },
+        error: '登录成功（模拟数据）'
+      });
+    } else {
+      return res.status(401).json({ code: 401, data: null, error: '用户名或密码错误（模拟数据）' });
+    }
+  } catch (err) {
+    console.error('登录失败:', err);
+    res.status(500).json({ code: 500, data: null, error: `登录失败：${err.message}` });
+  }
 });
 
 // 配置 multer 用于文件上传
@@ -90,25 +138,23 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
   }
 });
 
-// 添加详细的路由挂载日志（所有路由都使用/api前缀）
+// 使用统一的路由文件
 console.log('开始挂载路由...');
-console.log('挂载 /api/articles 路由');
-app.use('/api/articles', articlesRouter);
-console.log('挂载 /api/contents 路由');
-app.use('/api/contents', contentsRouter);
-console.log('挂载 /api/banners 路由');
-app.use('/api/banners', bannersRouter);
-console.log('挂载 /api/cases 路由');
-app.use('/api/cases', casesRouter);
-console.log('挂载 /api/services 路由');
-app.use('/api/services', servicesRouter);
-console.log('挂载 /api/contacts 路由');
-app.use('/api/contacts', contactsRouter);
+const mainRouter = require('./routes/index');
+app.use('/api', mainRouter);
+
 // 添加不带/api前缀的路由用于处理表单提交
 console.log('挂载 /contacts 路由');
 app.use('/contacts', contactsRouter);
-console.log('挂载 /api/configs 路由');
-app.use('/api/configs', configsRouter);
+
+// 添加不带/api前缀的services路由用于处理前端代理请求
+console.log('挂载 /services 路由');
+app.use('/services', servicesRouter);
+
+// 添加不带/api前缀的articles路由用于处理前端代理请求
+console.log('挂载 /articles 路由');
+app.use('/articles', articlesRouter);
+
 console.log('所有路由挂载完成');
 
 // 启动服务前连接数据库

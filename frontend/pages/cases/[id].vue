@@ -10,10 +10,10 @@
     
     <!-- 案例详情内容 -->
     <div class="container">
-      <!-- 返回按钮 - 使用简单的a标签 -->
-      <a href="/cases" class="back-link">
+      <!-- 返回按钮 - 使用NuxtLink -->
+      <NuxtLink to="/cases" class="back-link">
         &lt; 返回列表
-      </a>
+      </NuxtLink>
       
       <!-- 案例内容 -->
       <div class="case-content">
@@ -36,49 +36,65 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from 'vue';
 import { useRoute } from 'vue-router';
+import type { CaseItem } from '~/api/cases';
 
 // 获取路由参数
 const route = useRoute();
 
 // 模拟案例数据，使用与列表页相同的图片URL
-const mockCases = {
+const mockCases: Record<string, CaseItem> = {
   '1': {
     id: '1',
     description: 'XX教育使用我们的内容管理系统，内容发布效率提升60%',
     image: 'https://picsum.photos/seed/case1/400/300',
-    publishTime: '2024年01月15日'
+    publishTime: '2024年01月15日',
+    _id: '1',
+    order: 0,
+    isActive: true
   },
   '2': {
     id: '2',
     description: 'YY电商通过轮播图运营，首页点击率增长35%',
     image: 'https://picsum.photos/seed/case2/400/300',
-    publishTime: '2024年01月10日'
+    publishTime: '2024年01月10日',
+    _id: '2',
+    order: 0,
+    isActive: true
   },
   '3': {
     id: '3',
     description: 'ZZ金融平台使用我们的解决方案，转化率提升28%',
     image: 'https://picsum.photos/seed/case3/400/300',
-    publishTime: '2024年01月05日'
+    publishTime: '2024年01月05日',
+    _id: '3',
+    order: 0,
+    isActive: true
   },
   '4': {
     id: '4',
     description: 'AA医疗系统部署我们的应用，用户满意度提高42%',
     image: 'https://picsum.photos/seed/case4/400/300',
-    publishTime: '2024年01月01日'
+    publishTime: '2024年01月01日',
+    _id: '4',
+    order: 0,
+    isActive: true
   }
 };
 
 // 计算当前案例数据
-const currentCase = computed(() => {
-  const caseId = route.params.id;
+const currentCase = computed<CaseItem>(() => {
+  const caseId = route.params.id as string;
   return mockCases[caseId] || {
     id: caseId,
+    _id: caseId,
     description: `案例 ${caseId} 详情`,
     image: '/images/case1.png',
-    publishTime: '2024年01月01日'
+    publishTime: '2024年01月01日',
+    order: 0,
+    isActive: true
   };
 });
 

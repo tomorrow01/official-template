@@ -166,7 +166,6 @@
 
 <script>
 import { configsAPI } from '../utils/api';
-import api from '../utils/api';
 import { ElMessage } from 'element-plus';
 
 export default {
@@ -190,58 +189,61 @@ export default {
     };
   },
   mounted() {
+    console.log('ConfigManagement mounted');
     this.loadConfigs();
   },
   methods: {
     async loadConfigs() {
+      console.log('Loading configs...');
       this.loading = true;
       try {
         const response = await configsAPI.getList();
-        if (response.code === 200 && response.data) {
-          this.configCount = response.data.length;
+        console.log('Configs response:', response);
+        // 处理API响应，兼容直接返回数组和包装在data字段中的情况
+        const configs = Array.isArray(response) ? response : (response.data || []);
+        this.configCount = configs.length;
+        
+        // 处理每个配置项
+        configs.forEach(config => {
+          if (config.updateTime) {
+            if (!this.lastUpdateTime || new Date(config.updateTime) > new Date(this.lastUpdateTime)) {
+              this.lastUpdateTime = config.updateTime;
+            }
+          }
           
-          // 处理每个配置项
-          response.data.forEach(config => {
-            if (config.updateTime) {
-              if (!this.lastUpdateTime || new Date(config.updateTime) > new Date(this.lastUpdateTime)) {
-                this.lastUpdateTime = config.updateTime;
+          this.configIds[config.key] = config.id;
+          
+          switch (config.key) {
+            case 'about_company':
+              this.aboutConfigs.companyIntro = config.value || '';
+              break;
+            case 'about_company_detail':
+              this.aboutConfigs.companyDetail = config.value || '';
+              break;
+            case 'company_mission':
+              this.aboutConfigs.mission = config.value || '';
+              break;
+            case 'company_vision':
+              this.aboutConfigs.vision = config.value || '';
+              break;
+            case 'company_values':
+              this.aboutConfigs.values = config.value || '';
+              break;
+            case 'company_logo':
+              this.aboutConfigs.logo = config.value || '';
+              break;
+            case 'team_members':
+              try {
+                this.aboutConfigs.teamMembers = config.value ? JSON.parse(config.value) : [];
+              } catch (e) {
+                this.aboutConfigs.teamMembers = [];
               }
-            }
-            
-            this.configIds[config.key] = config.id;
-            
-            switch (config.key) {
-              case 'about_company':
-                this.aboutConfigs.companyIntro = config.value || '';
-                break;
-              case 'about_company_detail':
-                this.aboutConfigs.companyDetail = config.value || '';
-                break;
-              case 'company_mission':
-                this.aboutConfigs.mission = config.value || '';
-                break;
-              case 'company_vision':
-                this.aboutConfigs.vision = config.value || '';
-                break;
-              case 'company_values':
-                this.aboutConfigs.values = config.value || '';
-                break;
-              case 'company_logo':
-                this.aboutConfigs.logo = config.value || '';
-                break;
-              case 'team_members':
-                try {
-                  this.aboutConfigs.teamMembers = JSON.parse(config.value) || [];
-                } catch (e) {
-                  this.aboutConfigs.teamMembers = [];
-                }
-                break;
-            }
-          });
-        }
+              break;
+          }
+        });
       } catch (error) {
-        ElMessage.error('加载配置失败，请稍后重试');
         console.error('加载配置失败:', error);
+        ElMessage.error('加载配置失败，请稍后重试');
       } finally {
         this.loading = false;
       }

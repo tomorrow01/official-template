@@ -34,7 +34,7 @@ class ContactService {
       // 使用'/api/contacts'路径，确保通过代理转发到后端
       console.log('发送请求到: /api/contacts');
       // request.post现在返回正确的ContactResponse类型
-      const response = await request.post<ContactResponse>('/api/contacts', formData);
+      const response = await request.post<ContactResponse>('/contacts', formData);
       console.log('收到响应:', response);
       return response;
     } catch (error) {

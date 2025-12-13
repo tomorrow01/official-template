@@ -6,7 +6,7 @@
     <!-- 页面标题 -->
     <div class="hero-header">
       <div class="container">
-        <h1 class="hero-title">服务详情</h1>
+        <h1 class="hero-title">{{ serviceDetail?.title || '服务详情' }}</h1>
       </div>
     </div>
     
@@ -119,36 +119,12 @@ const fetchServiceDetail = async () => {
     loading.value = true;
     error.value = null;
     
-    // 直接使用硬编码的模拟数据，不依赖API调用
-    const defaultDetails: Record<string, ServiceItem> = {
-      '1': {
-        _id: '1',
-        id: '1',
-        icon: 'Management',
-        title: '软件开发',
-        description: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。我们的开发团队拥有丰富的经验和专业技能，能够满足各种复杂的业务需求。从需求分析、系统设计到编码实现、测试部署，我们提供全方位的服务支持。',
-        desc: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。'
-      },
-      '2': {
-        _id: '2',
-        id: '2',
-        icon: 'Monitor',
-        title: '数字化转型',
-        description: '帮助企业实现数字化转型，优化业务流程，提升运营效率。我们提供全面的数字化解决方案，包括业务流程重构、技术架构设计、系统集成等服务。通过数字化手段，帮助企业降低成本、提高效率、增强竞争力。',
-        desc: '帮助企业实现数字化转型，优化业务流程，提升运营效率。'
-      },
-      '3': {
-        _id: '3',
-        id: '3',
-        icon: 'Cloud',
-        title: '云服务',
-        description: '提供云计算解决方案，包括云迁移、云托管和云安全服务。我们的团队拥有丰富的云服务经验，能够为客户提供全方位的云服务支持，帮助客户实现数字化转型，提升业务灵活性和弹性。',
-        desc: '提供云计算解决方案，包括云迁移、云托管和云安全服务。'
-      }
-    };
+    // 调用API获取实际的服务详情
+    console.log('获取服务详情，ID:', serviceId.value);
+    const detail = await getServiceDetail(serviceId.value);
     
-    // 直接设置服务详情数据
-    serviceDetail.value = defaultDetails[serviceId.value] || {
+    // 设置服务详情数据
+    serviceDetail.value = detail || {
       _id: serviceId.value,
       id: serviceId.value,
       icon: 'Default',
@@ -162,15 +138,20 @@ const fetchServiceDetail = async () => {
       document.title = `${serviceDetail.value.title} - 服务详情`;
     }
     
-    // 设置默认推荐服务
-    const allServices = Object.values(defaultDetails);
-    recommendedServices.value = allServices
-      .filter((s) => s.id !== serviceId.value)
-      .slice(0, 2);
+    // 获取推荐服务
+    try {
+      const services = await getServiceList();
+      recommendedServices.value = services
+        .filter((s) => s.id !== serviceId.value && s._id !== serviceId.value)
+        .slice(0, 3);
+    } catch (err) {
+      console.error('获取推荐服务失败:', err);
+      recommendedServices.value = [];
+    }
     
   } catch (err) {
     console.error('获取服务详情失败:', err);
-    // 即使出错也设置默认数据
+    // 出错时设置默认数据
     serviceDetail.value = {
       _id: serviceId.value,
       id: serviceId.value,

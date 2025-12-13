@@ -25,114 +25,51 @@ export interface ApiResponse<T> {
  */
 export const getServiceList = async (params?: any): Promise<ServiceItem[]> => {
   try {
-    // 简化请求处理，使用any类型避免复杂的泛型问题
-    const response: any = await request({
-      url: '/api/services',
-      method: 'GET',
-      params
-    });
+    // 使用通用请求方式调用服务列表接口
+    console.log('开始调用getServiceList...');
+    const response = await request.get('/services', { params });
     
-    const responseData = response.data;
-    console.log('API响应原始数据:', JSON.stringify(responseData));
+    console.log('getServiceList - 原始响应:', JSON.stringify(response));
+    console.log('getServiceList - 响应类型:', typeof response);
+    console.log('getServiceList - 是否为数组:', Array.isArray(response));
     
-    // 处理可能的不同响应格式
     let serviceData: any[] = [];
     
-    // 情况1: 响应是 { code, data, error } 格式（后端实际返回格式）
-    if (typeof responseData === 'object' && responseData !== null) {
-      // 检查是否有data字段
-      if (responseData.data) {
-        // 如果data字段本身就是数组
-        if (Array.isArray(responseData.data)) {
-          serviceData = responseData.data;
-        }
-        // 如果data字段是对象，可能包含数组数据
-        else if (typeof responseData.data === 'object' && Array.isArray(responseData.data.data)) {
-          serviceData = responseData.data.data;
-        }
-      }
-    }
-    // 情况2: 响应本身就是数组（兼容性处理）
-    else if (Array.isArray(responseData)) {
-      serviceData = responseData;
+    // 由于request.ts的响应拦截器已经处理了响应格式，直接使用response即可
+    if (Array.isArray(response)) {
+      serviceData = response;
+      console.log('getServiceList - 响应是数组，长度:', serviceData.length);
+    } else {
+      // 提供一个空数组作为后备
+      serviceData = [];
+      console.log('getServiceList - 响应不是数组，使用空数组');
     }
     
-    // 如果没有获取到数据，使用模拟数据
-    if (!Array.isArray(serviceData) || serviceData.length === 0) {
-      console.warn('未获取到服务数据，使用模拟数据');
-      const mockData: ServiceItem[] = [
-        {
-          _id: '1',
-          id: '1',
-          icon: 'Management',
-          title: '软件开发',
-          description: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。',
-          desc: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。'
-        },
-        {
-          _id: '2',
-          id: '2',
-          icon: 'Monitor',
-          title: '数字化转型',
-          description: '帮助企业实现数字化转型，优化业务流程，提升运营效率。',
-          desc: '帮助企业实现数字化转型，优化业务流程，提升运营效率。'
-        },
-        {
-          _id: '3',
-          id: '3',
-          icon: 'Cloud',
-          title: '云服务',
-          description: '提供云计算解决方案，包括云迁移、云托管和云安全服务。',
-          desc: '提供云计算解决方案，包括云迁移、云托管和云安全服务。'
-        }
-      ];
-      return mockData;
-    }
-    
-    // 转换数据结构，确保字段一致性
-    return serviceData.map((item: any) => {
-      const serviceItem: ServiceItem = {
-        _id: item._id,
-        id: item.id || item._id,
-        icon: item.icon,
-        title: item.title,
-        description: item.description,
-        desc: item.description, // 确保desc字段存在
-        image: item.image,
-        order: item.order,
-        isActive: item.isActive
+    // 转换数据结构，确保每个服务项都符合ServiceItem接口
+    const processedServices = serviceData.map((item: any) => {
+      // 确保所有必要的属性都存在
+      const safeItem = item || {};
+      const description = safeItem.description || safeItem.content || '暂无描述';
+      
+      return {
+        _id: safeItem._id || safeItem.id || `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        id: safeItem.id || safeItem._id || `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        icon: safeItem.icon || 'el-icon-s-grid',
+        title: safeItem.title || '未命名服务',
+        description: description,
+        desc: safeItem.desc || description,
+        // 如果image是相对路径或不存在，则使用默认图片
+        image: safeItem.image && !safeItem.image.startsWith('/') ? safeItem.image : `https://picsum.photos/seed/service-${safeItem.id || safeItem._id || Math.random()}/600/400`,
+        order: safeItem.order || 0,
+        isActive: safeItem.isActive !== false // 默认激活
       };
-      return serviceItem;
     });
+    
+    return processedServices;
   } catch (error) {
     console.error('获取服务列表失败:', error);
-    // 在catch中返回模拟数据
-    return [
-      {
-        _id: '1',
-        id: '1',
-        icon: 'Management',
-        title: '软件开发',
-        description: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。',
-        desc: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。'
-      },
-      {
-        _id: '2',
-        id: '2',
-        icon: 'Monitor',
-        title: '数字化转型',
-        description: '帮助企业实现数字化转型，优化业务流程，提升运营效率。',
-        desc: '帮助企业实现数字化转型，优化业务流程，提升运营效率。'
-      },
-      {
-        _id: '3',
-        id: '3',
-        icon: 'Cloud',
-        title: '云服务',
-        description: '提供云计算解决方案，包括云迁移、云托管和云安全服务。',
-        desc: '提供云计算解决方案，包括云迁移、云托管和云安全服务。'
-      }
-    ];
+    // 不再返回模拟数据，直接抛出错误让调用者处理
+    throw error;
   }
 };
 
@@ -143,89 +80,35 @@ export const getServiceList = async (params?: any): Promise<ServiceItem[]> => {
  */
 export const getServiceDetail = async (id: string): Promise<ServiceItem> => {
   try {
-    // 简化请求处理，使用any类型避免复杂的泛型问题
-    const response: any = await request({
-      url: `/api/services/${id}`,
-      method: 'GET'
-    });
+    // 使用get方法简化请求
+    const response: any = await request.get(`/services/${id}`);
     
-    const responseData = response?.data;
-    console.log('服务详情API响应原始数据:', JSON.stringify(responseData));
+    // 由于request.ts的响应拦截器已经处理了响应格式，直接使用response即可
+    let serviceDetail: any = response;
     
-    // 处理可能的不同响应格式
-    let serviceDetail: any = null;
-    
-    // 情况1: 响应是 { code, data, error } 格式（后端实际返回格式）
-    if (typeof responseData === 'object' && responseData !== null) {
-      // 检查是否有data字段
-      if (responseData.data) {
-        serviceDetail = responseData.data;
-      }
-    }
-    // 情况2: 响应本身就是对象（兼容性处理）
-    else if (typeof responseData === 'object') {
-      serviceDetail = responseData;
-    }
-    
-    // 如果没有获取到有效的服务详情数据，使用模拟数据
-    if (!serviceDetail || typeof serviceDetail !== 'object' || !Object.keys(serviceDetail).length) {
-      console.warn('未获取到有效服务详情数据，使用模拟数据');
+    // 额外检查，确保我们得到的是对象
+    if (!serviceDetail || typeof serviceDetail !== 'object' || Array.isArray(serviceDetail)) {
+      throw new Error('未获取到有效服务详情数据');
     }
     
     // 如果获取到了有效数据，转换数据结构并返回
-    if (serviceDetail && typeof serviceDetail === 'object' && Object.keys(serviceDetail).length) {
-      const serviceItem: ServiceItem = {
-        _id: serviceDetail._id,
-        id: serviceDetail.id || serviceDetail._id,
-        icon: serviceDetail.icon,
-        title: serviceDetail.title,
-        description: serviceDetail.description,
-        desc: serviceDetail.description, // 确保desc字段存在
-        image: serviceDetail.image,
-        order: serviceDetail.order,
-        isActive: serviceDetail.isActive
-      };
-      return serviceItem;
-    }
+    // 将后端的content字段映射为前端的description字段
+    const description = serviceDetail.description || serviceDetail.content;
+    const serviceItem: ServiceItem = {
+      _id: serviceDetail._id,
+      id: serviceDetail.id || serviceDetail._id,
+      icon: serviceDetail.icon,
+      title: serviceDetail.title,
+      description: description,
+      desc: description, // 确保desc字段存在
+      image: serviceDetail.image,
+      order: serviceDetail.order,
+      isActive: serviceDetail.isActive
+    };
+    return serviceItem;
   } catch (error) {
-    console.error('获取服务详情API调用失败，使用模拟数据:', error);
-  } finally {
-    // 无论API调用是否成功，都返回模拟数据确保页面显示
-    const mockDetails: Record<string, ServiceItem> = {
-      '1': {
-        _id: '1',
-        id: '1',
-        icon: 'Management',
-        title: '软件开发',
-        description: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。我们的开发团队拥有丰富的经验和专业技能，能够满足各种复杂的业务需求。从需求分析、系统设计到编码实现、测试部署，我们提供全方位的服务支持。',
-        desc: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。'
-      },
-      '2': {
-        _id: '2',
-        id: '2',
-        icon: 'Monitor',
-        title: '数字化转型',
-        description: '帮助企业实现数字化转型，优化业务流程，提升运营效率。我们提供全面的数字化解决方案，包括业务流程重构、技术架构设计、系统集成等服务。通过数字化手段，帮助企业降低成本、提高效率、增强竞争力。',
-        desc: '帮助企业实现数字化转型，优化业务流程，提升运营效率。'
-      },
-      '3': {
-        _id: '3',
-        id: '3',
-        icon: 'Cloud',
-        title: '云服务',
-        description: '提供云计算解决方案，包括云迁移、云托管和云安全服务。我们的团队拥有丰富的云服务经验，能够为客户提供全方位的云服务支持，帮助客户实现数字化转型，提升业务灵活性和弹性。',
-        desc: '提供云计算解决方案，包括云迁移、云托管和云安全服务。'
-      }
-    };
-    
-    // 返回对应ID的模拟数据或默认值
-    return mockDetails[id] || {
-      _id: id,
-      id: id,
-      icon: 'Default',
-      title: '未知服务',
-      description: '未找到此服务的详细信息。',
-      desc: '未找到此服务的详细信息。'
-    };
+    console.error('获取服务详情失败:', error);
+    // 不再返回模拟数据，直接抛出错误让调用者处理
+    throw error;
   }
 };

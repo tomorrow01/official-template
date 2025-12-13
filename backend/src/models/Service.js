@@ -6,7 +6,7 @@ const serviceSchema = new mongoose.Schema({
     required: [true, '服务标题为必填项'],
     trim: true
   },
-  content: {
+  description: {
     type: String,
     required: [true, '内容为必填项'],
     trim: true

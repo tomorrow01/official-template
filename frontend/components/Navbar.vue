@@ -146,7 +146,14 @@ const fetchServices = async () => {
   loadingServices.value = true;
   try {
     const res = await getServiceList();
-    services.value = Array.isArray(res) ? res : (res.data || []);
+    // 确保返回的是数组，支持多种响应格式
+    if (Array.isArray(res)) {
+      services.value = res;
+    } else if (res && res.data && Array.isArray(res.data)) {
+      services.value = res.data;
+    } else {
+      services.value = [];
+    }
   } catch (error) {
     console.error('获取核心服务数据失败:', error);
     // 使用模拟数据
@@ -163,7 +170,7 @@ const fetchServices = async () => {
 // 获取公司logo
 const fetchCompanyLogo = async () => {
   try {
-    const response = await request.get('/api/configs/key/company_logo');
+    const response = await request.get('/configs/key/company_logo');
     // 检查响应格式并获取logo数据
     if (response && response.value) {
       companyLogo.value = response.value;

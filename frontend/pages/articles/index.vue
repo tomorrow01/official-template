@@ -93,11 +93,9 @@ const fetchArticles = async () => {
     console.log(`开始获取第${currentPage.value}页的文章列表...`);
     const res = await getArticleList({ page: currentPage.value, limit: pageSize.value });
     
-    // 正确提取数据
-    const data = res.data || res;
-    articles.value = Array.isArray(data.records || data.list || data) ? 
-      (data.records || data.list || data) : [];
-    total.value = data.total || articles.value.length;
+    // 正确提取数据 - res已经是文章数组
+    articles.value = Array.isArray(res) ? res : [];
+    total.value = articles.value.length;
     
     // 格式化文章数据
     articles.value = articles.value.map(article => ({

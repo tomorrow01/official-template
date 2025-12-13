@@ -133,7 +133,7 @@
             class="bg-white rounded-xl overflow-hidden">
             <!-- 卡片内部：图片在上 -->
             <div class="h-52 overflow-hidden">
-              <img :src="getServiceImage(index)" alt="服务图片" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease; transform: scale(1);" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+              <img :src="service.image || getServiceImage(index)" alt="服务图片" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease; transform: scale(1);" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
             </div>
             
             <!-- 卡片内部：标题和详情在下 -->
@@ -368,7 +368,7 @@
 
 <!-- 移除可能冲突的自定义样式 -->
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue';
 import Navbar from '@/components/Navbar.vue';
 import Footer from '@/components/Footer.vue';
@@ -376,22 +376,25 @@ import { ArrowUp } from '@element-plus/icons-vue';
 // 导入API模块
 // import { getBannerList } from '@/api/banner';
 import { getCaseList } from '@/api/cases';
+import type { CaseItem } from '@/api/cases';
 import { getServiceList } from '@/api/services';
+import type { ServiceItem } from '@/api/services';
 import { getArticleList } from '@/api/articles';
+import type { Article } from '@/api/articles';
 
-const services = ref([]);
+const services = ref<ServiceItem[]>([]);
 // 页面加载时获取数据
 onMounted(async () => {
   console.log('页面挂载，开始获取数据...');
-  await Promise.all([fetchServices(), fetchLatestArticles()]);
+  await Promise.all([fetchServices(), fetchCaseList(), fetchLatestArticles()]);
 });
-const cases = ref([]);
-const latestArticles = ref([]);
+const cases = ref<CaseItem[]>([]);
+const latestArticles = ref<Partial<Article>[]>([]);
 const showBackToTop = ref(false);
 const loadingCases = ref(true);
 const loadingServices = ref(true);
 const loadingArticles = ref(true);
-const error = ref(null);
+const error = ref<string | null>(null);
 
 
 
@@ -401,33 +404,24 @@ const fetchServices = async () => {
   error.value = null;
   try {
     console.log('开始获取服务数据...');
-    // 使用API获取数据
+    
+    // 直接使用API获取数据，API层已经处理了格式转换
     const res = await getServiceList();
     console.log('服务API返回结果:', res);
     
-    // 精确处理后端返回的数据格式
+    // 确保服务数据是数组
     if (Array.isArray(res)) {
-      console.log(`成功获取到${res.length}个服务数据`);
       services.value = res;
-    } else if (typeof res === 'object' && res !== null && res.data) {
-      // 处理嵌套的数据格式
-      services.value = Array.isArray(res.data) ? res.data : [];
-      console.log(`成功获取到${services.value.length}个服务数据`);
+      console.log(`成功获取到${res.length}个服务数据`);
     } else {
       console.warn('服务数据格式不正确，使用空数组');
       services.value = [];
     }
     
-    // 确保每个服务项都有必要的属性
-    services.value = services.value.map(service => ({
-      ...service,
-      desc: service.desc || service.description || '',
-      isActive: service.isActive !== false // 默认激活
-    }));
-    
-    // 如果没有数据，使用模拟数据
-    if (!services.value.length) {
-      services.value = [
+    // 确保至少有3条服务数据
+    if (services.value.length < 3) {
+      console.log('服务数据不足3条，使用模拟数据补充...');
+      const mockServices = [
         {
           _id: '1',
           id: '1',
@@ -489,12 +483,17 @@ const fetchServices = async () => {
           isActive: true
         }
       ];
-      console.log('使用模拟服务数据:', services.value);
+      
+      // 添加缺少的模拟数据
+      const neededMockCount = 3 - services.value.length;
+      services.value = [...services.value, ...mockServices.slice(0, neededMockCount)];
     }
   } catch (err) {
     console.error('获取服务数据失败:', err);
-    error.value = '获取服务数据失败，请稍后重试';
-    // 提供默认服务数据，与后端保持一致
+    error.value = err instanceof Error ? err.message : '获取服务数据失败，请稍后重试';
+    
+    // 使用模拟数据作为后备
+    console.log('使用模拟服务数据作为后备...');
     services.value = [
       {
         _id: '1',
@@ -568,85 +567,112 @@ const fetchCaseList = async () => {
   error.value = null;
   try {
     console.log('开始获取客户案例数据...');
+    
+    // 确保getCaseList函数存在
+    if (typeof getCaseList !== 'function') {
+      throw new Error('getCaseList函数未正确导入或定义');
+    }
+    
     // 使用API获取数据
     const res = await getCaseList();
     console.log('案例API返回结果:', res);
     
     // 处理可能的不同响应格式
-    let caseData = [];
+    let caseData: CaseItem[] = [];
     
     if (Array.isArray(res)) {
-      caseData = res;
-    } else if (typeof res === 'object' && res !== null && res.data) {
-      // 处理嵌套的数据格式
-      caseData = Array.isArray(res.data) ? res.data : [];
+      caseData = res as CaseItem[];
+    } else if (typeof res === 'object' && res !== null) {
+      if ('data' in res) {
+        // 处理嵌套的数据格式
+        const resData = res as any;
+        caseData = Array.isArray(resData.data) ? (resData.data as CaseItem[]) : [];
+      }
     }
+    
+    console.log(`成功获取到${caseData.length}个客户案例数据`);
     
     // 过滤激活的案例并确保数据格式一致
     cases.value = caseData
-      .filter(item => item && item.isActive !== false)
+      .filter(item => item && typeof item === 'object' && item.isActive !== false) // 先过滤无效和非激活数据
       .map(item => ({
-        id: item._id || item.id || String(item.id || Date.now()),
-        description: item.description || '',
-        image: item.image || '',
-        publishTime: item.publishTime || item.createTime || new Date().toISOString(),
-        order: item.order || 0
+        ...item,
+        _id: item._id || item.id || `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        id: item.id || item._id || `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        description: item.description || '暂无描述',
+        image: item.image || `https://picsum.photos/id/${Math.floor(Math.random() * 100)}/800/600`,
+        publishTime: item.publishTime || new Date().toISOString(),
+        order: item.order || 0,
+        isActive: item.isActive !== false
       }));
+
     
     console.log(`成功获取到${cases.value.length}个客户案例数据`, cases.value);
     
-    // 如果没有数据，使用模拟数据
-    if (!cases.value.length) {
-      cases.value = [
+    // 确保至少有3条案例数据
+    if (cases.value.length < 3) {
+      console.log('案例数据不足3条，使用模拟数据补充...');
+      const mockCases = [
         {
           id: '1',
           description: '通过实施智能制造解决方案，帮助企业提升生产效率30%，降低运营成本25%。',
           image: 'https://picsum.photos/id/239/800/600',
           publishTime: '2024-01-15',
-          order: 1
+          order: 1,
+          isActive: true
         },
         {
           id: '2',
           description: '为金融机构打造安全可靠的交易平台，支持日均交易量超过10万笔。',
           image: 'https://picsum.photos/id/24/800/600',
           publishTime: '2024-02-20',
-          order: 2
+          order: 2,
+          isActive: true
         },
         {
           id: '3',
           description: '对现有电商系统进行全面升级，提升用户体验和系统性能，销售额增长45%。',
           image: 'https://picsum.photos/id/119/800/600',
           publishTime: '2024-03-10',
-          order: 3
+          order: 3,
+          isActive: true
         }
       ];
-      console.log('使用模拟客户案例数据:', cases.value);
+      
+      // 添加缺少的模拟数据
+      const neededMockCount = 3 - cases.value.length;
+      cases.value = [...cases.value, ...mockCases.slice(0, neededMockCount)];
     }
   } catch (err) {
     console.error('获取客户案例数据失败:', err);
-    error.value = '获取客户案例数据失败，请稍后重试';
-    // 出错时使用模拟数据
+    error.value = err instanceof Error ? err.message : '获取客户案例数据失败，请稍后重试';
+    
+    // 使用模拟数据作为后备
+    console.log('使用模拟客户案例数据作为后备...');
     cases.value = [
       {
         id: '1',
         description: '通过实施智能制造解决方案，帮助企业提升生产效率30%，降低运营成本25%。',
         image: 'https://picsum.photos/id/239/800/600',
         publishTime: '2024-01-15',
-        order: 1
+        order: 1,
+        isActive: true
       },
       {
         id: '2',
         description: '为金融机构打造安全可靠的交易平台，支持日均交易量超过10万笔。',
         image: 'https://picsum.photos/id/24/800/600',
         publishTime: '2024-02-20',
-        order: 2
+        order: 2,
+        isActive: true
       },
       {
         id: '3',
         description: '对现有电商系统进行全面升级，提升用户体验和系统性能，销售额增长45%。',
         image: 'https://picsum.photos/id/119/800/600',
         publishTime: '2024-03-10',
-        order: 3
+        order: 3,
+        isActive: true
       }
     ];
   } finally {
@@ -660,87 +686,105 @@ const fetchLatestArticles = async () => {
   error.value = null;
   try {
     console.log('开始获取最新文章数据...');
-    // 使用API获取最新文章数据
-    const res = await getArticleList({ page: 1, limit: 3 });
     
-    // 正确提取数据
-    const data = res.data || res;
-    const articleList = Array.isArray(data.records || data.list || data) ? 
-      (data.records || data.list || data) : [];
+    // 直接使用API获取最新文章数据，API层已经处理了格式转换
+    const res = await getArticleList({ page: 1, limit: 3 });
+    console.log('文章API返回结果:', res);
     
     // 格式化文章数据
-    latestArticles.value = articleList.map(article => ({
-      id: article._id || article.id,
-      title: article.title,
-      excerpt: article.excerpt || (article.content ? article.content.substring(0, 150) + '...' : ''),
-      createTime: article.createTime || article.createdAt,
-      image: article.image || `/images/article${Math.floor(Math.random() * 10)}-placeholder.jpg`
-    }));
+    latestArticles.value = res
+      .filter(article => article && typeof article === 'object' && (article._id || article.id)) // 先过滤无效数据，支持_id字段
+      .map((article: any) => ({
+        id: article._id || article.id || `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        title: article.title || '未命名文章',
+        excerpt: article.excerpt || (article.content ? article.content.substring(0, 150) + '...' : '暂无摘要'),
+        createTime: article.createTime || article.createdAt || new Date().toISOString().split('T')[0],
+        image: article.image || `/images/article${Math.floor(Math.random() * 10)}-placeholder.jpg`
+      }));
+    
+    // 确保至少有3条数据显示
+    if (latestArticles.value.length < 3) {
+      console.log('文章数据不足3条，使用模拟数据补充...');
+      const mockArticles = [
+        { id: '1', title: '2024年企业数字化转型趋势分析', excerpt: '随着技术的快速发展，企业数字化转型已成为必然趋势。本文深入分析了2024年数字化转型的主要方向和策略。', createTime: '2024-03-15', image: '' },
+        { id: '2', title: '人工智能在企业决策中的应用', excerpt: '人工智能技术正在改变企业的决策方式，从数据中提取有价值的洞察，帮助企业做出更明智的决策。', createTime: '2024-03-10', image: '' },
+        { id: '3', title: '云计算如何提升企业IT效率', excerpt: '云计算技术为企业带来了灵活性和可扩展性，本文介绍了如何利用云服务优化IT基础设施。', createTime: '2024-03-05', image: '' }
+      ];
+      
+      // 添加缺少的模拟数据
+      const neededMockCount = 3 - latestArticles.value.length;
+      latestArticles.value = [...latestArticles.value, ...mockArticles.slice(0, neededMockCount)];
+    }
+
     
     console.log('获取到的最新文章数据:', latestArticles.value);
   } catch (err) {
-    console.error('获取文章数据失败:', err);
-    error.value = '获取文章数据失败，请稍后重试';
-    // 出错时使用模拟数据
-    latestArticles.value = [
-      {
-        id: '1',
-        title: '2024年企业数字化转型趋势分析',
-        excerpt: '随着技术的快速发展，企业数字化转型已成为必然趋势。本文深入分析了2024年数字化转型的主要方向和策略。',
-        createTime: '2024-03-15',
-        image: ''
-      },
-      {
-        id: '2',
-        title: '人工智能在企业决策中的应用',
-        excerpt: '人工智能技术正在改变企业的决策方式，从数据中提取有价值的洞察，帮助企业做出更明智的决策。',
-        createTime: '2024-03-10',
-        image: ''
-      },
-      {
-        id: '3',
-        title: '云计算如何提升企业IT效率',
-        excerpt: '云计算技术为企业带来了灵活性和可扩展性，本文介绍了如何利用云服务优化IT基础设施。',
-        createTime: '2024-03-05',
-        image: ''
-      }
-    ];
+    console.error('获取最新文章数据失败:', err);
+    error.value = err instanceof Error ? err.message : '获取文章数据失败，请稍后重试';
+    latestArticles.value = []; // 确保错误时数组为空
   } finally {
+    // 无论API返回什么结果，如果没有数据就使用模拟数据
+    if (latestArticles.value.length === 0) {
+      console.log('使用模拟数据填充文章列表...');
+      latestArticles.value = [
+        {
+          id: '1',
+          title: '2024年企业数字化转型趋势分析',
+          excerpt: '随着技术的快速发展，企业数字化转型已成为必然趋势。本文深入分析了2024年数字化转型的主要方向和策略。',
+          createTime: '2024-03-15',
+          image: ''
+        },
+        {
+          id: '2',
+          title: '人工智能在企业决策中的应用',
+          excerpt: '人工智能技术正在改变企业的决策方式，从数据中提取有价值的洞察，帮助企业做出更明智的决策。',
+          createTime: '2024-03-10',
+          image: ''
+        },
+        {
+          id: '3',
+          title: '云计算如何提升企业IT效率',
+          excerpt: '云计算技术为企业带来了灵活性和可扩展性，本文介绍了如何利用云服务优化IT基础设施。',
+          createTime: '2024-03-05',
+          image: ''
+        }
+      ];
+    }
     loadingArticles.value = false;
   }
 };
 
 // 获取服务图片
-const getServiceImage = (index) => {
+const getServiceImage = (index: number) => {
   const imageIds = [180, 239, 24, 119, 96, 101];
   return `https://picsum.photos/id/${imageIds[index % imageIds.length]}/600/400`;
 };
 
 // 获取案例图片（作为备用）
-const getCaseImage = (index) => {
+const getCaseImage = (index: number) => {
   const imageIds = [239, 24, 119];
   return `https://picsum.photos/id/${imageIds[index % imageIds.length]}/800/600`;
 };
 
 // 获取案例标题
-const getCaseTitle = (index) => {
+const getCaseTitle = (index: number) => {
   // 优先使用案例数据中的标题，如果没有则使用默认标题
   const titles = [
     '某大型制造企业数字化转型项目',
     '金融科技平台开发项目',
     '电商系统升级改造项目'
   ];
-  return cases.value[index]?.title || titles[index % titles.length];
+  return titles[index % titles.length];
 };
 
 // 获取团队成员姓名
-const getTeamMemberName = (index) => {
+const getTeamMemberName = (index: number) => {
   const names = ['张明', '李华', '王芳', '赵强'];
   return names[index - 1];
 };
 
 // 获取团队成员职位
-const getTeamMemberPosition = (index) => {
+const getTeamMemberPosition = (index: number) => {
   const positions = ['技术总监', '产品经理', 'UI设计师', '前端工程师'];
   return positions[index - 1];
 };

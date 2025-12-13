@@ -34,4 +34,39 @@ const router = createRouter({
   routes
 })
 
+// 路由守卫：验证登录状态
+router.beforeEach((to, from, next) => {
+  // 不需要登录的页面（白名单）
+  const whiteList = ['/login', '/'];
+  
+  try {
+    // 获取token
+    const token = localStorage.getItem('admin-token');
+    
+    // 如果用户已登录
+    if (token) {
+      if (to.path === '/login' || to.path === '/') {
+        // 已登录的用户访问登录页或根路径，重定向到后台首页
+        next('/dashboard');
+      } else {
+        // 已登录的用户访问后台页面，直接通过
+        next();
+      }
+    } else {
+      // 未登录的用户
+      if (whiteList.includes(to.path)) {
+        // 访问白名单页面，直接通过
+        next();
+      } else {
+        // 访问需要登录的页面，重定向到登录页
+        next('/login');
+      }
+    }
+  } catch (error) {
+    console.error('路由守卫错误:', error);
+    // 如果出现错误，重定向到登录页
+    next('/login');
+  }
+});
+
 export default router

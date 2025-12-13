@@ -13,22 +13,40 @@
     
     <!-- 服务列表 -->
     <div class="container">
-      <div class="services-grid">
+      <!-- 加载状态 -->
+      <div v-if="loading" class="loading-container">
+        <div class="loading-spinner"></div>
+        <p>加载服务数据中...</p>
+      </div>
+      
+      <!-- 错误提示 -->
+      <div v-else-if="error" class="error-container">
+        <p class="error-message">{{ error }}</p>
+        <button class="retry-btn" @click="fetchServices">重试</button>
+      </div>
+      
+      <!-- 服务列表 -->
+      <div v-else class="services-grid">
         <div 
-          v-for="service in services" 
-          :key="service.id" 
+          v-for="serviceItem in activeServices" 
+          :key="serviceItem.id || serviceItem._id" 
           class="service-card"
         >
           <div class="service-image">
-            <img :src="service.image" :alt="service.title" class="card-image">
+            <img :src="serviceItem.image" :alt="serviceItem.title" class="card-image">
           </div>
           <div class="service-content">
-            <h3>{{ service.title }}</h3>
-            <p>{{ service.desc || '服务描述' }}</p>
-            <NuxtLink :to="`/services/${service.id}`" class="service-btn">
+            <h3>{{ serviceItem.title }}</h3>
+            <p>{{ serviceItem.desc || serviceItem.description || '服务描述' }}</p>
+            <NuxtLink :to="`/services/${serviceItem.id || serviceItem._id}`" class="service-btn">
               查看详情 →
             </NuxtLink>
           </div>
+        </div>
+        
+        <!-- 空数据提示 -->
+        <div v-if="servicesList.length === 0" class="empty-container">
+          <p>暂无服务数据</p>
         </div>
       </div>
     </div>
@@ -68,50 +86,131 @@
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue'
+<script setup lang="ts">
+import { ref, onMounted, computed } from 'vue'
+import type { Ref } from 'vue'
 import Navbar from '~/components/Navbar.vue'
 import Footer from '~/components/Footer.vue'
+import { getServiceList } from '~/api/services'
+import type { ServiceItem } from '~/api/services'
 
 // 服务数据
-const services = ref([
-  {
-    id: '1',
-    title: '软件开发',
-    desc: '提供定制化的软件开发服务，包括Web应用、移动应用和桌面应用开发',
-    image: 'https://picsum.photos/seed/software/600/400'
-  },
-  {
-    id: '2',
-    title: '网站建设',
-    desc: '专业网站设计与开发，为企业打造现代化、响应式的官方网站',
-    image: 'https://picsum.photos/seed/webdev/600/400'
-  },
-  {
-    id: '3',
-    title: 'UI/UX设计',
-    desc: '提供用户体验设计和用户界面设计服务，打造直观易用的产品',
-    image: 'https://picsum.photos/seed/design/600/400'
-  },
-  {
-    id: '4',
-    title: '数据分析',
-    desc: '专业的数据分析和可视化服务，帮助企业挖掘数据价值',
-    image: 'https://picsum.photos/seed/data/600/400'
-  },
-  {
-    id: '5',
-    title: '云计算服务',
-    desc: '提供云基础设施搭建、迁移和管理服务，确保业务弹性扩展',
-    image: 'https://picsum.photos/seed/cloud/600/400'
-  },
-  {
-    id: '6',
-    title: 'IT咨询',
-    desc: '专业的IT战略咨询服务，帮助企业实现数字化转型',
-    image: 'https://picsum.photos/seed/consulting/600/400'
+const servicesList: Ref<ServiceItem[]> = ref([])
+const loading = ref(false)
+const error = ref<string | null>(null)
+
+// 活跃服务列表
+const activeServices = computed(() => {
+  return servicesList.value.filter(item => item.isActive !== false)
+})
+
+// 获取服务列表
+const fetchServices = async () => {
+  loading.value = true
+  error.value = null
+  try {
+    // 调用API获取服务数据
+    const serviceItems = await getServiceList()
+    console.log('服务API返回结果:', JSON.stringify(serviceItems, null, 2));
+    
+    // 确保我们得到的是数组格式的数据
+    let processedItems = [];
+    
+    if (Array.isArray(serviceItems)) {
+      console.log(`成功获取到${serviceItems.length}个服务数据`);
+      processedItems = serviceItems;
+    } else {
+      console.warn('服务数据格式不正确，尝试使用模拟数据');
+      // 使用模拟数据
+      processedItems = [
+        {
+          id: '1',
+          _id: '1',
+          title: '软件开发',
+          description: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。',
+          desc: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。',
+          order: 1,
+          isActive: true,
+          image: 'https://picsum.photos/seed/software/600/400'
+        },
+        {
+          id: '2',
+          _id: '2',
+          title: '数字化转型',
+          description: '帮助企业实现数字化转型，优化业务流程，提升运营效率。',
+          desc: '帮助企业实现数字化转型，优化业务流程，提升运营效率。',
+          order: 2,
+          isActive: true,
+          image: 'https://picsum.photos/seed/webdev/600/400'
+        },
+        {
+          id: '3',
+          _id: '3',
+          title: '云服务',
+          description: '提供云计算解决方案，包括云迁移、云托管和云安全服务。',
+          desc: '提供云计算解决方案，包括云迁移、云托管和云安全服务。',
+          order: 3,
+          isActive: true,
+          image: 'https://picsum.photos/seed/cloud/600/400'
+        }
+      ];
+    }
+    
+    // 确保每个服务项都有必要的属性
+    servicesList.value = processedItems.map(service => ({
+      ...service,
+      desc: service.desc || service.description || '',
+      isActive: service.isActive !== false, // 默认激活
+      image: service.image || 'https://picsum.photos/seed/service/' + (service.id || service._id || Math.random())
+    }))
+    
+    console.log('最终服务数据:', JSON.stringify(servicesList.value, null, 2));
+  } catch (err) {
+    console.error('获取服务数据失败:', err);
+    error.value = '获取服务数据失败，请稍后重试';
+    
+    // 提供默认服务数据，确保符合ServiceItem接口
+    servicesList.value = [
+      {
+        id: '1',
+        _id: '1',
+        title: '软件开发',
+        description: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。',
+        desc: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。',
+        order: 1,
+        isActive: true,
+        image: 'https://picsum.photos/seed/software/600/400'
+      },
+      {
+        id: '2',
+        _id: '2',
+        title: '数字化转型',
+        description: '帮助企业实现数字化转型，优化业务流程，提升运营效率。',
+        desc: '帮助企业实现数字化转型，优化业务流程，提升运营效率。',
+        order: 2,
+        isActive: true,
+        image: 'https://picsum.photos/seed/webdev/600/400'
+      },
+      {
+        id: '3',
+        _id: '3',
+        title: '云服务',
+        description: '提供云计算解决方案，包括云迁移、云托管和云安全服务。',
+        desc: '提供云计算解决方案，包括云迁移、云托管和云安全服务。',
+        order: 3,
+        isActive: true,
+        image: 'https://picsum.photos/seed/cloud/600/400'
+      }
+    ] as ServiceItem[];
+  } finally {
+    loading.value = false;
   }
-])
+}
+
+// 页面加载时获取服务数据
+onMounted(() => {
+  fetchServices()
+})
 </script>
 
 <style scoped>
@@ -283,6 +382,80 @@ const services = ref([
   line-height: 1.6;
 }
 
+/* 加载状态样式 */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-container p {
+  font-size: 1.1rem;
+  color: #666;
+  margin: 0;
+}
+
+/* 错误提示样式 */
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.error-message {
+  font-size: 1.1rem;
+  color: #e74c3c;
+  margin-bottom: 20px;
+  max-width: 600px;
+}
+
+.retry-btn {
+  padding: 10px 20px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.retry-btn:hover {
+  background: #5a67d8;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* 空数据提示样式 */
+.empty-container {
+  text-align: center;
+  padding: 60px 20px;
+  color: #666;
+  font-size: 1.1rem;
+}
+
 /* 响应式设计 */
 @media (max-width: 768px) {
   .services-grid {
@@ -305,6 +478,17 @@ const services = ref([
   
   .section-title {
     font-size: 1.8rem;
+  }
+  
+  .loading-container,
+  .error-container,
+  .empty-container {
+    padding: 40px 15px;
+  }
+  
+  .loading-spinner {
+    width: 40px;
+    height: 40px;
   }
 }
 

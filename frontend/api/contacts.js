@@ -36,7 +36,7 @@ const contactService = {
   submitContactForm: async (formData) => {
     try {
       // 使用/api/contacts路径与后端保持一致
-      const response = await apiClient.post('/api/contacts', formData);
+      const response = await apiClient.post('/contacts', formData);
       return response;
     } catch (error) {
       console.error('提交表单失败:', error);

@@ -3,18 +3,25 @@ import { ElMessage } from 'element-plus';
 
 // 创建axios实例
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE || 'http://localhost:3000', // 后端服务地址
+  baseURL: import.meta.env.VITE_API_BASE || 'http://localhost:3001', // 后端服务地址
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json'
   }
 });
 
-// 添加请求日志拦截器
+// 请求拦截器（合并日志和token添加）
 api.interceptors.request.use(
   config => {
     console.log('请求URL:', config.baseURL + config.url);
     console.log('请求参数:', config.params || {});
+    console.log('请求数据:', config.data || {});
+    
+    // 添加token认证信息
+    const token = localStorage.getItem('admin-token');
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
     return config;
   },
   error => {
@@ -23,44 +30,33 @@ api.interceptors.request.use(
   }
 );
 
-// 请求拦截器
-api.interceptors.request.use(
-  config => {
-    // 可以在这里添加token等认证信息
-    return config;
-  },
-  error => {
-    return Promise.reject(error);
-  }
-);
-
 // 响应拦截器
 api.interceptors.response.use(
   response => {
+    console.log('响应数据:', response.data);
     return response.data;
   },
   error => {
+    console.error('响应错误:', error);
+    console.error('错误状态:', error.response?.status);
+    console.error('错误数据:', error.response?.data);
+    
     let errorMessage = '请求失败，请稍后重试';
     if (error.response) {
-      switch (error.response.status) {
-        case 401:
-          errorMessage = '未授权，请重新登录';
-          // 可以在这里添加跳转到登录页的逻辑
-          break;
-        case 404:
-          errorMessage = '请求的资源不存在';
-          break;
-        case 500:
-          errorMessage = '服务器错误';
-          break;
-        default:
-          errorMessage = error.response.data?.message || errorMessage;
+      // 这里只处理网络错误和服务器错误，不处理业务错误
+      // 业务错误（如401）由调用方自己处理
+      if (error.response.status >= 500) {
+        errorMessage = '服务器错误';
+        ElMessage.error(errorMessage);
+      } else if (error.response.status === 404) {
+        errorMessage = '请求的资源不存在';
+        ElMessage.error(errorMessage);
       }
     } else if (error.request) {
       errorMessage = '网络错误，请检查网络连接';
+      ElMessage.error(errorMessage);
     }
     
-    ElMessage.error(errorMessage);
     return Promise.reject(error);
   }
 );
@@ -137,6 +133,11 @@ export const configsAPI = {
   getById: (id) => api.get(`/api/configs/${id}`),
   update: (id, data) => api.put(`/api/configs/${id}`, data),
   getByKey: (key) => api.get(`/api/configs/key/${key}`)
+};
+
+export const authAPI = {
+  login: (data) => api.post('/api/auth/login', data),
+  getCurrentUser: () => api.get('/api/auth/current')
 };
 
 export default api;

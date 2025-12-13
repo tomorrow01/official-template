@@ -15,7 +15,7 @@ export interface CaseItem {
 export const getCaseList = () => {
   const request = getRequestInstance();
   return request<CaseItem[]>({
-    url: '/api/cases',
+    url: '/cases',
     method: 'get'
   });
 };
@@ -24,7 +24,7 @@ export const getCaseList = () => {
 export const getCaseDetail = async (caseId: string) => {
   try {
     const request = getRequestInstance();
-    const response = await request.get(`/api/cases/${caseId}`);
+    const response = await request.get(`/cases/${caseId}`);
     return response;
   } catch (error) {
     console.error(`获取案例详情失败 (ID: ${caseId}):`, error);

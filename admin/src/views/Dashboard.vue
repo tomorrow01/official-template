@@ -16,6 +16,9 @@
         <div class="user-info">
           <el-avatar size="small" icon="el-icon-user" class="mr-2"></el-avatar>
           <span>{{ currentUser.username }}</span>
+          <el-button type="text" size="small" class="ml-4 logout-btn" @click="handleLogout">
+            退出登录
+          </el-button>
         </div>
       </div>
     </div>
@@ -71,19 +74,44 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+import { ElMessage } from 'element-plus';
 
 
 const router = useRouter();
 const route = useRoute();
 
 // 用户信息管理
-const currentUser = ref(JSON.parse(localStorage.getItem('admin-user')) || { username: '管理员' });
+let userData = localStorage.getItem('admin-user');
+let initialUser = { username: '管理员' };
+try {
+  if (userData) {
+    initialUser = JSON.parse(userData);
+  }
+} catch (error) {
+  console.error('解析用户信息失败:', error);
+  // 解析失败时使用默认值并清除无效数据
+  localStorage.removeItem('admin-user');
+}
+const currentUser = ref(initialUser);
 onMounted(() => {
   // 移除主题相关的类名，确保使用默认主题
   document.documentElement.className = '';
   // 清除本地存储中的主题设置
   localStorage.removeItem('admin-theme');
 });
+
+// 退出登录处理函数
+const handleLogout = () => {
+  // 清除本地存储中的用户信息
+  localStorage.removeItem('admin-user');
+  // 清除可能存在的token信息
+  localStorage.removeItem('admin-token');
+  // 显示退出成功消息
+  ElMessage.success('退出登录成功');
+  // 跳转到登录页面
+  router.push('/login');
+};
+
 </script>
 
 <style scoped>
@@ -158,6 +186,25 @@ onMounted(() => {
 .nav-right .user-info span {
   color: #fff;
   font-weight: 500;
+}
+
+/* 退出登录按钮样式 */
+.nav-right .logout-btn {
+  color: rgba(255, 255, 255, 0.85);
+  padding: 4px 12px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  margin-left: 16px;
+}
+
+.nav-right .logout-btn:hover {
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.2);
+}
+
+.nav-right .logout-btn .el-icon {
+  margin-right: 4px;
 }
 
 /* 主容器 */

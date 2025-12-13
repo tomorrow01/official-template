@@ -3,22 +3,23 @@
     <h1>简单案例列表</h1>
     <ul>
       <li v-for="caseItem in cases" :key="caseItem.id">
-        <!-- 最简单的a标签导航 -->
-        <a :href="'/cases/' + caseItem.id">
+        <!-- 使用NuxtLink进行导航 -->
+        <NuxtLink :to="'/cases/' + caseItem.id">
           {{ caseItem.description }}
-        </a>
+        </NuxtLink>
       </li>
     </ul>
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
+import type { CaseItem } from '~/api/cases';
 // 静态案例数据
-const cases = [
-  { id: '1', description: '案例1' },
-  { id: '2', description: '案例2' },
-  { id: '3', description: '案例3' },
-  { id: '4', description: '案例4' }
+const cases: CaseItem[] = [
+  { id: '1', description: '案例1', image: '/images/case1.jpg', publishTime: '2025-01-01', order: 1, isActive: true },
+  { id: '2', description: '案例2', image: '/images/case2.jpg', publishTime: '2025-01-02', order: 2, isActive: true },
+  { id: '3', description: '案例3', image: '/images/case3.jpg', publishTime: '2025-01-03', order: 3, isActive: true },
+  { id: '4', description: '案例4', image: '/images/case4.jpg', publishTime: '2025-01-04', order: 4, isActive: true }
 ];
 </script>
 

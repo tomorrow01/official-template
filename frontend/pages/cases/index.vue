@@ -23,10 +23,10 @@
       
       <!-- 案例卡片容器 -->
       <div v-else class="cases-grid">
-        <a 
+        <NuxtLink 
           v-for="(caseItem, index) in cases" 
           :key="caseItem.id" 
-          :href="`/cases/${caseItem.id}`"
+          :to="`/cases/${caseItem.id}`"
           class="case-card"
         >
           <!-- 案例图片 -->
@@ -48,7 +48,7 @@
               <span class="arrow">→</span>
             </span>
           </div>
-        </a>
+        </NuxtLink>
       </div>
     </div>
     
@@ -56,12 +56,13 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import Footer from '@/components/Footer.vue';
+import type { CaseItem } from '~/api/cases';
 
 // 状态管理
-const cases = ref([]);
+const cases = ref<CaseItem[]>([]);
 const loadingCases = ref(true);
 const error = ref('');
 
@@ -75,12 +76,40 @@ const fetchCaseList = async () => {
     // 模拟网络延迟
     await new Promise(resolve => setTimeout(resolve, 300));
     
-    // 使用模拟数据
+    // 使用模拟数据，确保符合CaseItem接口
     cases.value = [
-      { id: '1', description: 'XX教育使用我们的内容管理系统，内容发布效率提升60%' },
-      { id: '2', description: 'YY电商通过轮播图运营，首页点击率增长35%' },
-      { id: '3', description: 'ZZ金融平台使用我们的解决方案，转化率提升28%' },
-      { id: '4', description: 'AA医疗系统部署我们的应用，用户满意度提高42%' }
+      { 
+        id: '1', 
+        description: 'XX教育使用我们的内容管理系统，内容发布效率提升60%',
+        image: '',
+        publishTime: '',
+        order: 1,
+        isActive: true
+      },
+      { 
+        id: '2', 
+        description: 'YY电商通过轮播图运营，首页点击率增长35%',
+        image: '',
+        publishTime: '',
+        order: 2,
+        isActive: true
+      },
+      { 
+        id: '3', 
+        description: 'ZZ金融平台使用我们的解决方案，转化率提升28%',
+        image: '',
+        publishTime: '',
+        order: 3,
+        isActive: true
+      },
+      { 
+        id: '4', 
+        description: 'AA医疗系统部署我们的应用，用户满意度提高42%',
+        image: '',
+        publishTime: '',
+        order: 4,
+        isActive: true
+      }
     ];
     
     console.log('案例列表页面加载，数据:', cases.value);
@@ -93,14 +122,14 @@ const fetchCaseList = async () => {
 };
 
 // 获取案例图片
-const getCaseImage = (index) => {
+const getCaseImage = (index: number) => {
   const imageIds = ['case1', 'case2', 'case3', 'case4'];
   const imageIndex = index % imageIds.length;
   return `https://picsum.photos/seed/${imageIds[imageIndex]}/400/300`;
 };
 
 // 获取案例标题
-const getCaseTitle = (index) => {
+const getCaseTitle = (index: number) => {
   const titles = [
     '企业数字化转型案例',
     '电子商务平台开发案例',

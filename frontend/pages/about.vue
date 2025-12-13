@@ -97,7 +97,7 @@ const configs = ref({
 async function fetchConfigs() {
   try {
     // 获取所有配置
-    const response = await request.get('/api/configs');
+    const response = await request.get('/configs');
     
     // 响应拦截器已经处理了code检查，这里直接使用response
     if (response && Array.isArray(response)) {

@@ -34,10 +34,7 @@ export const getBannerList = async (): Promise<BannerItem[]> => {
     console.log('正在请求轮播图数据...');
     
     // 发送请求到后端API
-    const response = await request<BannerResponseItem[]>({
-      url: '/api/banners', // 通过代理配置转发到后端
-      method: 'get'
-    });
+    const response = await request.get<BannerResponseItem[]>('/banners');
     
     console.log('获取到轮播图原始数据:', response);
     
@@ -45,7 +42,7 @@ export const getBannerList = async (): Promise<BannerItem[]> => {
     // 并确保只返回激活状态的轮播图
     // 注意：根据request.ts的响应拦截器，response已经是res.data了，不需要再访问.data
     const banners: BannerItem[] = response
-      .data.filter((item: BannerResponseItem) => item.isActive)
+      .filter((item: BannerResponseItem) => item.isActive)
       .map((item: BannerResponseItem) => ({
         id: item._id,
         image: item.imageUrl, // 转换字段名
@@ -54,7 +51,7 @@ export const getBannerList = async (): Promise<BannerItem[]> => {
         // 保留order字段以便排序使用
         order: item.order
       }))
-      .sort((a, b) => a.order - b.order); // 直接使用转换后保留的order字段排序
+      .sort((a: BannerItem, b: BannerItem) => (a.order || 0) - (b.order || 0)); // 直接使用转换后保留的order字段排序
     
     console.log('转换后的轮播图数据:', banners);
     return banners;

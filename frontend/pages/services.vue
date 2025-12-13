@@ -87,21 +87,21 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import Navbar from '~/components/Navbar.vue'
 import Footer from '~/components/Footer.vue'
-import { getServiceList } from '~/api/services'
+import { getServiceList, type ServiceItem } from '~/api/services'
 
 // 服务数据
-const services = ref([])
+const services = ref<ServiceItem[]>([])
 const loadingServices = ref(false)
-const error = ref(null)
+const error = ref<string | null>(null)
 
-// 获取服务数据
 // 图片错误处理函数
-const handleImageError = (event) => {
-  event.target.src = `https://picsum.photos/seed/serviceDefault/400/300`;
+const handleImageError = (event: Event) => {
+  const target = event.target as HTMLImageElement;
+  target.src = `https://picsum.photos/seed/serviceDefault/400/300`;
 };
 
 const fetchServices = async () => {
@@ -113,7 +113,7 @@ const fetchServices = async () => {
     const response = await getServiceList()
     
     if (response && Array.isArray(response)) {
-      services.value = response
+      services.value = response as ServiceItem[]
     } else {
       // 如果API返回的数据不是预期格式，使用模拟数据
       console.warn('API返回数据格式异常，使用模拟数据')
@@ -122,22 +122,40 @@ const fetchServices = async () => {
         _id: '1',
         id: '1',
         title: '软件开发',
-        desc: '为客户提供定制化的软件开发服务',
-        image: 'https://picsum.photos/seed/service1/400/300'
+        description: '为客户提供定制化的软件开发服务',
+        image: 'https://picsum.photos/seed/service1/400/300',
+        content: '',
+        order: 0,
+        icon: '',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        isActive: true
       },
       {
         _id: '2',
         id: '2',
         title: '数字化转型',
-        desc: '帮助企业实现数字化转型，优化业务流程',
-        image: 'https://picsum.photos/seed/service2/400/300'
+        description: '帮助企业实现数字化转型，优化业务流程',
+        image: 'https://picsum.photos/seed/service2/400/300',
+        content: '',
+        order: 0,
+        icon: '',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        isActive: true
       },
       {
         _id: '3',
         id: '3',
         title: '云服务',
-        desc: '提供云计算解决方案，包括云迁移、云托管和云安全服务',
-        image: 'https://picsum.photos/seed/service3/400/300'
+        description: '提供云计算解决方案，包括云迁移、云托管和云安全服务',
+        image: 'https://picsum.photos/seed/service3/400/300',
+        content: '',
+        order: 0,
+        icon: '',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        isActive: true
       }
     ]
     }
@@ -151,22 +169,40 @@ const fetchServices = async () => {
         _id: '1',
         id: '1',
         title: '软件开发',
-        desc: '为客户提供定制化的软件开发服务',
-        image: 'https://picsum.photos/seed/service1/400/300'
+        description: '为客户提供定制化的软件开发服务',
+        image: 'https://picsum.photos/seed/service1/400/300',
+        content: '',
+        order: 0,
+        icon: '',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        isActive: true
       },
       {
         _id: '2',
         id: '2',
         title: '数字化转型',
-        desc: '帮助企业实现数字化转型，优化业务流程',
-        image: 'https://picsum.photos/seed/service2/400/300'
+        description: '帮助企业实现数字化转型，优化业务流程',
+        image: 'https://picsum.photos/seed/service2/400/300',
+        content: '',
+        order: 0,
+        icon: '',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        isActive: true
       },
       {
         _id: '3',
         id: '3',
         title: '云服务',
-        desc: '提供云计算解决方案，包括云迁移、云托管和云安全服务',
-        image: 'https://picsum.photos/seed/service3/400/300'
+        description: '提供云计算解决方案，包括云迁移、云托管和云安全服务',
+        image: 'https://picsum.photos/seed/service3/400/300',
+        content: '',
+        order: 0,
+        icon: '',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        isActive: true
       }
     ]
   } finally {

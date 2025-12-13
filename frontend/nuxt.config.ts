@@ -4,7 +4,7 @@ import { resolve } from 'path'
 export default defineNuxtConfig({
   // 只保留最基本的配置
   devServer: {
-    port: 3001 // 设置Nuxt开发服务器端口为3001
+    port: 3002 // 设置Nuxt开发服务器端口为3002，避免与后端冲突
   },
   // 运行时配置
   runtimeConfig: {
@@ -34,15 +34,13 @@ export default defineNuxtConfig({
     }
   },
   // 确保API代理仍然工作
-  vite: {
-    server: {
-      proxy: {
-        // 保留原有的API路径代理
-        '/api': {
-          target: 'http://127.0.0.1:3000',
-          changeOrigin: true
-        }
-      }
-    }
+  nitro: {
+    devProxy: {
+      '/api': {
+        target: 'http://127.0.0.1:3001',
+        changeOrigin: true,
+        // 代理会自动处理路径，无需额外配置
+      },
+    },
   }
 })

@@ -9,6 +9,8 @@ const cases = require('./cases');
 const contents = require('./contents');
 const services = require('./services');
 const contacts = require('./contacts'); // 新增联系表单路由
+const auth = require('./auth'); // 新增认证路由
+const configs = require('./configs'); // 新增配置路由
 
 // 使用各模块路由
 router.use('/articles', articles);
@@ -17,6 +19,8 @@ router.use('/cases', cases);
 router.use('/contents', contents);
 router.use('/services', services);
 router.use('/contacts', contacts); // 新增联系表单路由
+router.use('/auth', auth); // 新增认证路由
+router.use('/configs', configs); // 新增配置路由
 
 // 示例路由
 router.get('/example', (req, res) => {
