@@ -8,18 +8,13 @@ const serviceSchema = new mongoose.Schema({
   },
   description: {
     type: String,
-    required: [true, '内容为必填项'],
+    required: [true, '服务描述为必填项'],
     trim: true
   },
   icon: {
     type: String,
     required: [true, '服务图标为必填项'],
     trim: true
-  },
-  image: {
-    type: String,
-    trim: true,
-    default: ''
   },
   order: {
     type: Number,
