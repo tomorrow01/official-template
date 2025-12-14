@@ -141,6 +141,12 @@ const handleSubmit = async () => {
     
     // 格式化发布时间为字符串
     const submitData = { ...form.value };
+    // 将前端的content字段转换为后端需要的description字段
+    if (submitData.content) {
+      submitData.description = submitData.content;
+      delete submitData.content;
+    }
+    
     if (typeof submitData.publishTime === 'object') {
       submitData.publishTime = submitData.publishTime.toISOString().split('T')[0];
     }
@@ -177,7 +183,8 @@ const editCase = (row) => {
   showDialog.value = true;
   form.value = {
     title: row.title || '',
-    content: row.content || '',
+    // 将后端的description字段映射到前端的content字段
+    content: row.description || row.content || '',
     image: row.image || '',
     publishTime: row.publishTime ? new Date(row.publishTime) : new Date(),
     order: row.order || 0,

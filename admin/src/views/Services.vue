@@ -163,9 +163,16 @@ const handleSubmit = async () => {
   }
 
   try {
+    // 将前端的content字段转换为后端期望的description字段
+    const submitData = {
+      ...form.value,
+      description: form.value.content,
+      content: undefined // 移除content字段，避免后端混淆
+    };
+
     if (currentId.value) {
       // 编辑：更新现有数据
-      await servicesAPI.update(currentId.value, form.value);
+      await servicesAPI.update(currentId.value, submitData);
       const index = services.value.findIndex(item => item._id === currentId.value || item.id === currentId.value);
       if (index !== -1) {
         services.value[index] = { ...services.value[index], ...form.value };
@@ -173,7 +180,7 @@ const handleSubmit = async () => {
       ElMessage.success('编辑成功');
     } else {
       // 新增：添加新数据
-      const newService = await servicesAPI.create(form.value);
+      const newService = await servicesAPI.create(submitData);
       console.log('新增服务数据:', newService);
       // 确保返回的数据包含所有必要字段
       services.value.push(newService);
@@ -194,16 +201,14 @@ const handleSubmit = async () => {
 
 // 编辑服务（填充表单数据）
 const editService = (row) => {
-  showDialog.value = true;
-  form.value = {
-    title: row.title,
-    content: row.content || row.description || '',
-    icon: row.icon,
-    order: row.order,
-    isActive: row.isActive || true
-  };
   // MongoDB使用_id作为唯一标识，但也可能有id字段
   currentId.value = row._id || row.id;
+  // 将后端的description字段映射到前端的content字段
+  form.value = {
+    ...row,
+    content: row.description || row.content
+  };
+  showDialog.value = true;
   console.log('编辑服务ID:', currentId.value);
 };
 
