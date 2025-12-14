@@ -98,24 +98,45 @@ const insertDefaultData = async () => {
     if (caseCount === 0) {
       const defaultCases = [
         {
-          title: 'Vue 3 新特性解读',
-          description: '深入解析组合式 API...',
-          image: '/images/case-bg-1.png',
+          title: '电商平台全栈开发',
+          description: '为某大型零售企业开发的全渠道电商平台，采用Vue 3 + Node.js微服务架构，实现了高并发、高性能的购物体验。平台支持PC、移动端和小程序，包含商品管理、订单系统、支付集成、物流追踪等完整功能模块。上线后，企业销售额提升了45%，用户满意度达到92%。',
+          image: '/images/cases/ecommerce-platform.jpg',
           order: 1,
           isActive: true
         },
         {
-          title: 'React 性能优化实践',
-          description: '分享 React 组件优化技巧...',
-          image: '/images/case-bg-2.png',
+          title: '企业数字化转型方案',
+          description: '帮助传统制造企业实现数字化转型，构建了基于大数据的生产管理系统和客户关系管理平台。通过物联网技术实时监控生产设备，使用人工智能算法优化生产流程，提高了生产效率30%，降低了运营成本20%。系统支持多终端访问，管理层可以实时掌握企业运营状况。',
+          image: '/images/cases/digital-transformation.jpg',
           order: 2,
           isActive: true
         },
         {
-          title: 'Node.js 微服务架构',
-          description: '构建高性能可扩展的微服务系统...',
-          image: '/images/case-bg-3.png',
+          title: '智慧教育平台',
+          description: '为教育机构开发的智慧教育平台，集成了在线课程、直播教学、作业管理、考试系统等功能。平台采用响应式设计，支持各种设备访问，同时具备强大的数据分析能力，可以跟踪学生学习进度和教师教学效果。平台已服务超过100所学校，注册用户突破50万。',
+          image: '/images/cases/education-platform.jpg',
           order: 3,
+          isActive: true
+        },
+        {
+          title: '医疗健康管理系统',
+          description: '为医疗机构开发的全流程医疗健康管理系统，涵盖了患者管理、电子病历、预约挂号、诊疗流程、药品管理等模块。系统符合医疗行业标准，具备严格的数据安全和隐私保护机制。上线后，医院的挂号效率提升了60%，患者等待时间减少了50%，医疗资源得到了更合理的配置。',
+          image: '/images/cases/healthcare-system.jpg',
+          order: 4,
+          isActive: true
+        },
+        {
+          title: '金融科技应用开发',
+          description: '为金融机构开发的创新金融科技应用，包含移动银行、在线支付、投资管理等功能。应用采用多重安全认证机制，确保交易安全。系统具备高可用性和可扩展性，能够处理高峰期的大量并发请求。上线后，用户活跃度提升了80%，交易成功率达到99.99%。',
+          image: '/images/cases/fintech-app.jpg',
+          order: 5,
+          isActive: true
+        },
+        {
+          title: '智慧城市解决方案',
+          description: '为城市管理部门开发的智慧城市综合管理平台，集成了交通监控、环境监测、公共安全、便民服务等多个子系统。通过大数据分析和人工智能技术，实现了城市资源的智能调度和优化配置。平台上线后，城市交通拥堵指数下降了25%，环境质量监测覆盖率达到100%，市民满意度显著提升。',
+          image: '/images/cases/smart-city.jpg',
+          order: 6,
           isActive: true
         }
       ];

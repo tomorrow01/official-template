@@ -2,11 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const { connectDB, insertDefaultData } = require('./utils/db'); // 引入数据库连接函数
-const articlesRouter = require('./routes/articles');
-const contentsRouter = require('./routes/contents');
-const bannersRouter = require('./routes/banners');
-const casesRouter = require('./routes/cases'); // 引入 cases 路由
-const servicesRouter = require('./routes/services'); // 引入 services 路由
+const mainRouter = require('./routes/index'); // 引入主路由文件
 
 const app = express();
 const port = process.env.PORT || 3001; // 修改为3001端口
@@ -23,12 +19,8 @@ app.use((req, res, next) => {
   console.log('请求来源IP:', req.ip);
   next(); // 传递请求到下一个中间件/路由
 });
-// 挂载路由
-app.use('/articles', articlesRouter);
-app.use('/contents', contentsRouter);
-app.use('/banners', bannersRouter);
-app.use('/cases', casesRouter); // 挂载 cases 路由
-app.use('/services', servicesRouter); // 挂载 services 路由
+// 挂载主路由 - 只添加/api前缀
+app.use('/api', mainRouter);
 
 // 启动服务前连接数据库
 connectDB().then(async (isConnected) => {
