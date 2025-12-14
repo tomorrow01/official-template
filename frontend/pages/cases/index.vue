@@ -22,9 +22,9 @@
       </div>
       
       <!-- 案例卡片容器 -->
-      <div v-else class="cases-grid">
+      <div v-else-if="cases.length > 0" class="cases-grid">
         <NuxtLink 
-          v-for="(caseItem, index) in cases" 
+          v-for="caseItem in cases" 
           :key="caseItem.id" 
           :to="`/cases/${caseItem.id}`"
           class="case-card"
@@ -32,7 +32,7 @@
           <!-- 案例图片 -->
           <div class="case-image-container">
             <img 
-              :src="getCaseImage(index)" 
+              :src="getCaseImage(caseItem)" 
               :alt="caseItem.description" 
               class="case-image"
             >
@@ -40,8 +40,8 @@
           
           <!-- 案例描述 -->
           <div class="case-desc">
-            <h3>{{ getCaseTitle(index) }}</h3>
-            <p>{{ caseItem.description }}</p>
+            <h3>{{ getCaseTitle(caseItem) }}</h3>
+            <p style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">{{ caseItem.description }}</p>
             <!-- 查看详情链接 -->
             <span class="view-detail-link">
               查看详情
@@ -49,6 +49,11 @@
             </span>
           </div>
         </NuxtLink>
+      </div>
+      
+      <!-- 无数据状态 -->
+      <div v-else class="no-data-message">
+        <p>暂无案例数据</p>
       </div>
     </div>
     
@@ -60,84 +65,113 @@
 import { ref, onMounted } from 'vue';
 import Footer from '@/components/Footer.vue';
 import type { CaseItem } from '~/api/cases';
+import { getCaseList } from '~/api/cases';
 
 // 状态管理
 const cases = ref<CaseItem[]>([]);
 const loadingCases = ref(true);
 const error = ref('');
 
-// 模拟获取案例数据的函数
+// 获取案例数据
 const fetchCaseList = async () => {
   loadingCases.value = true;
+  error.value = '';
   try {
-    // 这里应该是实际的API调用
-    // const res = await getCaseList();
+    console.log('开始获取客户案例数据...');
     
-    // 模拟网络延迟
-    await new Promise(resolve => setTimeout(resolve, 300));
+    // 确保getCaseList函数存在
+    if (typeof getCaseList !== 'function') {
+      throw new Error('getCaseList函数未正确导入或定义');
+    }
     
-    // 使用模拟数据，确保符合CaseItem接口
+    // 使用API获取数据
+    const res = await getCaseList();
+    console.log('案例API返回结果:', res);
+    
+    // 处理可能的不同响应格式
+    let caseData: CaseItem[] = [];
+    
+    if (Array.isArray(res)) {
+      caseData = res as CaseItem[];
+    } else if (res && typeof res === 'object' && 'data' in res) {
+      // 处理嵌套的数据格式
+      caseData = (res as any).data as CaseItem[];
+    } else {
+      throw new Error('获取的案例数据格式不正确');
+    }
+    
+    // 过滤激活的案例并确保数据格式一致
+    cases.value = caseData
+      .filter(item => item && typeof item === 'object' && item.isActive !== false) // 先过滤无效和非激活数据
+      .map(item => ({
+        ...item,
+        _id: item._id || item.id || `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        id: item.id || item._id || `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        description: item.description || '暂无描述',
+        image: item.image || `https://picsum.photos/id/${Math.floor(Math.random() * 100)}/800/600`,
+        publishTime: item.publishTime || new Date().toISOString(),
+        order: item.order || 0,
+        isActive: item.isActive !== false
+      }));
+    
+    console.log(`成功获取到${cases.value.length}个客户案例数据`, cases.value);
+  } catch (err) {
+    console.error('获取案例数据失败:', err);
+    error.value = err instanceof Error ? err.message : '获取案例数据失败，请稍后重试';
+    
+    // 使用模拟数据作为后备
+    console.log('使用模拟客户案例数据作为后备...');
     cases.value = [
       { 
         id: '1', 
         description: 'XX教育使用我们的内容管理系统，内容发布效率提升60%',
-        image: '',
-        publishTime: '',
+        image: 'https://picsum.photos/id/237/800/600',
+        publishTime: '2024-01-15',
         order: 1,
         isActive: true
       },
       { 
         id: '2', 
         description: 'YY电商通过轮播图运营，首页点击率增长35%',
-        image: '',
-        publishTime: '',
+        image: 'https://picsum.photos/id/24/800/600',
+        publishTime: '2024-02-20',
         order: 2,
         isActive: true
       },
       { 
         id: '3', 
         description: 'ZZ金融平台使用我们的解决方案，转化率提升28%',
-        image: '',
-        publishTime: '',
+        image: 'https://picsum.photos/id/119/800/600',
+        publishTime: '2024-03-10',
         order: 3,
         isActive: true
       },
       { 
         id: '4', 
         description: 'AA医疗系统部署我们的应用，用户满意度提高42%',
-        image: '',
-        publishTime: '',
+        image: 'https://picsum.photos/id/10/800/600',
+        publishTime: '2024-04-05',
         order: 4,
         isActive: true
       }
     ];
-    
-    console.log('案例列表页面加载，数据:', cases.value);
-  } catch (err) {
-    console.error('获取案例数据失败:', err);
-    error.value = '获取案例数据失败，请稍后重试';
   } finally {
     loadingCases.value = false;
   }
 };
 
 // 获取案例图片
-const getCaseImage = (index: number) => {
-  const imageIds = ['case1', 'case2', 'case3', 'case4'];
-  const imageIndex = index % imageIds.length;
-  return `https://picsum.photos/seed/${imageIds[imageIndex]}/400/300`;
+const getCaseImage = (caseItem: CaseItem) => {
+  return caseItem.image || `https://picsum.photos/id/${Math.floor(Math.random() * 100)}/800/600`;
 };
 
 // 获取案例标题
-const getCaseTitle = (index: number) => {
-  const titles = [
-    '企业数字化转型案例',
-    '电子商务平台开发案例',
-    '数据智能分析系统案例',
-    '医疗健康信息化解决方案'
-  ];
-  const titleIndex = index % titles.length;
-  return titles[titleIndex];
+const getCaseTitle = (caseItem: CaseItem) => {
+  // 从描述中提取前几个字作为标题，如果描述较长
+  if (caseItem.description && caseItem.description.length > 20) {
+    return caseItem.description.substring(0, 20) + '...';
+  }
+  return caseItem.description || '客户案例';
 };
 
 // 组件挂载时获取数据

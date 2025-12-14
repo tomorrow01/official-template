@@ -37,7 +37,7 @@
           </div>
           <div class="service-content">
             <h3>{{ service.title }}</h3>
-            <p>{{ service.desc || service.description || '服务描述' }}</p>
+            <p style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">{{ service.desc || service.description || '服务描述' }}</p>
             <NuxtLink 
             :to="`/services/${service._id || service.id}`" class="service-btn">
               查看详情 →

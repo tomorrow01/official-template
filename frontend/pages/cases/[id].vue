@@ -15,10 +15,20 @@
         &lt; 返回列表
       </NuxtLink>
       
+      <!-- 加载状态 -->
+      <div v-if="loading" class="loading-container">
+        <p>正在加载案例详情...</p>
+      </div>
+      
+      <!-- 错误状态 -->
+      <div v-else-if="error" class="error-message">
+        <p>{{ error }}</p>
+      </div>
+      
       <!-- 案例内容 -->
-      <div class="case-content">
+      <div v-else class="case-content">
         <h2 class="case-title">{{ currentCase.description }}</h2>
-        <p class="case-date">{{ currentCase.publishTime }}</p>
+        <p class="case-date">{{ formatDate(currentCase.publishTime) }}</p>
         
         <!-- 案例图片 -->
         <div class="case-image-wrapper">
@@ -28,8 +38,7 @@
         <!-- 案例描述 -->
         <div class="case-description">
           <h3>案例详情</h3>
-          <p>这是ID为 {{ route.params.id }} 的客户案例详细信息。通过我们的解决方案，客户实现了显著的业务增长和效率提升。</p>
-          <p>我们的专业团队为客户提供了全方位的技术支持和咨询服务，帮助客户成功应对业务挑战，实现数字化转型。</p>
+          <p>{{ currentCase.description }}</p>
         </div>
       </div>
     </div>
@@ -37,65 +46,104 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import type { CaseItem } from '~/api/cases';
+import { getCaseDetail } from '~/api/cases';
 
 // 获取路由参数
 const route = useRoute();
 
-// 模拟案例数据，使用与列表页相同的图片URL
-const mockCases: Record<string, CaseItem> = {
-  '1': {
-    id: '1',
-    description: 'XX教育使用我们的内容管理系统，内容发布效率提升60%',
-    image: 'https://picsum.photos/seed/case1/400/300',
-    publishTime: '2024年01月15日',
-    _id: '1',
-    order: 0,
-    isActive: true
-  },
-  '2': {
-    id: '2',
-    description: 'YY电商通过轮播图运营，首页点击率增长35%',
-    image: 'https://picsum.photos/seed/case2/400/300',
-    publishTime: '2024年01月10日',
-    _id: '2',
-    order: 0,
-    isActive: true
-  },
-  '3': {
-    id: '3',
-    description: 'ZZ金融平台使用我们的解决方案，转化率提升28%',
-    image: 'https://picsum.photos/seed/case3/400/300',
-    publishTime: '2024年01月05日',
-    _id: '3',
-    order: 0,
-    isActive: true
-  },
-  '4': {
-    id: '4',
-    description: 'AA医疗系统部署我们的应用，用户满意度提高42%',
-    image: 'https://picsum.photos/seed/case4/400/300',
-    publishTime: '2024年01月01日',
-    _id: '4',
-    order: 0,
-    isActive: true
+// 状态管理
+const currentCase = ref<CaseItem>({
+  id: '',
+  _id: '',
+  description: '',
+  image: '',
+  publishTime: '',
+  order: 0,
+  isActive: true
+});
+
+const loading = ref(true);
+const error = ref('');
+
+// 格式化日期
+const formatDate = (dateString: string) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  });
+};
+
+// 获取案例详情
+const fetchCaseDetail = async () => {
+  loading.value = true;
+  error.value = '';
+  try {
+    const caseId = route.params.id as string;
+    console.log('开始获取案例详情，ID:', caseId);
+    
+    // 确保getCaseDetail函数存在
+    if (typeof getCaseDetail !== 'function') {
+      throw new Error('getCaseDetail函数未正确导入或定义');
+    }
+    
+    // 使用API获取数据
+    const res = await getCaseDetail(caseId);
+    console.log('案例详情API返回结果:', res);
+    
+    // 处理可能的不同响应格式
+    let caseData: CaseItem;
+    
+    if (res && typeof res === 'object') {
+      // 如果响应是一个对象，直接使用
+      caseData = res as CaseItem;
+    } else if (res && typeof res === 'object' && 'data' in res) {
+      // 处理嵌套的数据格式
+      caseData = (res as any).data as CaseItem;
+    } else {
+      throw new Error('获取的案例详情数据格式不正确');
+    }
+    
+    // 确保数据格式符合CaseItem接口
+    currentCase.value = {
+      ...caseData,
+      id: caseData._id || caseData.id || '',
+      _id: caseData._id || caseData.id || '',
+      description: caseData.description || '',
+      image: caseData.image || 'https://picsum.photos/id/237/800/600',
+      publishTime: caseData.publishTime || '',
+      order: caseData.order || 0,
+      isActive: caseData.isActive !== false
+    };
+    
+    console.log('成功获取到案例详情数据:', currentCase.value);
+  } catch (err) {
+    console.error('获取案例详情失败:', err);
+    error.value = err instanceof Error ? err.message : '获取案例详情失败，请稍后重试';
+    
+    // 设置默认数据
+    currentCase.value = {
+      id: route.params.id as string,
+      _id: route.params.id as string,
+      description: `案例 ${route.params.id} 详情`,
+      image: 'https://picsum.photos/id/237/800/600',
+      publishTime: '',
+      order: 0,
+      isActive: true
+    };
+  } finally {
+    loading.value = false;
   }
 };
 
-// 计算当前案例数据
-const currentCase = computed<CaseItem>(() => {
-  const caseId = route.params.id as string;
-  return mockCases[caseId] || {
-    id: caseId,
-    _id: caseId,
-    description: `案例 ${caseId} 详情`,
-    image: '/images/case1.png',
-    publishTime: '2024年01月01日',
-    order: 0,
-    isActive: true
-  };
+// 组件挂载时获取数据
+onMounted(() => {
+  fetchCaseDetail();
 });
 
 // 页面加载时的日志
@@ -149,6 +197,28 @@ console.log('案例详情页加载，ID:', route.params.id);
 
 .back-link:hover {
   color: #66b1ff;
+}
+
+/* 加载状态样式 */
+.loading-container {
+  background: white;
+  border-radius: 12px;
+  padding: 60px 40px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  text-align: center;
+  font-size: 18px;
+  color: #606266;
+}
+
+/* 错误状态样式 */
+.error-message {
+  background: white;
+  border-radius: 12px;
+  padding: 60px 40px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  text-align: center;
+  font-size: 18px;
+  color: #f56c6c;
 }
 
 .case-content {
@@ -216,7 +286,7 @@ console.log('案例详情页加载，ID:', route.params.id);
     padding: 0 15px;
   }
   
-  .case-content {
+  .case-content, .loading-container, .error-message {
     padding: 20px;
   }
   

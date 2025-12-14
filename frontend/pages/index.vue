@@ -166,15 +166,15 @@
           <p class="section-subtitle text-gray-600">我们为众多企业提供了专业的技术解决方案，助力业务增长</p>
         </div>
         
-        <div v-for="(item, index) in cases" :key="item.id" class="case-item" style="display: flex; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); overflow: hidden; margin-bottom: 30px; flex-wrap: wrap;">
+        <div v-for="item in cases" :key="item.id" class="case-item" style="display: flex; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); overflow: hidden; margin-bottom: 30px; flex-wrap: wrap;">
           <!-- 左侧图片 -->
           <div class="case-image" style="width: 350px; height: 250px; overflow: hidden; flex-shrink: 0;">
-            <img :src="item.image || getCaseImage(index)" :alt="getCaseTitle(index)" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease; transform: scale(1);" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+            <img :src="getCaseImage(item)" :alt="getCaseTitle(item)" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease; transform: scale(1);" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
           </div>
           <!-- 右侧内容 -->
           <div style="padding: 30px; flex: 1; background-color: white;">
-            <h3 style="margin-bottom: 15px; font-size: 22px; font-weight: 600;">{{ getCaseTitle(index) }}</h3>
-            <p style="line-height: 1.6; margin-bottom: 20px; color: #333;">{{ item.description }}</p>
+            <h3 style="margin-bottom: 15px; font-size: 22px; font-weight: 600;">{{ getCaseTitle(item) }}</h3>
+            <p style="line-height: 1.6; margin-bottom: 20px; color: #333; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">{{ item.description }}</p>
             <NuxtLink :to="`/cases/${item.id}`" style="text-decoration: none;">
               <button style="background: #1677ff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; box-shadow: 0 2px 8px rgba(22, 119, 255, 0.3); transition: all 0.3s ease;">了解更多</button>
             </NuxtLink>
@@ -760,21 +760,18 @@ const getServiceImage = (index: number) => {
   return `https://picsum.photos/id/${imageIds[index % imageIds.length]}/600/400`;
 };
 
-// 获取案例图片（作为备用）
-const getCaseImage = (index: number) => {
-  const imageIds = [239, 24, 119];
-  return `https://picsum.photos/id/${imageIds[index % imageIds.length]}/800/600`;
+// 获取案例图片（优先使用案例数据中的图片，如果没有则使用默认图片）
+const getCaseImage = (caseItem: CaseItem) => {
+  return caseItem.image || `https://picsum.photos/id/${Math.floor(Math.random() * 100)}/800/600`;
 };
 
-// 获取案例标题
-const getCaseTitle = (index: number) => {
-  // 优先使用案例数据中的标题，如果没有则使用默认标题
-  const titles = [
-    '某大型制造企业数字化转型项目',
-    '金融科技平台开发项目',
-    '电商系统升级改造项目'
-  ];
-  return titles[index % titles.length];
+// 获取案例标题（优先使用案例数据中的标题，如果没有则从描述中提取）
+const getCaseTitle = (caseItem: CaseItem) => {
+  // 从描述中提取前几个字作为标题，如果描述较长
+  if (caseItem.description && caseItem.description.length > 20) {
+    return caseItem.description.substring(0, 20) + '...';
+  }
+  return caseItem.description || '客户案例';
 };
 
 // 获取团队成员姓名

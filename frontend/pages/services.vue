@@ -42,7 +42,7 @@
           </div>
           <div class="service-content">
             <h3>{{ service.title }}</h3>
-            <p>{{ service.desc || service.description || '服务描述' }}</p>
+            <p style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">{{ service.desc || service.description || '服务描述' }}</p>
             <NuxtLink 
             :to="`/service-detail/${service._id || service.id}`" class="service-btn">
               查看详情 →
@@ -124,7 +124,6 @@ const fetchServices = async () => {
         title: '软件开发',
         description: '为客户提供定制化的软件开发服务',
         image: 'https://picsum.photos/seed/service1/400/300',
-        content: '',
         order: 0,
         icon: '',
         createdAt: new Date().toISOString(),
@@ -137,7 +136,6 @@ const fetchServices = async () => {
         title: '数字化转型',
         description: '帮助企业实现数字化转型，优化业务流程',
         image: 'https://picsum.photos/seed/service2/400/300',
-        content: '',
         order: 0,
         icon: '',
         createdAt: new Date().toISOString(),
@@ -150,7 +148,6 @@ const fetchServices = async () => {
         title: '云服务',
         description: '提供云计算解决方案，包括云迁移、云托管和云安全服务',
         image: 'https://picsum.photos/seed/service3/400/300',
-        content: '',
         order: 0,
         icon: '',
         createdAt: new Date().toISOString(),
@@ -171,7 +168,6 @@ const fetchServices = async () => {
         title: '软件开发',
         description: '为客户提供定制化的软件开发服务',
         image: 'https://picsum.photos/seed/service1/400/300',
-        content: '',
         order: 0,
         icon: '',
         createdAt: new Date().toISOString(),
@@ -184,7 +180,6 @@ const fetchServices = async () => {
         title: '数字化转型',
         description: '帮助企业实现数字化转型，优化业务流程',
         image: 'https://picsum.photos/seed/service2/400/300',
-        content: '',
         order: 0,
         icon: '',
         createdAt: new Date().toISOString(),
@@ -197,7 +192,6 @@ const fetchServices = async () => {
         title: '云服务',
         description: '提供云计算解决方案，包括云迁移、云托管和云安全服务',
         image: 'https://picsum.photos/seed/service3/400/300',
-        content: '',
         order: 0,
         icon: '',
         createdAt: new Date().toISOString(),
