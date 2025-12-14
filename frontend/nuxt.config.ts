@@ -34,13 +34,16 @@ export default defineNuxtConfig({
     }
   },
   // 确保API代理仍然工作
+  devtools: {
+    enabled: true
+  },
+  // API代理配置
   nitro: {
     devProxy: {
-      '/api': {
-        target: 'http://127.0.0.1:3001',
-        changeOrigin: true,
-        // 代理会自动处理路径，无需额外配置
-      },
-    },
+      '/api/': {
+        target: 'http://localhost:3001/api/',
+        changeOrigin: true
+      }
+    }
   }
 })
