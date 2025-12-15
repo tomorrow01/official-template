@@ -40,7 +40,7 @@
           
           <!-- 案例描述 -->
           <div class="case-desc">
-            <h3>{{ getCaseTitle(caseItem) }}</h3>
+            <h3>{{ caseItem.title }}</h3>
             <p style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">{{ caseItem.description }}</p>
             <!-- 查看详情链接 -->
             <span class="view-detail-link">
@@ -103,16 +103,25 @@ const fetchCaseList = async () => {
     // 过滤激活的案例并确保数据格式一致
     cases.value = caseData
       .filter(item => item && typeof item === 'object' && item.isActive !== false) // 先过滤无效和非激活数据
-      .map(item => ({
-        ...item,
-        _id: item._id || item.id || `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        id: item.id || item._id || `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        description: item.description || '暂无描述',
-        image: item.image || `https://picsum.photos/id/${Math.floor(Math.random() * 100)}/800/600`,
-        publishTime: item.publishTime || new Date().toISOString(),
-        order: item.order || 0,
-        isActive: item.isActive !== false
-      }));
+      .map(item => {
+        // 如果没有title，从description中提取前几个字作为标题
+        let title = item.title;
+        if (!title && item.description) {
+          title = item.description.length > 20 ? item.description.substring(0, 20) + '...' : item.description;
+        }
+        
+        return {
+          ...item,
+          _id: item._id || item.id || `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          id: item.id || item._id || `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          title: title || '客户案例',
+          description: item.description || '暂无描述',
+          image: item.image || `https://picsum.photos/id/${Math.floor(Math.random() * 100)}/800/600`,
+          publishTime: item.publishTime || new Date().toISOString(),
+          order: item.order || 0,
+          isActive: item.isActive !== false
+        };
+      });
     
     console.log(`成功获取到${cases.value.length}个客户案例数据`, cases.value);
   } catch (err) {
@@ -165,13 +174,15 @@ const getCaseImage = (caseItem: CaseItem) => {
   return caseItem.image || `https://picsum.photos/id/${Math.floor(Math.random() * 100)}/800/600`;
 };
 
-// 获取案例标题
-const getCaseTitle = (caseItem: CaseItem) => {
-  // 从描述中提取前几个字作为标题，如果描述较长
-  if (caseItem.description && caseItem.description.length > 20) {
-    return caseItem.description.substring(0, 20) + '...';
-  }
-  return caseItem.description || '客户案例';
+// 格式化日期（可选，用于后续扩展）
+const formatDate = (dateStr?: string): string => {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  });
 };
 
 // 组件挂载时获取数据

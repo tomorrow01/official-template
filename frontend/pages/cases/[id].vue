@@ -27,8 +27,9 @@
       
       <!-- 案例内容 -->
       <div v-else class="case-content">
-        <h2 class="case-title">{{ currentCase.description }}</h2>
-        <p class="case-date">{{ formatDate(currentCase.publishTime) }}</p>
+        <!-- 使用title字段作为标题 -->
+        <h2 class="case-title">{{ currentCase.title }}</h2>
+        <p class="case-date">{{ formatDate(currentCase.createTime || currentCase.publishTime) }}</p>
         
         <!-- 案例图片 -->
         <div class="case-image-wrapper">
@@ -58,6 +59,7 @@ const route = useRoute();
 const currentCase = ref<CaseItem>({
   id: '',
   _id: '',
+  title: '',
   description: '',
   image: '',
   publishTime: '',
@@ -69,7 +71,7 @@ const loading = ref(true);
 const error = ref('');
 
 // 格式化日期
-const formatDate = (dateString: string) => {
+const formatDate = (dateString?: string) => {
   if (!dateString) return '';
   const date = new Date(dateString);
   return date.toLocaleDateString('zh-CN', {
@@ -130,9 +132,10 @@ const fetchCaseDetail = async () => {
     currentCase.value = {
       id: route.params.id as string,
       _id: route.params.id as string,
+      title: `案例 ${route.params.id} 详情`, // 添加默认标题
       description: `案例 ${route.params.id} 详情`,
       image: 'https://picsum.photos/id/237/800/600',
-      publishTime: '',
+      createTime: '',
       order: 0,
       isActive: true
     };
@@ -145,6 +148,8 @@ const fetchCaseDetail = async () => {
 onMounted(() => {
   fetchCaseDetail();
 });
+
+
 
 // 页面加载时的日志
 console.log('案例详情页加载，ID:', route.params.id);

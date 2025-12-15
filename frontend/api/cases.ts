@@ -4,9 +4,11 @@ import { getRequestInstance } from './request';
 export interface CaseItem {
   _id?: string;
   id?: string;
+  title: string; // 添加标题字段
   image: string;
   description: string;
-  publishTime: string;
+  publishTime?: string; // 修改为可选字段，因为后端是createTime
+  createTime?: string; // 添加后端使用的createTime字段
   order: number;
   isActive: boolean;
 }

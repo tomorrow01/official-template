@@ -595,16 +595,25 @@ const fetchCaseList = async () => {
     // 过滤激活的案例并确保数据格式一致
     cases.value = caseData
       .filter(item => item && typeof item === 'object' && item.isActive !== false) // 先过滤无效和非激活数据
-      .map(item => ({
-        ...item,
-        _id: item._id || item.id || `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        id: item.id || item._id || `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        description: item.description || '暂无描述',
-        image: item.image || `https://picsum.photos/id/${Math.floor(Math.random() * 100)}/800/600`,
-        publishTime: item.publishTime || new Date().toISOString(),
-        order: item.order || 0,
-        isActive: item.isActive !== false
-      }));
+      .map(item => {
+        // 如果没有title，从description中提取前几个字作为标题
+        let title = item.title;
+        if (!title && item.description) {
+          title = item.description.length > 20 ? item.description.substring(0, 20) + '...' : item.description;
+        }
+        
+        return {
+          ...item,
+          _id: item._id || item.id || `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          id: item.id || item._id || `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          title: title || '客户案例',
+          description: item.description || '暂无描述',
+          image: item.image || `https://picsum.photos/id/${Math.floor(Math.random() * 100)}/800/600`,
+          publishTime: item.publishTime || new Date().toISOString(),
+          order: item.order || 0,
+          isActive: item.isActive !== false
+        };
+      });
 
     
     console.log(`成功获取到${cases.value.length}个客户案例数据`, cases.value);
@@ -615,6 +624,7 @@ const fetchCaseList = async () => {
       const mockCases = [
         {
           id: '1',
+          title: '智能制造解决方案',
           description: '通过实施智能制造解决方案，帮助企业提升生产效率30%，降低运营成本25%。',
           image: 'https://picsum.photos/id/239/800/600',
           publishTime: '2024-01-15',
@@ -623,6 +633,7 @@ const fetchCaseList = async () => {
         },
         {
           id: '2',
+          title: '金融交易平台开发',
           description: '为金融机构打造安全可靠的交易平台，支持日均交易量超过10万笔。',
           image: 'https://picsum.photos/id/24/800/600',
           publishTime: '2024-02-20',
@@ -631,6 +642,7 @@ const fetchCaseList = async () => {
         },
         {
           id: '3',
+          title: '电商系统全面升级',
           description: '对现有电商系统进行全面升级，提升用户体验和系统性能，销售额增长45%。',
           image: 'https://picsum.photos/id/119/800/600',
           publishTime: '2024-03-10',
@@ -652,6 +664,7 @@ const fetchCaseList = async () => {
     cases.value = [
       {
         id: '1',
+        title: '智能制造解决方案',
         description: '通过实施智能制造解决方案，帮助企业提升生产效率30%，降低运营成本25%。',
         image: 'https://picsum.photos/id/239/800/600',
         publishTime: '2024-01-15',
@@ -660,6 +673,7 @@ const fetchCaseList = async () => {
       },
       {
         id: '2',
+        title: '金融交易平台开发',
         description: '为金融机构打造安全可靠的交易平台，支持日均交易量超过10万笔。',
         image: 'https://picsum.photos/id/24/800/600',
         publishTime: '2024-02-20',
@@ -668,6 +682,7 @@ const fetchCaseList = async () => {
       },
       {
         id: '3',
+        title: '电商系统全面升级',
         description: '对现有电商系统进行全面升级，提升用户体验和系统性能，销售额增长45%。',
         image: 'https://picsum.photos/id/119/800/600',
         publishTime: '2024-03-10',
@@ -767,6 +782,10 @@ const getCaseImage = (caseItem: CaseItem) => {
 
 // 获取案例标题（优先使用案例数据中的标题，如果没有则从描述中提取）
 const getCaseTitle = (caseItem: CaseItem) => {
+  // 优先使用案例数据中的标题字段
+  if (caseItem.title) {
+    return caseItem.title;
+  }
   // 从描述中提取前几个字作为标题，如果描述较长
   if (caseItem.description && caseItem.description.length > 20) {
     return caseItem.description.substring(0, 20) + '...';
