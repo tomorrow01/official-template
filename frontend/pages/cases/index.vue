@@ -133,6 +133,7 @@ const fetchCaseList = async () => {
     cases.value = [
       { 
         id: '1', 
+        title: 'XX教育内容管理系统',
         description: 'XX教育使用我们的内容管理系统，内容发布效率提升60%',
         image: 'https://picsum.photos/id/237/800/600',
         publishTime: '2024-01-15',
@@ -141,6 +142,7 @@ const fetchCaseList = async () => {
       },
       { 
         id: '2', 
+        title: 'YY电商轮播图运营',
         description: 'YY电商通过轮播图运营，首页点击率增长35%',
         image: 'https://picsum.photos/id/24/800/600',
         publishTime: '2024-02-20',
@@ -149,6 +151,7 @@ const fetchCaseList = async () => {
       },
       { 
         id: '3', 
+        title: 'ZZ金融平台解决方案',
         description: 'ZZ金融平台使用我们的解决方案，转化率提升28%',
         image: 'https://picsum.photos/id/119/800/600',
         publishTime: '2024-03-10',
@@ -157,6 +160,7 @@ const fetchCaseList = async () => {
       },
       { 
         id: '4', 
+        title: 'AA医疗系统应用部署',
         description: 'AA医疗系统部署我们的应用，用户满意度提高42%',
         image: 'https://picsum.photos/id/10/800/600',
         publishTime: '2024-04-05',
