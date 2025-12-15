@@ -126,8 +126,6 @@ const fetchServices = async () => {
         image: 'https://picsum.photos/seed/service1/400/300',
         order: 0,
         icon: '',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
         isActive: true
       },
       {
@@ -138,8 +136,6 @@ const fetchServices = async () => {
         image: 'https://picsum.photos/seed/service2/400/300',
         order: 0,
         icon: '',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
         isActive: true
       },
       {
@@ -150,8 +146,6 @@ const fetchServices = async () => {
         image: 'https://picsum.photos/seed/service3/400/300',
         order: 0,
         icon: '',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
         isActive: true
       }
     ]
@@ -170,8 +164,6 @@ const fetchServices = async () => {
         image: 'https://picsum.photos/seed/service1/400/300',
         order: 0,
         icon: '',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
         isActive: true
       },
       {
@@ -182,8 +174,6 @@ const fetchServices = async () => {
         image: 'https://picsum.photos/seed/service2/400/300',
         order: 0,
         icon: '',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
         isActive: true
       },
       {
@@ -194,8 +184,6 @@ const fetchServices = async () => {
         image: 'https://picsum.photos/seed/service3/400/300',
         order: 0,
         icon: '',
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
         isActive: true
       }
     ]
