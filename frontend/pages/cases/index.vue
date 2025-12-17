@@ -40,8 +40,12 @@
           
           <!-- 案例描述 -->
           <div class="case-desc">
-            <h3>{{ caseItem.title }}</h3>
-            <p style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">{{ caseItem.description }}</p>
+            <div class="case-content-wrapper">
+              <h3>{{ caseItem.title }}</h3>
+              <div class="case-description-wrapper">
+                <p class="case-description">{{ caseItem.description }}</p>
+              </div>
+            </div>
             <!-- 查看详情链接 -->
             <span class="view-detail-link">
               查看详情
@@ -264,7 +268,7 @@ onMounted(() => {
   overflow: hidden;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
-  height: 100%;
+  height: 480px; /* 设置固定高度 */
   display: flex;
   flex-direction: column;
 }
@@ -294,9 +298,14 @@ onMounted(() => {
 .case-desc {
   padding: 25px;
   flex: 1;
-  display: flex;
-  flex-direction: column;
   background-color: white;
+  height: 200px; /* 固定内容区域总高度 */
+  position: relative; /* 设置为相对定位，作为按钮绝对定位的参照 */
+  overflow: hidden;
+}
+
+.case-content-wrapper {
+  width: 100%;
 }
 
 .case-desc h3 {
@@ -304,13 +313,28 @@ onMounted(() => {
   color: #2c3e50;
   margin-bottom: 15px;
   font-weight: 600;
+  height: 48px; /* 固定标题高度 */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.case-desc p {
+.case-description-wrapper {
+  height: 60px; /* 固定描述区域高度 */
+  overflow: hidden;
+}
+
+.case-description {
   color: #7f8c8d;
   line-height: 1.6;
-  margin-bottom: 20px;
-  flex: 1;
+  margin-bottom: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .view-detail-link {
@@ -320,6 +344,9 @@ onMounted(() => {
   text-decoration: none;
   font-weight: 500;
   transition: all 0.3s ease;
+  position: absolute; /* 使用绝对定位 */
+  bottom: 25px; /* 固定到底部 */
+  left: 25px; /* 固定到左侧 */
 }
 
 .view-detail-link:hover {

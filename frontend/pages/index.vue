@@ -137,16 +137,18 @@
             </div>
             
             <!-- 卡片内部：标题和详情在下 -->
-            <div style="padding: 24px !important; width: 100%; box-sizing: border-box;">
+            <div style="padding: 24px !important; width: 100%; box-sizing: border-box; height: 220px; position: relative; overflow: hidden;">
               <!-- 标题 -->
-              <h3 style="font-size: 20px; font-weight: 600; margin: 0 0 15px 0 !important; padding: 0 !important; color: #333; width: 100%; box-sizing: border-box;">{{ service.title }}</h3>
+              <h3 style="font-size: 20px; font-weight: 600; margin: 0 0 15px 0 !important; padding: 0 !important; color: #333; width: 100%; box-sizing: border-box; height: 48px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">{{ service.title }}</h3>
               
               <!-- 详情 -->
-              <p style="line-height: 1.6; margin: 0 0 20px 0 !important; padding: 0 !important; color: #666; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; width: 100%; box-sizing: border-box;">{{ service.description || service.desc || '为客户提供专业的技术解决方案，助力业务增长和数字化转型。' }}</p>
+              <div style="height: 60px; overflow: hidden; margin-bottom: 20px;">
+                <p style="line-height: 1.6; margin: 0 !important; padding: 0 !important; color: #666; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; width: 100%; box-sizing: border-box;">{{ service.description || service.desc || '为客户提供专业的技术解决方案，助力业务增长和数字化转型。' }}</p>
+              </div>
               
               <!-- 跳转到详情页面的按钮 -->
               <ClientOnly>
-                <button style="background: #1677ff; color: white; border: none; margin: 0 !important; padding: 10px 20px !important; border-radius: 4px; cursor: pointer; box-shadow: 0 2px 8px rgba(22, 119, 255, 0.3); transition: all 0.3s ease; display: inline-flex; align-items: center; font-weight: 500;">
+                <button style="background: #1677ff; color: white; border: none; margin: 0 !important; padding: 10px 20px !important; border-radius: 4px; cursor: pointer; box-shadow: 0 2px 8px rgba(22, 119, 255, 0.3); transition: all 0.3s ease; display: inline-flex; align-items: center; font-weight: 500; position: absolute; bottom: 24px; left: 24px; width: calc(100% - 48px); text-align: center; justify-content: center;">
                   查看详情
                 </button>
               </ClientOnly>

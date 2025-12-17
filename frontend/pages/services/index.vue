@@ -36,8 +36,12 @@
             <img :src="serviceItem.image" :alt="serviceItem.title" class="card-image">
           </div>
           <div class="service-content">
-            <h3>{{ serviceItem.title }}</h3>
-            <p style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">{{ serviceItem.desc || serviceItem.description || '服务描述' }}</p>
+            <div class="service-content-wrapper">
+                <h3>{{ serviceItem.title }}</h3>
+                <div class="service-description-wrapper">
+                  <p class="service-description">{{ serviceItem.desc || serviceItem.description || '服务描述' }}</p>
+                </div>
+              </div>
             <NuxtLink :to="`/services/${serviceItem.id || serviceItem._id}`" class="service-btn">
               查看详情 →
             </NuxtLink>
@@ -249,8 +253,7 @@ onMounted(() => {
   color: #333;
   transition: all 0.3s ease;
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  height: 100%;
-  min-height: 350px;
+  height: 530px; /* 使用固定高度而不是最小高度 */
   display: flex;
   flex-direction: column;
 }
@@ -281,8 +284,13 @@ onMounted(() => {
 .service-content {
   padding: 20px;
   flex: 1;
-  display: flex;
-  flex-direction: column;
+  height: 350px;
+  position: relative; /* 设置为相对定位，作为按钮绝对定位的参照 */
+  overflow: hidden;
+}
+
+.service-content-wrapper {
+  width: 100%;
 }
 
 .service-content h3 {
@@ -290,16 +298,31 @@ onMounted(() => {
   margin-bottom: 10px;
   font-size: 1.5rem;
   color: #333;
+  height: 48px; /* 固定标题区域高度 */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.service-content p {
+.service-description-wrapper {
+  height: 60px; /* 固定描述区域高度 */
+  overflow: hidden;
+}
+
+.service-description {
   color: #666;
   margin-bottom: 15px;
-  flex: 1;
+  line-height: 1.5; /* 确保文本行高一致 */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .service-btn {
-  margin-top: 20px;
   padding: 10px 20px;
   background: #667eea;
   color: white;
@@ -309,9 +332,13 @@ onMounted(() => {
   font-weight: 500;
   cursor: pointer;
   transition: all 0.3s ease;
-  align-self: flex-start;
   display: inline-block;
   text-decoration: none;
+  width: calc(100% - 40px); /* 确保按钮宽度一致 */
+  text-align: center;
+  position: absolute; /* 使用绝对定位 */
+  bottom: 20px; /* 固定到底部 */
+  left: 20px; /* 固定到左侧 */
 }
 
 .service-btn:hover {

@@ -41,8 +41,12 @@
             >
           </div>
           <div class="service-content">
-            <h3>{{ service.title }}</h3>
-            <p style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">{{ service.desc || service.description || '服务描述' }}</p>
+            <div class="service-content-wrapper">
+              <h3>{{ service.title }}</h3>
+              <div class="service-description-wrapper">
+                <p style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis;">{{ service.desc || service.description || '服务描述' }}</p>
+              </div>
+            </div>
             <NuxtLink 
             :to="`/service-detail/${service._id || service.id}`" class="service-btn">
               查看详情 →
@@ -362,24 +366,47 @@ onMounted(() => {
 .service-content {
   padding: 25px;
   position: relative;
+  height: 220px; /* 增加内容区域总高度，防止按钮挡住文字 */
+  overflow: hidden;
+}
+
+.service-content-wrapper {
+  width: 100%;
 }
 
 .service-content h3 {
-  font-size: 1.6rem;
+  font-size: 1.5rem;
   margin-bottom: 15px;
   color: #333;
   font-weight: 600;
   position: relative;
   z-index: 1;
+  height: 48px; /* 固定标题高度 */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.service-description-wrapper {
+  height: 60px; /* 固定描述区域高度 */
+  overflow: hidden;
+  margin-bottom: 15px;
 }
 
 .service-content p {
   color: #666;
   line-height: 1.7;
-  margin-bottom: 25px;
+  margin-bottom: 0;
   font-size: 16px;
   position: relative;
   z-index: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .service-btn {
@@ -391,9 +418,13 @@ onMounted(() => {
   text-decoration: none;
   transition: all 0.3s ease;
   font-weight: 500;
-  position: relative;
+  position: absolute;
   overflow: hidden;
   z-index: 1;
+  bottom: 20px;
+  left: 25px;
+  width: calc(100% - 50px); /* 确保按钮宽度一致 */
+  text-align: center;
 }
 
 .service-btn:hover {

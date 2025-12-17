@@ -7,7 +7,7 @@
       <div class="back-button-container">
         <el-button @click="navigateBack" type="default" size="small">
           <el-icon><ArrowLeft /></el-icon>
-          返回首页
+          返回列表
         </el-button>
       </div>
       
@@ -40,7 +40,7 @@
       <div v-else class="error-container">
         <el-empty description="文章不存在或已被删除"></el-empty>
         <el-button @click="navigateBack" type="primary" style="margin-top: 20px;">
-          返回首页
+          返回列表
         </el-button>
       </div>
     </div>
@@ -145,7 +145,7 @@ const fetchArticleDetail = async () => {
 
 // 返回上一页
 const navigateBack = () => {
-  router.push('/');
+  router.push('/articles');
 };
 
 // 页面加载时获取文章详情
