@@ -28,6 +28,11 @@ const connectDB = async () => {
   }
 };
 
+// 检查MongoDB是否已连接
+const isMongoConnected = () => {
+  return mongoose.connection.readyState === 1;
+};
+
 // 分离插入默认数据的逻辑，在确认连接成功后调用
 const insertDefaultData = async () => {
   try {
@@ -37,6 +42,7 @@ const insertDefaultData = async () => {
     const Case = require('../models/Case');
     const Article = require('../models/Article');
     const Config = require('../models/Config');
+    const Content = require('../models/Content');
     const fs = require('fs').promises;
     const path = require('path');
     
@@ -215,10 +221,54 @@ const insertDefaultData = async () => {
       await Config.insertMany(configsToInsert);
       console.log('配置数据同步到数据库成功');
     }
+    
+    // 插入默认内容数据
+    const contentCount = await Content.countDocuments();
+    if (contentCount === 0) {
+      const defaultContents = [
+        {
+          title: '公司简介',
+          content: '我们是一家专业的互联网技术公司，专注于为企业提供全方位的数字化解决方案。公司成立于2020年，拥有一支经验丰富的技术团队，致力于为客户创造最大的价值。',
+          type: '企业介绍',
+          status: '发布',
+          sort: 1
+        },
+        {
+          title: '关于我们',
+          content: '公司秉承"技术驱动，创新发展"的理念，不断提升技术实力和服务质量。我们的服务范围包括网站建设、APP开发、数据分析、云计算等多个领域，为客户提供一站式的数字化转型服务。',
+          type: '企业介绍',
+          status: '发布',
+          sort: 2
+        },
+        {
+          title: '企业文化',
+          content: '我们的企业文化包括创新、协作、责任和客户导向。我们鼓励员工不断创新，团队协作，承担责任，以客户需求为导向，提供优质的产品和服务。',
+          type: '企业文化',
+          status: '发布',
+          sort: 3
+        },
+        {
+          title: '服务流程',
+          content: '1. 需求分析：了解客户需求，制定解决方案\n2. 方案设计：设计详细的技术方案\n3. 开发实现：按照方案进行开发\n4. 测试验收：进行全面测试和客户验收\n5. 上线部署：正式上线并提供维护服务',
+          type: '服务流程',
+          status: '发布',
+          sort: 4
+        },
+        {
+          title: '联系我们',
+          content: '地址：北京市朝阳区建国路88号\n电话：010-12345678\n邮箱：info@example.com\n网址：www.example.com',
+          type: '联系信息',
+          status: '发布',
+          sort: 5
+        }
+      ];
+      await Content.insertMany(defaultContents);
+      console.log('默认内容数据插入成功');
+    }
   } catch (err) {
     console.error('插入默认数据失败:', err.message);
     console.error('详细错误:', err);
   }
 };
 
-module.exports = { connectDB, insertDefaultData };
+module.exports = { connectDB, insertDefaultData, isMongoConnected };
