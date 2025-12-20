@@ -1,32 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
-const userSchema = new mongoose.Schema({
-  username: {
-    type: String,
-    required: [true, '用户名为必填项'],
-    unique: true,
-    trim: true
-  },
-  password: {
-    type: String,
-    required: [true, '密码为必填项'],
-    minlength: [6, '密码长度不能少于6位']
-  },
-  role: {
-    type: String,
-    default: 'admin',
-    enum: ['admin', 'editor']
-  },
-  createTime: {
-    type: Date,
-    default: Date.now
-  },
-  updateTime: {
-    type: Date,
-    default: Date.now
-  }
-});
+const userSchema = new mongoose.Schema({  username: {    type: String,    required: [true, '用户名为必填项'],    unique: true,    trim: true  },  password: {    type: String,    required: [true, '密码为必填项'],    minlength: [6, '密码长度不能少于6位']  },  role: {    type: String,    default: 'admin',    enum: ['admin', 'editor']  },  avatar: {    type: String,    default: '',    trim: true  },  createTime: {    type: Date,    default: Date.now  },  updateTime: {    type: Date,    default: Date.now  }});
 
 // 密码加密中间件
 userSchema.pre('save', async function(next) {

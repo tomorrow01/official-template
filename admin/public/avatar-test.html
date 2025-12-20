@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>头像显示功能测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+        .code-block {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            overflow-x: auto;
+        }
+        .btn {
+            padding: 8px 16px;
+            background: #409eff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #66b1ff;
+        }
+        .status {
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background: #f0f9eb;
+            color: #67c23a;
+            border: 1px solid #c2e7b0;
+        }
+        .error {
+            background: #fef0f0;
+            color: #f56c6c;
+            border: 1px solid #fbc4c4;
+        }
+        .warning {
+            background: #fdf6ec;
+            color: #e6a23c;
+            border: 1px solid #fce3b6;
+        }
+    </style>
+</head>
+<body>
+    <h1>头像显示功能测试</h1>
+    
+    <div class="test-section">
+        <h2>1. 头像图片访问测试</h2>
+        <p>测试默认头像图片是否可以正常访问：</p>
+        <img src="/images/admin-avatar.png" alt="默认头像" class="test-avatar">
+        <p id="avatar-image-status" class="status warning">正在测试...</p>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. 后端接口测试</h2>
+        <p>测试后端接口是否返回包含头像信息的用户数据：</p>
+        <button class="btn" onclick="testLoginApi()">测试登录接口</button>
+        <button class="btn" onclick="testCurrentApi()">测试获取当前用户接口</button>
+        <div id="api-status" class="status warning">点击按钮开始测试...</div>
+        <div id="api-result" class="code-block">测试结果将显示在这里</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. localStorage测试</h2>
+        <p>检查浏览器localStorage中的用户信息：</p>
+        <button class="btn" onclick="checkLocalStorage()">检查localStorage</button>
+        <button class="btn" onclick="clearLocalStorage()">清除用户信息</button>
+        <div id="localStorage-status" class="status warning">点击按钮开始检查...</div>
+        <div id="localStorage-content" class="code-block">localStorage内容将显示在这里</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. 解决方案</h2>
+        <ol>
+            <li><strong>清除旧数据</strong>：点击上面的"清除用户信息"按钮</li>
+            <li><strong>重新登录</strong>：访问 <a href="/" target="_blank">登录页面</a>，使用正确的用户名密码登录（用户名：admin，密码：123456）</li>
+            <li><strong>验证结果</strong>：登录成功后，右上角应该能看到头像图标</li>
+        </ol>
+        <p class="status warning">注意：如果使用的是浏览器缓存的页面，可能需要强制刷新（Ctrl+F5 或 Cmd+Shift+R）</p>
+    </div>
+    
+    <script>
+        // 测试头像图片访问
+        const avatarImg = document.querySelector('.test-avatar');
+        const avatarStatus = document.getElementById('avatar-image-status');
+        
+        avatarImg.onload = function() {
+            avatarStatus.innerHTML = '<strong>✓ 头像图片可以正常访问</strong>';
+            avatarStatus.className = 'status success';
+        };
+        
+        avatarImg.onerror = function() {
+            avatarStatus.innerHTML = '<strong>✗ 头像图片访问失败</strong>';
+            avatarStatus.className = 'status error';
+        };
+        
+        // 测试登录接口
+        async function testLoginApi() {
+            const statusDiv = document.getElementById('api-status');
+            const resultDiv = document.getElementById('api-result');
+            
+            statusDiv.innerHTML = '<strong>正在测试登录接口...</strong>';
+            statusDiv.className = 'status warning';
+            
+            try {
+                const response = await fetch('http://localhost:3003/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: 'admin', password: '123456' })
+                });
+                
+                const data = await response.json();
+                resultDiv.innerHTML = JSON.stringify(data, null, 2);
+                
+                if (data.code === 200 && data.data.user.avatar) {
+                    statusDiv.innerHTML = '<strong>✓ 登录接口返回了包含头像字段的用户信息</strong>';
+                    statusDiv.className = 'status success';
+                } else {
+                    statusDiv.innerHTML = '<strong>✗ 登录接口没有返回头像字段</strong>';
+                    statusDiv.className = 'status error';
+                }
+            } catch (error) {
+                statusDiv.innerHTML = '<strong>✗ 测试登录接口失败</strong>';
+                statusDiv.className = 'status error';
+                resultDiv.innerHTML = error.message;
+            }
+        }
+        
+        // 测试获取当前用户接口
+        async function testCurrentApi() {
+            const statusDiv = document.getElementById('api-status');
+            const resultDiv = document.getElementById('api-result');
+            
+            statusDiv.innerHTML = '<strong>正在测试获取当前用户接口...</strong>';
+            statusDiv.className = 'status warning';
+            
+            try {
+                // 先登录获取token
+                const loginResponse = await fetch('http://localhost:3003/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: 'admin', password: '123456' })
+                });
+                
+                const loginData = await loginResponse.json();
+                
+                if (loginData.code !== 200) {
+                    throw new Error('登录失败，无法获取token');
+                }
+                
+                // 使用token获取当前用户信息
+                const currentResponse = await fetch('http://localhost:3003/api/auth/current', {
+                    method: 'GET',
+                    headers: { 'Authorization': `Bearer ${loginData.data.token}` }
+                });
+                
+                const currentData = await currentResponse.json();
+                resultDiv.innerHTML = JSON.stringify(currentData, null, 2);
+                
+                if (currentData.code === 200 && currentData.data.avatar) {
+                    statusDiv.innerHTML = '<strong>✓ 获取当前用户接口返回了包含头像字段的用户信息</strong>';
+                    statusDiv.className = 'status success';
+                } else {
+                    statusDiv.innerHTML = '<strong>✗ 获取当前用户接口没有返回头像字段</strong>';
+                    statusDiv.className = 'status error';
+                }
+            } catch (error) {
+                statusDiv.innerHTML = '<strong>✗ 测试获取当前用户接口失败</strong>';
+                statusDiv.className = 'status error';
+                resultDiv.innerHTML = error.message;
+            }
+        }
+        
+        // 检查localStorage
+        function checkLocalStorage() {
+            const statusDiv = document.getElementById('localStorage-status');
+            const contentDiv = document.getElementById('localStorage-content');
+            
+            try {
+                const adminUser = localStorage.getItem('admin-user');
+                if (adminUser) {
+                    const userObj = JSON.parse(adminUser);
+                    contentDiv.innerHTML = JSON.stringify(userObj, null, 2);
+                    
+                    if (userObj.avatar) {
+                        statusDiv.innerHTML = '<strong>✓ localStorage中的用户信息包含avatar字段</strong>';
+                        statusDiv.className = 'status success';
+                    } else {
+                        statusDiv.innerHTML = '<strong>✗ localStorage中的用户信息缺少avatar字段</strong>';
+                        statusDiv.className = 'status error';
+                    }
+                } else {
+                    statusDiv.innerHTML = '<strong>✗ localStorage中没有用户信息</strong>';
+                    statusDiv.className = 'status warning';
+                    contentDiv.innerHTML = 'localStorage中没有admin-user数据';
+                }
+            } catch (error) {
+                statusDiv.innerHTML = '<strong>✗ 解析localStorage数据失败</strong>';
+                statusDiv.className = 'status error';
+                contentDiv.innerHTML = error.message;
+            }
+        }
+        
+        // 清除localStorage
+        function clearLocalStorage() {
+            const statusDiv = document.getElementById('localStorage-status');
+            const contentDiv = document.getElementById('localStorage-content');
+            
+            try {
+                localStorage.removeItem('admin-user');
+                localStorage.removeItem('admin-token');
+                statusDiv.innerHTML = '<strong>✓ 已成功清除localStorage中的用户信息</strong>';
+                statusDiv.className = 'status success';
+                contentDiv.innerHTML = 'localStorage已清除';
+            } catch (error) {
+                statusDiv.innerHTML = '<strong>✗ 清除localStorage数据失败</strong>';
+                statusDiv.className = 'status error';
+                contentDiv.innerHTML = error.message;
+            }
+        }
+        
+        // 页面加载时自动检查
+        window.onload = function() {
+            checkLocalStorage();
+        };
+    </script>
+</body>
+</html>

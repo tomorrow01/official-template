@@ -28,9 +28,9 @@ router.post('/login', async (req, res) => {
     }
 
     // 使用模拟数据进行验证（仅用于开发环境）
-    if (username === 'admin' && password === '123456') {
+      if (username === 'admin' && password === '123456') {
       const token = jwt.sign(
-        { userId: 'mock_user_id', username: 'admin', role: 'admin' },
+        { userId: 'mock_user_id', username: 'admin', role: 'admin', avatar: '/images/admin-avatar.png' },
         'your_jwt_secret_key',
         { expiresIn: '24h' }
       );
@@ -40,7 +40,8 @@ router.post('/login', async (req, res) => {
         user: {
           _id: 'mock_user_id',
           username: 'admin',
-          role: 'admin'
+          role: 'admin',
+          avatar: '/images/admin-avatar.png'
         }
       }, '登录成功（模拟数据）');
     } else {
@@ -69,7 +70,8 @@ router.get('/current', async (req, res) => {
     sendResponse(res, 200, {
       _id: decoded.userId,
       username: decoded.username,
-      role: decoded.role
+      role: decoded.role,
+      avatar: decoded.avatar || '/images/admin-avatar.png'
     }, '获取用户信息成功（模拟数据）');
   } catch (err) {
     if (err.name === 'JsonWebTokenError' || err.name === 'TokenExpiredError') {

@@ -14,7 +14,9 @@
       </div>
       <div class="nav-right">
         <div class="user-info">
-          <el-avatar size="small" icon="el-icon-user" class="mr-2"></el-avatar>
+          <el-avatar size="small" class="mr-2" :src="currentUser.avatar || '/images/admin-avatar.png'">
+            <User v-if="!currentUser.avatar" />
+          </el-avatar>
           <span>{{ currentUser.username }}</span>
           <el-button type="text" size="small" class="ml-4 logout-btn" @click="handleLogout">
             退出登录
@@ -81,6 +83,7 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { ElMessage } from 'element-plus';
+import { User } from '@element-plus/icons-vue';
 
 
 const router = useRouter();
@@ -92,13 +95,19 @@ let initialUser = { username: '管理员' };
 try {
   if (userData) {
     initialUser = JSON.parse(userData);
+    // 确保用户信息包含avatar字段，如果没有则添加默认值
+    if (!initialUser.avatar) {
+      initialUser.avatar = '/images/admin-avatar.png';
+      // 更新localStorage中的用户信息
+      localStorage.setItem('admin-user', JSON.stringify(initialUser));
+    }
   }
 } catch (error) {
   console.error('解析用户信息失败:', error);
-  // 解析失败时使用默认值并清除无效数据
   localStorage.removeItem('admin-user');
 }
 const currentUser = ref(initialUser);
+
 onMounted(() => {
   // 移除主题相关的类名，确保使用默认主题
   document.documentElement.className = '';
