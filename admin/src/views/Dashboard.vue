@@ -44,7 +44,7 @@
             <template #title>
               <span>轮播图管理</span>
             </template>
-            <el-menu-item index="/dashboard/banners/sections">轮播图板块列表</el-menu-item>
+            <el-menu-item index="/dashboard/banners/sections">板块列表</el-menu-item>
             <el-menu-item index="/dashboard/banners/list">轮播图列表</el-menu-item>
           </el-sub-menu>
           <el-menu-item index="/dashboard/content">内容管理</el-menu-item>
@@ -72,7 +72,7 @@
     
     <!-- 页脚 -->
     <div class="footer">
-      <div>© 2023 管理后台系统. All rights reserved.</div>
+      <div>© 2025 管理后台系统. All rights reserved.</div>
     </div>
   </div>
 </template>
