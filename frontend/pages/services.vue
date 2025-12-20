@@ -3,13 +3,8 @@
     <!-- 引入公共导航 -->
     <Navbar />
     
-    <!-- 顶部Banner -->
-  <div class="services-banner">
-    <div class="container">
-      <h1>核心服务</h1>
-      <p>提供专业、高效的解决方案，满足您的多样化需求</p>
-    </div>
-  </div>
+    <!-- 动态轮播图 -->
+    <Banner :banners="banners" />
     
     <div class="container">
       
@@ -95,10 +90,13 @@
 import { ref, onMounted } from 'vue'
 import Navbar from '~/components/Navbar.vue'
 import Footer from '~/components/Footer.vue'
+import Banner from '~/components/Banner.vue'
 import { getServiceList, type ServiceItem } from '~/api/services'
+import { getBannerList } from '~/api/banner'
 
 // 服务数据
 const services = ref<ServiceItem[]>([])
+const banners = ref<any[]>([])
 const loadingServices = ref(false)
 const error = ref<string | null>(null)
 
@@ -106,6 +104,30 @@ const error = ref<string | null>(null)
 const handleImageError = (event: Event) => {
   const target = event.target as HTMLImageElement;
   target.src = `https://picsum.photos/seed/serviceDefault/400/300`;
+};
+
+// 获取轮播图数据
+const fetchBanners = async () => {
+  try {
+    console.log('开始获取服务页轮播图数据...');
+    const res = await getBannerList('services');
+    console.log('服务页轮播图API返回结果:', res);
+    banners.value = res;
+  } catch (err) {
+    console.error('获取服务页轮播图数据失败:', err);
+    // 使用模拟数据作为兜底
+    banners.value = [
+      {
+        id: '1',
+        title: '服务页轮播图',
+        description: '专业的技术服务，满足您的各种需求',
+        ctaText: '了解更多',
+        link: '/services',
+        image: '/images/banner3.jpg',
+        isActive: true
+      }
+    ];
+  }
 };
 
 const fetchServices = async () => {
@@ -197,8 +219,8 @@ const fetchServices = async () => {
 }
 
 // 页面加载时获取数据
-onMounted(() => {
-  fetchServices()
+onMounted(async () => {
+  await Promise.all([fetchBanners(), fetchServices()])
 })
 </script>
 

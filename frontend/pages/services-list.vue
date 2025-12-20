@@ -95,26 +95,26 @@ const error = ref(null)
 
 // 获取服务数据
 const fetchServices = async () => {
-  loadingServices.value = true
-  error.value = null
-  try {
-    console.log('开始获取服务数据...')
-    // 使用API获取数据
-    const res = await getServiceList()
-    console.log('服务API返回结果:', res)
-    
-    // 精确处理后端返回的{code, data, error}格式
-    if (typeof res === 'object' && res !== null && res.data && Array.isArray(res.data)) {
-      console.log(`成功获取到${res.data.length}个服务数据`)
-      services.value = res.data.map(service => ({
-        ...service,
-        // 确保有必要的字段，使用默认值
-        image: service.image || `https://picsum.photos/seed/service${service.id}/600/400`
-      }))
-    } else {
-      console.warn('服务数据格式不正确，使用空数组')
-      services.value = []
-    }
+    loadingServices.value = true
+    error.value = null
+    try {
+      console.log('开始获取服务数据...')
+      // 使用API获取数据
+      const res = await getServiceList()
+      console.log('服务API返回结果:', res)
+      
+      // 由于响应拦截器已经处理了格式，res直接是服务数据数组
+      if (Array.isArray(res)) {
+        console.log(`成功获取到${res.length}个服务数据`)
+        services.value = res.map(service => ({
+          ...service,
+          // 确保有必要的字段，使用默认值
+          image: service.image || `https://picsum.photos/seed/service${service.id || service._id}/600/400`
+        }))
+      } else {
+        console.warn('服务数据格式不正确，使用空数组')
+        services.value = []
+      }
     
     // 如果没有数据，使用模拟数据
     if (!services.value.length) {

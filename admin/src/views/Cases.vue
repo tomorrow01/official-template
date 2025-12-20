@@ -102,13 +102,14 @@ const rules = ref({
 // 初始化加载案例数据
 const loadCases = async () => {
   try {
+    loading.value = true;
     const response = await casesAPI.getList();
     console.log('加载案例列表响应:', response);
     
     // 处理不同的数据结构格式
     let casesData = [];
     if (response && response.data) {
-      // 格式1: {data: [...]}
+      // 格式1: {data: [...]} 
       casesData = response.data;
     } else if (Array.isArray(response)) {
       // 格式2: [...]直接数组
@@ -121,7 +122,7 @@ const loadCases = async () => {
     // 确保每个案例对象都有必要的字段，添加默认值
     cases.value = casesData.map(item => ({
       ...item,
-      _id: item._id || item.id,
+      _id: item._id || item.id || `temp-${Date.now()}-${Math.random()}`,
       title: item.title || '未命名案例',
       image: item.image || '',
       description: item.description || '',
@@ -152,8 +153,10 @@ const loadCases = async () => {
         isActive: true
       }
     ];
+  } finally {
+    loading.value = false;
   }
-};
+}
 
 // 新增/编辑提交逻辑
 const handleSubmit = async () => {
@@ -164,6 +167,7 @@ const handleSubmit = async () => {
   }
 
   try {
+    loading.value = true;
     // 打印表单数据用于调试
     console.log('提交的案例数据:', form.value);
     
@@ -171,16 +175,27 @@ const handleSubmit = async () => {
       // 编辑：更新现有数据
       await casesAPI.update(currentId.value, form.value);
       const index = cases.value.findIndex(item => item._id === currentId.value || item.id === currentId.value);
-      cases.value[index] = { ...cases.value[index], ...form.value };
+      if (index !== -1) {
+        cases.value[index] = {
+          ...cases.value[index],
+          ...form.value,
+          _id: cases.value[index]._id // 保留原有ID
+        };
+      }
       ElMessage.success('编辑成功');
     } else {
       // 新增：生成唯一ID并添加数据
       const newCase = await casesAPI.create(form.value);
       console.log('返回的新案例数据:', newCase);
-      // 检查返回数据结构，确保添加到列表中
-      cases.value.push(newCase);
-      // 重新加载列表确保数据一致性
-      await loadCases();
+      // 检查返回数据结构，确保添加到列表中，保持字段一致性
+      cases.value.push({
+        _id: newCase._id || newCase.id || `temp-${Date.now()}-${Math.random()}`,
+        title: newCase.title || form.value.title || '未命名案例',
+        image: newCase.image || form.value.image || '',
+        description: newCase.description || form.value.description || '',
+        order: newCase.order || form.value.order || 0,
+        isActive: newCase.isActive !== undefined ? newCase.isActive : form.value.isActive
+      });
       ElMessage.success('新增成功');
     }
 
@@ -188,11 +203,15 @@ const handleSubmit = async () => {
     showDialog.value = false;
     form.value = { title: '', image: '', description: '', order: 1, isActive: true };
     currentId.value = null;
+    // 重新加载列表确保数据一致性
+    await loadCases();
   } catch (error) {
     console.error('提交案例数据失败:', error);
     ElMessage.error('提交失败，请稍后重试');
+  } finally {
+    loading.value = false;
   }
-};
+}
 
 // 编辑案例（填充表单数据）
 const editCase = (row) => {

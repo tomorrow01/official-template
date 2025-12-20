@@ -71,7 +71,7 @@ export const articlesAPI = {
 };
 
 export const bannersAPI = {
-  getList: () => api.get('/api/banners'),
+  getList: (params) => api.get('/api/banners', { params }),
   getById: (id) => api.get(`/api/banners/${id}`),
   create: async (data) => {
     const response = await api.post('/api/banners', data);

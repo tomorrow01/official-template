@@ -6,6 +6,22 @@ const bannerSchema = new mongoose.Schema({
     required: false,
     trim: true
   },
+  description: {
+    type: String,
+    required: false,
+    trim: true
+  },
+  ctaText: {
+    type: String,
+    required: false,
+    trim: true
+  },
+  section: {
+    type: String,
+    required: true,
+    default: 'home',
+    trim: true
+  },
   imageUrl: {
     type: String,
     required: [true, '轮播图图片URL为必填项'],

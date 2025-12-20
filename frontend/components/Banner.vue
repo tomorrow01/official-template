@@ -1,5 +1,5 @@
 <template>
-  <div class="banner-container relative overflow-hidden">
+  <div class="banner-container relative overflow-hidden w-full">
     <!-- 当没有轮播图数据时显示默认内容 -->
     <div v-if="!banners || banners.length === 0" class="no-banners">
       <div class="placeholder-banner bg-white/10 backdrop-blur-md rounded-xl p-8 text-center">
@@ -11,27 +11,30 @@
     <!-- 正常轮播图组件 -->
     <el-carousel 
       v-else
-      class="banner-carousel h-full"
+      class="banner-carousel w-full"
       :height="bannerHeight"
       indicator-position="outside"
       arrow="hover"
       :autoplay="true"
       :interval="5000"
     >
-      <el-carousel-item v-for="(item, index) in banners" :key="item.id || index">
-        <NuxtLink :to="item.link || '#'" class="banner-link block w-full h-full relative overflow-hidden">
-          <div class="absolute inset-0 bg-gradient-to-r from-black/60 to-black/30 z-10"></div>
+      <el-carousel-item v-for="item in banners" :key="item.id || item._id">
+        <div class="banner-item w-full h-full relative overflow-hidden">
+          <!-- 背景图片 -->
           <img 
             :src="item.image" 
             :alt="item.title || '轮播图'" 
-            class="banner-image w-full h-full object-cover transition-transform duration-7000 ease-in-out"
+            class="banner-image w-full h-full object-cover"
           >
+          
+          <!-- 黑色渐变遮罩 -->
+          <div class="absolute inset-0 bg-gradient-to-r from-black/60 to-black/30 z-10"></div>
           
           <!-- 轮播内容区 -->
           <div class="banner-content absolute inset-0 z-20 flex items-center">
-            <div class="container" :class="{ 'animate-fadeIn': currentIndex === index }">
-              <div class="max-w-xl" v-if="item.title">
-                <h2 class="text-[clamp(2rem,5vw,4rem)] font-bold text-white leading-tight mb-4">{{ item.title }}</h2>
+            <div class="container">
+              <div class="max-w-xl">
+                <h2 class="text-[clamp(2rem,5vw,4rem)] font-bold text-white leading-tight mb-4">{{ item.title || '默认标题' }}</h2>
                 <p v-if="item.description" class="text-[clamp(1rem,2vw,1.25rem)] text-white/90 mb-8 max-w-lg">
                   {{ item.description }}
                 </p>
@@ -46,63 +49,59 @@
               </div>
             </div>
           </div>
-        </NuxtLink>
+          
+          <!-- 点击链接 -->
+          <NuxtLink :to="item.link || '#'" class="banner-link absolute inset-0 z-30"></NuxtLink>
+        </div>
       </el-carousel-item>
     </el-carousel>
-    
-    <!-- 装饰元素 -->
-    <div class="decorative-elements">
-      <div class="decor-circle-1 absolute top-20 right-20 w-64 h-64 rounded-full bg-primary/10 blur-3xl"></div>
-      <div class="decor-circle-2 absolute bottom-10 left-40 w-80 h-80 rounded-full bg-secondary/10 blur-3xl"></div>
-    </div>
   </div>
 </template>
 
-<script setup>
-import { defineProps, ref, computed, onMounted, onUnmounted } from 'vue';
+<script setup lang="ts">
+import { computed, onMounted, onUnmounted } from 'vue';
+import type { BannerItem } from '~/types/banner';
 
-// 定义接收的轮播数据 prop
-const props = defineProps({
-  banners: {
-    type: Array,
-    required: true,
-    default: () => []
-  }
+// 定义组件属性
+interface Props {
+  banners?: BannerItem[];
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  banners: () => [],
 });
 
-const currentIndex = ref(0);
+// 添加调试信息
+console.log('Banner组件接收的轮播图数据:', props.banners);
+console.log('轮播图数据长度:', props.banners?.length);
 
 // 根据屏幕尺寸动态计算轮播图高度
 const bannerHeight = computed(() => {
-  const isMobile = window.innerWidth < 768;
-  const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024;
-  
-  if (isMobile) return '70vh';
-  if (isTablet) return '80vh';
-  return '90vh';
+  const width = window.innerWidth;
+  if (width < 768) return '60vh';
+  if (width < 1024) return '70vh';
+  return '80vh';
 });
 
 // 处理窗口大小变化
-const handleResize = () => {
-  // 强制重新计算高度
-  currentIndex.value = currentIndex.value;
-};
-
 onMounted(() => {
-  window.addEventListener('resize', handleResize);
+  // 监听窗口大小变化
+  window.addEventListener('resize', () => {
+    // 窗口大小变化时会自动触发计算属性更新
+  });
 });
 
 onUnmounted(() => {
-  window.removeEventListener('resize', handleResize);
+  window.removeEventListener('resize', () => {});
 });
 </script>
 
 <style scoped>
 .banner-container {
   width: 100%;
-  min-height: 600px;
   background-color: var(--bg-dark);
   position: relative;
+  overflow-x: hidden;
 }
 
 /* 当没有轮播图数据时的占位样式 */
@@ -130,26 +129,37 @@ onUnmounted(() => {
 /* 轮播图容器样式 */
 .banner-carousel {
   width: 100%;
+  height: 100%;
+  overflow-x: hidden;
 }
 
 /* 轮播图链接样式 */
 .banner-link {
   position: relative;
   overflow: hidden;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* 轮播项样式 */
+.banner-item {
+  height: 100%;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
 }
 
 /* 轮播图图片样式 */
 .banner-image {
-  transform: scale(1.1);
-}
-
-.banner-link:hover .banner-image {
-  transform: scale(1.15);
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 /* 轮播内容区样式 */
 .banner-content {
-  animation: fadeInUp 1s ease-out;
+  /* 移除动画效果，确保内容直接显示 */
 }
 
 /* 自定义指示器样式 */

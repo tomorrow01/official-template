@@ -12,19 +12,21 @@ const routes = [
   { path: '/', redirect: '/login' },
   { path: '/login', component: Login },
   // 新增：后台主页及子路由
-  { 
-    path: '/dashboard', 
+  {
+    path: '/dashboard',
     component: Dashboard,
     redirect: '/dashboard/config', // 默认重定向到配置管理
     children: [
-      { path: 'config', component: ConfigManagement },  // 新增：配置管理路由
-      { path: 'articles', component: Articles },   // 文章管理
-      { path: 'banners', component: Banners },     // 轮播图管理
-      { path: 'content', component: Content },     // 内容管理
-      { path: 'services', name: 'ServicesManagement', component: () => import('../views/Services.vue'), meta: { title: '核心服务管理' } },     // 核心服务管理
-      { path: 'cases', name: 'CasesManagement', component: CasesManagement, meta: { title: '客户案例管理' } },           // 客户案例管理
-      { path: 'latest-news', component: LatestNews },                             // 最新动态管理
-      { path: 'contacts', component: () => import('../views/Contacts.vue') }      // 联系表单管理
+      { path: 'config', component: ConfigManagement },
+      { path: 'articles', component: Articles },
+      { path: 'banners', redirect: '/dashboard/banners/list' },
+      { path: 'banners/list', component: Banners, meta: { title: '轮播图列表' } },
+      { path: 'banners/sections', component: Banners, meta: { title: '轮播图板块列表', sectionsOnly: true } },
+      { path: 'content', component: Content },
+      { path: 'services', name: 'ServicesManagement', component: () => import('../views/Services.vue'), meta: { title: '核心服务管理' } },
+      { path: 'cases', name: 'CasesManagement', component: CasesManagement, meta: { title: '客户案例管理' } },
+      { path: 'latest-news', component: LatestNews },
+      { path: 'contacts', component: () => import('../views/Contacts.vue') }
     ]
   }
 ]

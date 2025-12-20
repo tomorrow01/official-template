@@ -40,7 +40,13 @@
         >
           <el-menu-item index="/dashboard/config">基础配置管理</el-menu-item>
           <el-menu-item index="/dashboard/articles">文章管理</el-menu-item>
-          <el-menu-item index="/dashboard/banners">轮播图管理</el-menu-item>
+          <el-sub-menu index="/dashboard/banners">
+            <template #title>
+              <span>轮播图管理</span>
+            </template>
+            <el-menu-item index="/dashboard/banners/sections">轮播图板块列表</el-menu-item>
+            <el-menu-item index="/dashboard/banners/list">轮播图列表</el-menu-item>
+          </el-sub-menu>
           <el-menu-item index="/dashboard/content">内容管理</el-menu-item>
           <el-menu-item index="/dashboard/services">核心服务管理</el-menu-item>
           <el-menu-item index="/dashboard/cases">案例管理</el-menu-item>
@@ -315,6 +321,31 @@ const handleLogout = () => {
   background-color: #409eff !important;
   color: #fff !important;
   font-weight: 500;
+}
+
+/* 子菜单样式 */
+:deep(.el-submenu__title) {
+  padding: 0 20px !important;
+  height: 50px !important;
+  line-height: 50px !important;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+:deep(.el-submenu__title:hover) {
+  background-color: #34495e !important;
+  color: #409eff !important;
+  font-weight: 500;
+}
+
+:deep(.el-submenu__title.is-active) {
+  background-color: #409eff !important;
+  color: #fff !important;
+  font-weight: 500;
+}
+
+:deep(.el-submenu .el-menu-item) {
+  padding-left: 40px !important;
 }
 
 /* 路由视图容器 */

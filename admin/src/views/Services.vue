@@ -175,7 +175,14 @@ const handleSubmit = async () => {
       await servicesAPI.update(currentId.value, submitData);
       const index = services.value.findIndex(item => item._id === currentId.value || item.id === currentId.value);
       if (index !== -1) {
-        services.value[index] = { ...services.value[index], ...form.value };
+        // 使用统一的数据处理逻辑更新服务项
+        services.value[index] = {
+          ...services.value[index],
+          ...form.value,
+          _id: services.value[index]._id || services.value[index].id,
+          content: form.value.content,
+          description: form.value.content
+        };
       }
       ElMessage.success('编辑成功');
     } else {
@@ -183,7 +190,14 @@ const handleSubmit = async () => {
       const newService = await servicesAPI.create(submitData);
       console.log('新增服务数据:', newService);
       // 确保返回的数据包含所有必要字段
-      services.value.push(newService);
+      services.value.push({
+        _id: newService._id || newService.id || `temp-${Date.now()}-${Math.random()}`,
+        title: newService.title || '',
+        content: newService.content || newService.description || '',
+        icon: newService.icon || '',
+        order: newService.order || 0,
+        isActive: newService.isActive !== undefined ? newService.isActive : true
+      });
       ElMessage.success('新增成功');
     }
 
@@ -197,16 +211,19 @@ const handleSubmit = async () => {
     console.error('提交服务数据失败:', error);
     ElMessage.error('提交失败，请稍后重试');
   }
-};
+}
 
 // 编辑服务（填充表单数据）
 const editService = (row) => {
   // MongoDB使用_id作为唯一标识，但也可能有id字段
   currentId.value = row._id || row.id;
-  // 将后端的description字段映射到前端的content字段
+  // 将后端的description字段映射到前端的content字段，并移除不必要的字段
   form.value = {
-    ...row,
-    content: row.description || row.content
+    title: row.title || '',
+    content: row.description || row.content || '',
+    icon: row.icon || '',
+    order: row.order || 0,
+    isActive: row.isActive !== undefined ? row.isActive : true
   };
   showDialog.value = true;
   console.log('编辑服务ID:', currentId.value);
@@ -221,7 +238,7 @@ const handleDelete = async (row) => {
     const deleteId = row._id || row.id;
     console.log('删除服务ID:', deleteId);
     await servicesAPI.delete(deleteId);
-    // 修复过滤逻辑：使用或运算符而不是与运算符
+    // 使用或运算符过滤掉要删除的项
     services.value = services.value.filter(item => item._id !== deleteId && item.id !== deleteId);
     ElMessage.success('删除成功');
     loadServices(); // 重新加载列表

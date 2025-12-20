@@ -1,50 +1,14 @@
 <template>
   <div class="home-container">
-    <!-- 英雄区域 -->
-    <section class="hero-section relative overflow-hidden" style="z-index: 0;">
-      <div class="absolute inset-0 z-0 overflow-hidden">
-        <img 
-          src="https://picsum.photos/id/1071/1920/1080" 
-          alt="技术创新背景" 
-          class="w-full h-full object-cover" 
-          style="transition: transform 0.7s ease; transform: scale(1);" 
-          onmouseover="this.style.transform='scale(1.1)'" 
-          onmouseout="this.style.transform='scale(1)'"
-        >
-        <div class="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40"></div>
-      </div>
-      <div class="container relative z-10 py-20 md:py-28">
-        <div class="max-w-3xl">
-          <h1 class="text-[clamp(2.5rem,5vw,4rem)] font-bold text-white leading-tight mb-6">
-            创新技术<br>
-            <span class="text-primary">引领数字化未来</span>
-          </h1>
-          <p class="text-[clamp(1rem,2vw,1.25rem)] text-white/90 mb-8 max-w-2xl">
-            我们提供全方位的技术服务和解决方案，助力企业实现数字化转型，提升核心竞争力。
-          </p>
-          <ClientOnly>
-            <div class="flex flex-wrap gap-4">
-              <NuxtLink to="/services">
-                <el-button type="primary" class="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-full text-lg">
-                  了解我们的服务
-                </el-button>
-              </NuxtLink>
-              <NuxtLink to="/cases">
-                <el-button type="default" class="bg-white/10 hover:bg-white/20 text-white border-white/30 px-8 py-3 rounded-full text-lg">
-                  查看成功案例
-                </el-button>
-              </NuxtLink>
-            </div>
-          </ClientOnly>
-        </div>
-      </div>
-      <!-- 波浪装饰 -->
-      <div class="absolute bottom-0 left-0 w-full overflow-hidden z-10">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 100" class="w-full h-auto">
-          <path fill="#ffffff" fill-opacity="1" d="M0,64L48,53.3C96,43,192,21,288,21.3C384,21,480,43,576,53.3C672,64,768,64,864,53.3C960,43,1056,21,1152,21.3C1248,21,1344,43,1392,53.3L1440,64L1440,100L1392,100C1344,100,1248,100,1152,100C1056,100,960,100,864,100C768,100,672,100,576,100C480,100,384,100,288,100C192,100,96,100,48,100L0,100Z"></path>
-        </svg>
-      </div>
-    </section>
+    <!-- 动态轮播图区域 -->
+    <Banner :banners="banners" />
+    
+    <!-- 波浪装饰 -->
+    <div class="absolute bottom-0 left-0 w-full overflow-hidden z-10">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 100" class="w-full h-auto">
+        <path fill="#ffffff" fill-opacity="1" d="M0,64L48,53.3C96,43,192,21,288,21.3C384,21,480,43,576,53.3C672,64,768,64,864,53.3C960,43,1056,21,1152,21.3C1248,21,1344,43,1392,53.3L1440,64L1440,100L1392,100C1344,100,1248,100,1152,100C1056,100,960,100,864,100C768,100,672,100,576,100C480,100,384,100,288,100C192,100,96,100,48,100L0,100Z"></path>
+      </svg>
+    </div>
 
     <!-- 我们的优势 -->
     <section class="features-section py-12 bg-white" style="margin-bottom: 0;">
@@ -374,9 +338,10 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 import Navbar from '@/components/Navbar.vue';
 import Footer from '@/components/Footer.vue';
+import Banner from '@/components/Banner.vue';
 import { ArrowUp } from '@element-plus/icons-vue';
 // 导入API模块
-// import { getBannerList } from '@/api/banner';
+import { getBannerList } from '@/api/banner';
 import { getCaseList } from '@/api/cases';
 import type { CaseItem } from '@/api/cases';
 import { getServiceList } from '@/api/services';
@@ -385,10 +350,13 @@ import { getArticleList } from '@/api/articles';
 import type { Article } from '@/api/articles';
 
 const services = ref<ServiceItem[]>([]);
+const banners = ref<any[]>([]);
+// 添加调试信息
+console.log('首页轮播图数据初始值:', banners.value);
 // 页面加载时获取数据
 onMounted(async () => {
   console.log('页面挂载，开始获取数据...');
-  await Promise.all([fetchServices(), fetchCaseList(), fetchLatestArticles()]);
+  await Promise.all([fetchBanners(), fetchServices(), fetchCaseList(), fetchLatestArticles()]);
 });
 const cases = ref<CaseItem[]>([]);
 const latestArticles = ref<Partial<Article>[]>([]);
@@ -397,6 +365,19 @@ const loadingCases = ref(true);
 const loadingServices = ref(true);
 const loadingArticles = ref(true);
 const error = ref<string | null>(null);
+
+// 获取轮播图数据
+const fetchBanners = async () => {
+  try {
+    console.log('开始获取首页轮播图数据...');
+    const res = await getBannerList('home');
+    console.log('轮播图API返回结果:', res);
+    banners.value = res;
+  } catch (err) {
+    console.error('获取轮播图数据失败:', err);
+    banners.value = [];
+  }
+};
 
 
 

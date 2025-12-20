@@ -5,7 +5,7 @@ const { connectDB, insertDefaultData } = require('./utils/db'); // 引入数据�
 const mainRouter = require('./routes/index'); // 引入主路由文件
 
 const app = express();
-const port = process.env.PORT || 3001; // 修改为3001端口
+const port = process.env.PORT || 3003; // 修改为3003端口
 
 // 中间件配置
 app.use(cors()); // 允许跨域
