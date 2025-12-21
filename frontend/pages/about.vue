@@ -18,7 +18,7 @@
             <p>{{ configs.companyDetail }}</p>
           </div>
           <div class="intro-image">
-            <img src="/images/case1.jpg" alt="公司办公环境" class="company-img">
+            <img src="/images/about-banner.jpg" alt="公司办公环境" class="company-img">
           </div>
         </div>
 
