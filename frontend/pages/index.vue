@@ -1,7 +1,7 @@
 <template>
   <div class="home-container">
     <!-- 动态轮播图区域 -->
-    <Banner :banners="banners" />
+    <Banner :banners="banners" height="auto" />
     
     <!-- 波浪装饰 -->
     <div class="absolute bottom-0 left-0 w-full overflow-hidden z-10">

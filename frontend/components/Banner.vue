@@ -1,6 +1,6 @@
 <template>
   <div class="banner-container relative overflow-hidden w-full">
-    <!-- 当没有轮播图数据时显示默认内容 -->
+    <!-- 当没有轮播图数据或数据为空时显示默认内容 -->
     <div v-if="!banners || banners.length === 0" class="no-banners">
       <div class="placeholder-banner bg-white/10 backdrop-blur-md rounded-xl p-8 text-center">
         <h3 class="text-white text-2xl font-bold mb-2">专业解决方案</h3>
@@ -12,7 +12,7 @@
     <el-carousel 
       v-else
       class="banner-carousel w-full"
-      :height="bannerHeight"
+      :style="{ height: carouselHeight }"
       indicator-position="outside"
       arrow="hover"
       :autoplay="true"
@@ -20,11 +20,13 @@
     >
       <el-carousel-item v-for="item in banners" :key="item.id || item._id">
         <div class="banner-item w-full h-full relative overflow-hidden">
-          <!-- 背景图片 -->
+          <!-- 背景图片 - 添加错误处理 -->
           <img 
-            :src="item.image" 
+            :src="item.image || '/images/default-banner.jpg'" 
             :alt="item.title || '轮播图'" 
             class="banner-image w-full h-full object-cover"
+            @load="handleImageLoad"
+            @error="handleImageError"
           >
           
           <!-- 黑色渐变遮罩 -->
@@ -59,40 +61,64 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted } from 'vue';
-import type { BannerItem } from '~/types/banner';
+import { ref, onMounted, watch } from 'vue';
 
 // 定义组件属性
 interface Props {
-  banners?: BannerItem[];
+  banners?: any[];
+  height?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
   banners: () => [],
+  height: undefined,
 });
 
-// 添加调试信息
-console.log('Banner组件接收的轮播图数据:', props.banners);
-console.log('轮播图数据长度:', props.banners?.length);
+// 轮播图高度
+const carouselHeight = ref<string>('60vh');
 
-// 根据屏幕尺寸动态计算轮播图高度
-const bannerHeight = computed(() => {
-  const width = window.innerWidth;
-  if (width < 768) return '60vh';
-  if (width < 1024) return '70vh';
-  return '80vh';
+// 图片加载完成后设置轮播图高度
+const handleImageLoad = (event: Event) => {
+  const img = event.target as HTMLImageElement;
+  if (img) {
+    // 计算图片的宽高比
+    const aspectRatio = img.naturalWidth / img.naturalHeight;
+    // 根据宽高比和容器宽度计算高度
+    const containerWidth = document.querySelector('.banner-container')?.clientWidth || window.innerWidth;
+    const calculatedHeight = `${containerWidth / aspectRatio}px`;
+    carouselHeight.value = calculatedHeight;
+  }
+};
+
+// 图片加载失败时的处理函数
+const handleImageError = (event: Event) => {
+  const img = event.target as HTMLImageElement;
+  if (img) {
+    // 当图片加载失败时，使用默认图片
+    img.src = '/images/default-banner.jpg';
+    // 为默认图片设置一个合理的高度
+    carouselHeight.value = '50vh';
+  }
+};
+
+// 监听轮播图数据变化
+watch(() => props.banners, () => {
+  // 当轮播图数据变化时，重置高度为默认值
+  carouselHeight.value = '60vh';
 });
 
-// 处理窗口大小变化
+// 监听height属性变化
+watch(() => props.height, (newHeight) => {
+  if (newHeight) {
+    carouselHeight.value = newHeight;
+  }
+});
+
 onMounted(() => {
-  // 监听窗口大小变化
-  window.addEventListener('resize', () => {
-    // 窗口大小变化时会自动触发计算属性更新
-  });
-});
-
-onUnmounted(() => {
-  window.removeEventListener('resize', () => {});
+  // 组件挂载后，如果传入了height属性，使用传入的高度
+  if (props.height) {
+    carouselHeight.value = props.height;
+  }
 });
 </script>
 
@@ -107,7 +133,7 @@ onUnmounted(() => {
 /* 当没有轮播图数据时的占位样式 */
 .no-banners {
   width: 100%;
-  height: 90vh;
+  height: 400px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -126,10 +152,9 @@ onUnmounted(() => {
   transform: scale(1.05);
 }
 
-/* 轮播图容器样式 */
+/* 轮播图容器样式 - 移除固定高度 */
 .banner-carousel {
   width: 100%;
-  height: 100%;
   overflow-x: hidden;
 }
 
@@ -142,19 +167,26 @@ onUnmounted(() => {
   height: 100%;
 }
 
-/* 轮播项样式 */
+/* 轮播项样式 - 确保容器充满整个轮播区域 */
 .banner-item {
-  height: 100%;
   width: 100%;
+  height: 100%;
   position: relative;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* 轮播图图片样式 */
+/* 轮播图图片样式 - 确保图片居中并覆盖整个容器 */
 .banner-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 /* 轮播内容区样式 */
@@ -266,10 +298,6 @@ onUnmounted(() => {
 
 /* 响应式设计 */
 @media (max-width: 1024px) {
-  .banner-container {
-    min-height: 70vh;
-  }
-  
   :deep(.el-carousel__indicator) {
     width: 10px;
     height: 10px;
@@ -282,12 +310,8 @@ onUnmounted(() => {
 }
 
 @media (max-width: 768px) {
-  .banner-container {
-    min-height: 60vh;
-  }
-  
   .no-banners {
-    height: 70vh;
+    height: 300px;
   }
   
   .placeholder-banner {
@@ -328,5 +352,33 @@ onUnmounted(() => {
   .decorative-elements {
     display: none;
   }
+}
+
+/* 确保轮播图容器高度由JavaScript控制 */
+:deep(.el-carousel__container),
+:deep(.el-carousel__item) {
+  height: 100% !important;
+}
+
+:deep(.el-carousel__item img) {
+  height: 100% !important;
+  width: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
+}
+
+/* 确保轮播图容器能正确显示 */
+:deep(.el-carousel) {
+  display: block;
+}
+
+/* 确保指示器和箭头位置正确 */
+:deep(.el-carousel__indicators) {
+  bottom: 20px;
+  z-index: 100;
+}
+
+:deep(.el-carousel__arrow) {
+  z-index: 100;
 }
 </style>

@@ -4,7 +4,7 @@
     <Navbar />
     
     <!-- 动态轮播图 -->
-    <Banner :banners="banners" />
+    <Banner :banners="banners" height="40vh" />
     
     <div class="container">
       

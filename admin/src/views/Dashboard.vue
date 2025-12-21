@@ -33,7 +33,7 @@
           功能导航
         </div>
         <el-menu 
-          default-active="/dashboard/config" 
+          :default-active="route.path" 
           router 
           class="nav-menu"
           background-color="#2c3e50"
