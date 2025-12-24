@@ -4,7 +4,7 @@ import { resolve } from 'path'
 export default defineNuxtConfig({
   // 只保留最基本的配置
   devServer: {
-    port: 3002 // 设置Nuxt开发服务器端口为3002，避免与后端冲突
+    port: 3001 // 设置Nuxt开发服务器端口为3002，避免与后端冲突
   },
   // 运行时配置
   runtimeConfig: {
