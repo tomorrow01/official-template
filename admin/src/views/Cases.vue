@@ -57,7 +57,7 @@
           <el-input v-model="form.title" placeholder="请输入案例标题" />
         </el-form-item>
         <el-form-item label="案例图片" prop="image">
-          <el-input v-model="form.image" placeholder="请输入案例图片URL" />
+          <ImageUpload v-model="form.image" />
         </el-form-item>
         <el-form-item label="案例描述" prop="description">
           <el-input v-model="form.description" type="textarea" placeholder="请输入案例描述" :rows="3" />
@@ -81,6 +81,7 @@
 import { ref, onMounted, nextTick } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { casesAPI } from '../utils/api';
+import ImageUpload from '../components/ImageUpload.vue';
 
 // 案例数据列表
 const cases = ref([]);
@@ -90,6 +91,8 @@ const loading = ref(false);
 const showDialog = ref(false);
 const form = ref({ title: '', image: '', description: '', order: 1, isActive: true });
 const currentId = ref(null); // 当前编辑的案例ID
+
+
 
 // 表单验证规则
 const rules = ref({

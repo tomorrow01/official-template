@@ -9,25 +9,25 @@
       <el-tabs v-model="activeTab" type="border-card">
         <el-tab-pane label="关于我们" name="about">
           <div class="config-section">
-            <h3>公司Logo</h3>
-            <div class="logo-uploader">
-              <el-upload
-                class="avatar-uploader"
-                :show-file-list="false"
-                :on-change="handleLogoChange"
-                :before-upload="beforeLogoUpload"
-                style="display: block; margin-bottom: 20px;"
-              >
-                <img v-if="aboutConfigs.logo" :src="aboutConfigs.logo" class="logo-preview" alt="公司Logo" />
-                <div v-else class="avatar-uploader-icon">
-                  <span>+</span>
-                </div>
-              </el-upload>
-              <el-button v-if="aboutConfigs.logo" type="danger" size="small" @click="removeLogo">
-                移除Logo
-              </el-button>
-            </div>
+          <h3>公司Logo</h3>
+          <div class="logo-uploader">
+            <el-upload
+              class="avatar-uploader"
+              :show-file-list="false"
+              :before-upload="beforeLogoUpload"
+              :on-change="handleLogoChange"
+              style="display: block; margin-bottom: 20px;"
+            >
+              <img v-if="aboutConfigs.logo" :src="aboutConfigs.logo" class="logo-preview" alt="公司Logo" />
+              <div v-else class="avatar-uploader-icon">
+                <span>+</span>
+              </div>
+            </el-upload>
+            <el-button v-if="aboutConfigs.logo" type="danger" size="small" @click="removeLogo">
+              移除Logo
+            </el-button>
           </div>
+        </div>
 
           <div class="config-section">
             <h3>公司简介</h3>
@@ -103,11 +103,22 @@
                     placeholder="职位"
                     class="team-input"
                   />
-                  <el-input
-                    v-model="member.image"
-                    placeholder="图片路径"
-                    class="team-input"
-                  />
+                  <div class="team-image-uploader">
+                    <el-upload
+                      class="team-image-uploader"
+                      :show-file-list="false"
+                      :before-upload="beforeLogoUpload"
+                      :on-change="(file) => handleTeamImageChange(file, index)"
+                    >
+                      <img v-if="member.image" :src="member.image" class="team-image-preview" alt="团队成员图片" />
+                      <div v-else class="team-avatar-uploader-icon">
+                        <span>+</span>
+                      </div>
+                    </el-upload>
+                    <el-button v-if="member.image" type="danger" size="small" @click="removeTeamImage(index)">
+                      移除
+                    </el-button>
+                  </div>
                   <el-button
                     type="danger"
                     icon="el-icon-delete"
@@ -306,9 +317,8 @@ export default {
       return isImage && isLt5M;
     },
     
-    // 处理logo选择
+    // 处理logo选择，转换为base64
     handleLogoChange(file) {
-      // 添加标志位防止重复触发toast
       if (file.status === 'ready') {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -320,6 +330,26 @@ export default {
         };
         reader.readAsDataURL(file.raw);
       }
+    },
+    
+    // 处理团队成员图片选择，转换为base64
+    handleTeamImageChange(file, index) {
+      if (file.status === 'ready') {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          this.aboutConfigs.teamMembers[index].image = e.target.result;
+          ElMessage.success('团队成员图片已加载');
+        };
+        reader.onerror = () => {
+          ElMessage.error('图片加载失败');
+        };
+        reader.readAsDataURL(file.raw);
+      }
+    },
+    
+    // 移除团队成员图片
+    removeTeamImage(index) {
+      this.aboutConfigs.teamMembers[index].image = '';
     },
     
     // 移除logo
@@ -430,6 +460,41 @@ export default {
   gap: 20px;
 }
 
+/* 团队成员图片上传样式 */
+.team-image-uploader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.team-image-preview {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid #dcdfe6;
+}
+
+.team-avatar-uploader-icon {
+  width: 80px;
+  height: 80px;
+  line-height: 80px;
+  border: 2px dashed #409EFF;
+  border-radius: 6px;
+  text-align: center;
+  color: #409EFF;
+  font-size: 24px;
+  background-color: #f5f7fa;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.team-avatar-uploader-icon:hover {
+  border-color: #66b1ff;
+  background-color: #ecf5ff;
+  color: #66b1ff;
+}
+
 /* 响应式设计 */
 @media (max-width: 768px) {
   .team-info {
@@ -439,6 +504,11 @@ export default {
   
   .team-input {
     width: 100%;
+  }
+  
+  .team-image-uploader {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
 </style>

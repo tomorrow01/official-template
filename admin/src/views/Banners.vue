@@ -150,7 +150,7 @@
             <el-input v-model="form.description" type="textarea" rows="3" placeholder="请输入轮播图描述" />
           </el-form-item>
           <el-form-item label="轮播图" prop="imageUrl">
-            <el-input v-model="form.imageUrl" placeholder="请输入图片URL" />
+            <ImageUpload v-model="form.imageUrl" />
           </el-form-item>
           <el-form-item label="链接地址" prop="link">
             <el-input v-model="form.link" placeholder="请输入跳转链接" />
@@ -172,10 +172,12 @@
 </template>
 
 <script setup>
+// 导入必要的库
 import { ref, onMounted, nextTick, watch, computed } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { bannersAPI } from '../utils/api';
 import { useRoute } from 'vue-router';
+import ImageUpload from '../components/ImageUpload.vue';
 
 // 表格数据
 const banners = ref([]);
@@ -201,7 +203,6 @@ const form = ref({
   isActive: true
 });
 const currentId = ref(null); // 当前编辑的轮播图ID
-const formRef = ref(null);
 
 // 板块数据
 const sections = ref([
@@ -216,7 +217,7 @@ const showSectionDialog = ref(false);
 const newSectionForm = ref({ label: '', value: '' });
 
 // 验证板块标识是否已存在
-const validateSectionId = (rule, value, callback) => {
+const validateSectionId = (_, value, callback) => {
   if (sections.value.some(section => section.value === value)) {
     callback(new Error('该板块标识已存在'));
   } else {
@@ -361,38 +362,7 @@ const loadBanners = async () => {
   }
 };
 
-// 新增板块
-const handleAddSection = async () => {
-  try {
-    await nextTick();
-    // 表单验证
-    if (!newSectionForm.value.label || !newSectionForm.value.value) {
-      ElMessage.error('请填写完整的板块信息');
-      return;
-    }
-    
-    // 检查板块标识是否已存在
-    if (sections.value.some(section => section.value === newSectionForm.value.value)) {
-      ElMessage.error('该板块标识已存在');
-      return;
-    }
-    
-    // 添加新板块
-    sections.value.push({
-      label: newSectionForm.value.label,
-      value: newSectionForm.value.value,
-      bannerCount: 0
-    });
-    
-    ElMessage.success('板块添加成功');
-    showSectionDialog.value = false;
-    resetSectionForm();
-    
-  } catch (error) {
-    ElMessage.error('添加板块失败');
-    console.error('Failed to add section:', error);
-  }
-};
+
 
 // 删除板块
 const handleDeleteSection = async (section) => {
@@ -433,10 +403,7 @@ const handleDeleteSection = async (section) => {
   }
 };
 
-// 重置新增板块表单
-const resetSectionForm = () => {
-  newSectionForm.value = { label: '', value: '' };
-};
+
 
 // 获取板块标签
 const getSectionLabel = (value) => {
@@ -461,7 +428,7 @@ watch(() => route.meta.section, (newSection) => {
 const rules = ref({
   section: [{ required: true, message: '请选择板块', trigger: 'change' }],
   title: [{ required: true, message: '请输入轮播图标题', trigger: 'blur' }],
-  imageUrl: [{ required: true, message: '请输入图片URL', trigger: 'blur' }],
+  imageUrl: [{ required: true, message: '请上传图片', trigger: 'change' }],
   link: [{ required: true, message: '请输入跳转链接', trigger: 'blur' }]
 });
 
@@ -470,41 +437,72 @@ const handleSubmit = async () => {
   try {
     // 表单验证
     await nextTick();
+    
+    // 检查必填字段
     if (!form.value.imageUrl || !form.value.link) {
       ElMessage.error('请填写完整信息');
       return;
     }
 
+    // 准备提交的数据，只包含服务器需要的字段
+    const submitData = {
+      section: form.value.section,
+      title: form.value.title,
+      description: form.value.description,
+      ctaText: form.value.ctaText,
+      imageUrl: form.value.imageUrl,
+      link: form.value.link,
+      order: form.value.order,
+      isActive: form.value.isActive
+    };
+
+    // 添加详细日志
+    console.log('准备提交轮播图数据:', submitData);
+    console.log('提交数据大小:', JSON.stringify(submitData).length, '字节');
+    console.log('图片URL字段类型:', typeof submitData.imageUrl);
+    console.log('图片URL开头:', submitData.imageUrl.substring(0, 100));
+    console.log('图片URL是否为base64:', submitData.imageUrl.startsWith('data:image/'));
+    console.log('section字段:', submitData.section);
+    console.log('title字段:', submitData.title);
+    console.log('description字段:', submitData.description);
+    console.log('ctaText字段:', submitData.ctaText);
+    console.log('link字段:', submitData.link);
+    console.log('order字段:', submitData.order);
+    console.log('isActive字段:', submitData.isActive);
+
+    let response;
     if (currentId.value) {
       // 编辑：更新现有数据
-      console.log('编辑轮播图数据:', form.value);
-      await bannersAPI.update(currentId.value, form.value);
+      console.log('执行更新操作，ID:', currentId.value);
+      console.log('更新API地址:', `/api/banners/${currentId.value}`);
+      response = await bannersAPI.update(currentId.value, submitData);
+      console.log('更新响应:', response);
       // 更新本地列表中的数据
       const index = banners.value.findIndex(item => item._id === currentId.value || item.id === currentId.value);
       if (index !== -1) {
         banners.value[index] = {
           ...banners.value[index],
-          ...form.value,
+          ...submitData,
           _id: banners.value[index]._id // 保留原有ID
         };
       }
       ElMessage.success('编辑成功');
     } else {
       // 新增：添加新数据
-      console.log('新增轮播图数据:', form.value);
-      const newBanner = await bannersAPI.create(form.value);
-      console.log('新增轮播图返回:', newBanner);
+      console.log('执行新增操作');
+      response = await bannersAPI.create(submitData);
+      console.log('新增响应:', response);
       // 将新数据添加到列表中，确保字段一致性
       banners.value.push({
-        _id: newBanner._id || newBanner.id || `temp-${Date.now()}-${Math.random()}`,
-        section: newBanner.section || form.value.section || 'home',
-        title: newBanner.title || form.value.title || '',
-        description: newBanner.description || form.value.description || '',
-        ctaText: newBanner.ctaText || newBanner.buttonText || form.value.ctaText || '',
-        imageUrl: newBanner.imageUrl || newBanner.image || form.value.imageUrl || '',
-        link: newBanner.link || form.value.link || '',
-        order: newBanner.order || newBanner.sort || form.value.order || 0,
-        isActive: newBanner.isActive !== undefined ? newBanner.isActive : (newBanner.status !== undefined ? newBanner.status : form.value.isActive)
+        _id: response._id || response.id || `temp-${Date.now()}-${Math.random()}`,
+        section: response.section || submitData.section || 'home',
+        title: response.title || submitData.title || '',
+        description: response.description || submitData.description || '',
+        ctaText: response.ctaText || response.buttonText || submitData.ctaText || '',
+        imageUrl: response.imageUrl || response.image || submitData.imageUrl || '',
+        link: response.link || submitData.link || '',
+        order: response.order || response.sort || submitData.order || 0,
+        isActive: response.isActive !== undefined ? response.isActive : (response.status !== undefined ? response.status : submitData.isActive)
       });
       ElMessage.success('新增成功');
     }
@@ -513,20 +511,36 @@ const handleSubmit = async () => {
     resetForm();
     loadBanners();
   } catch (error) {
-    ElMessage.error('操作失败');
-    console.error('Failed to submit banner:', error);
+    console.error('提交失败详情:', error);
+    if (error.response) {
+      console.error('响应状态:', error.response.status);
+      console.error('响应数据:', error.response.data);
+      console.error('响应头:', error.response.headers);
+      ElMessage.error('操作失败: ' + (error.response.data?.error || error.response.data?.message || '服务器错误'));
+    } else if (error.request) {
+      console.error('请求已发送但没有收到响应:', error.request);
+      ElMessage.error('操作失败: 服务器无响应，请检查服务器状态');
+    } else {
+      console.error('请求配置错误:', error.message);
+      ElMessage.error('操作失败: 请求配置错误');
+    }
+    console.error('错误堆栈:', error.stack);
   }
 };
 
 // 编辑轮播图（填充表单数据）
 const editBanner = (row) => {
   showDialog.value = true;
+  
+  // 提取图片URL，优先使用imageUrl字段
+  const imageUrl = row.imageUrl || row.image || '';
+  
   form.value = {
     section: row.section || selectedSection.value,
     title: row.title || '',
     description: row.description || '',
     ctaText: row.ctaText || '',
-    imageUrl: row.imageUrl || row.image,
+    imageUrl: imageUrl,
     link: row.link,
     order: row.order || row.sort || 0,
     isActive: row.isActive !== undefined ? row.isActive : (row.status !== undefined ? row.status : true)
@@ -534,6 +548,9 @@ const editBanner = (row) => {
   // MongoDB使用_id作为唯一标识，但也可能有id字段
   currentId.value = row._id || row.id;
   console.log('编辑轮播图ID:', currentId.value);
+  console.log('编辑轮播图原始数据:', row);
+  console.log('编辑轮播图图片URL:', imageUrl);
+  console.log('图片URL是否为base64:', imageUrl.startsWith('data:image/'));
 };
 
 // 删除轮播图（带确认对话框）

@@ -140,4 +140,29 @@ export const authAPI = {
   getCurrentUser: () => api.get('/api/auth/current')
 };
 
+export const uploadsAPI = {
+  // 单个文件上传
+  uploadSingle: (file) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    return api.post('/api/uploads/single', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+  },
+  // 多个文件上传
+  uploadMultiple: (files) => {
+    const formData = new FormData();
+    files.forEach(file => {
+      formData.append('images', file);
+    });
+    return api.post('/api/uploads/multiple', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+  }
+};
+
 export default api;

@@ -9,7 +9,11 @@ const port = process.env.PORT || 3000; // 使用3003端口避免冲突
 
 // 中间件配置
 app.use(cors()); // 允许跨域
-app.use(bodyParser.json()); // 解析 JSON 请求体
+app.use(bodyParser.json({ limit: '50mb' })); // 解析 JSON 请求体，增加大小限制以支持 base64 图片
+
+// 配置静态文件服务，用于访问上传的图片
+const path = require('path');
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // 添加全局请求日志中间件（关键修改）
 app.use((req, res, next) => {

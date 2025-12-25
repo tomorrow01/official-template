@@ -16,6 +16,11 @@ const serviceSchema = new mongoose.Schema({
     required: [true, '服务图标为必填项'],
     trim: true
   },
+  image: {
+    type: String,
+    required: false,
+    trim: true
+  },
   order: {
     type: Number,
     default: 0,

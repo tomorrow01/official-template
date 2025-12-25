@@ -59,8 +59,8 @@
             placeholder="请输入案例内容"
           />
         </el-form-item>
-        <el-form-item label="图片链接" prop="image">
-          <el-input v-model="form.image" placeholder="请输入图片URL" />
+        <el-form-item label="图片上传" prop="image">
+          <ImageUpload v-model="form.image" />
         </el-form-item>
         <el-form-item label="发布时间" prop="publishTime">
           <el-date-picker 
@@ -86,6 +86,7 @@
 import { ref, onMounted, nextTick } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { casesAPI } from '../utils/api';
+import ImageUpload from '../components/ImageUpload.vue';
 
 // 表格数据
 const casesList = ref([]);
@@ -104,11 +105,13 @@ const form = ref({
 const currentId = ref(null); // 当前编辑的案例ID
 const formRef = ref(null);
 
+
+
 // 表单验证规则
 const rules = ref({
   title: [{ required: true, message: '请输入标题', trigger: 'blur' }],
   content: [{ required: true, message: '请输入内容', trigger: 'blur' }],
-  image: [{ required: true, message: '请输入图片URL', trigger: 'blur' }],
+  image: [{ required: true, message: '请上传图片', trigger: 'change' }],
   publishTime: [{ required: true, message: '请选择发布时间', trigger: 'change' }]
 });
 
@@ -151,17 +154,23 @@ const handleSubmit = async () => {
       submitData.publishTime = submitData.publishTime.toISOString().split('T')[0];
     }
     
+    // 添加详细的日志，包括数据大小
+    console.log('提交数据大小:', JSON.stringify(submitData).length, '字节');
+    console.log('图片字段类型:', typeof submitData.image);
+    console.log('图片字段开头:', submitData.image.substring(0, 100));
+    
+    let response;
     if (currentId.value) {
       // 编辑：更新现有数据
       console.log('执行更新操作，ID:', currentId.value);
-      const updateResponse = await casesAPI.update(currentId.value, submitData);
-      console.log('更新响应:', updateResponse);
+      response = await casesAPI.update(currentId.value, submitData);
+      console.log('更新响应:', response);
       ElMessage.success('编辑成功');
     } else {
       // 新增：添加新数据
       console.log('执行新增操作');
-      const createResponse = await casesAPI.create(submitData);
-      console.log('新增响应:', createResponse);
+      response = await casesAPI.create(submitData);
+      console.log('新增响应:', response);
       ElMessage.success('新增成功');
     }
 
@@ -173,8 +182,15 @@ const handleSubmit = async () => {
     if (error.response) {
       console.error('响应状态:', error.response.status);
       console.error('响应数据:', error.response.data);
+      ElMessage.error('操作失败: ' + (error.response.data?.error || '服务器错误'));
+    } else if (error.request) {
+      console.error('请求已发送但没有收到响应:', error.request);
+      ElMessage.error('操作失败: 服务器无响应，请检查服务器状态');
+    } else {
+      console.error('请求配置错误:', error.message);
+      ElMessage.error('操作失败: 请求配置错误');
     }
-    ElMessage.error('操作失败');
+    console.error('错误堆栈:', error.stack);
   }
 };
 
@@ -192,6 +208,7 @@ const editCase = (row) => {
   };
   // MongoDB使用_id作为唯一标识，但也可能有id字段
   currentId.value = row._id || row.id;
+  
   console.log('编辑案例ID:', currentId.value);
 };
 

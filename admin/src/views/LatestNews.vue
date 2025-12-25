@@ -57,8 +57,23 @@
             placeholder="请输入动态内容"
           />
         </el-form-item>
-        <el-form-item label="图片链接" prop="image">
-          <el-input v-model="form.image" placeholder="请输入图片URL" />
+        <el-form-item label="图片上传" prop="image">
+          <el-upload
+            class="image-uploader"
+            :before-upload="beforeUpload"
+            :on-change="handleFileChange"
+            :on-remove="handleRemove"
+            :file-list="fileList"
+            :auto-upload="false"
+            list-type="picture-card"
+          >
+            <el-icon class="el-icon--plus">Plus</el-icon>
+            <template #tip>
+              <div class="el-upload__tip">
+                只能上传 JPG/PNG 格式，且不超过 5MB
+              </div>
+            </template>
+          </el-upload>
         </el-form-item>
         <el-form-item label="排序" prop="sort">
           <el-input v-model.number="form.sort" placeholder="数值越小越靠前" />
@@ -75,6 +90,7 @@
 <script setup>
 import { ref, onMounted, nextTick } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { Plus } from '@element-plus/icons-vue';
 import { articlesAPI } from '../utils/api';
 
 // 表格数据
@@ -94,10 +110,14 @@ const form = ref({
 const currentId = ref(null); // 当前编辑的动态ID
 const formRef = ref(null);
 
+// 图片上传配置
+const fileList = ref([]);
+
 // 表单验证规则
 const rules = ref({
   title: [{ required: true, message: '请输入标题', trigger: 'blur' }],
-  content: [{ required: true, message: '请输入内容', trigger: 'blur' }]
+  content: [{ required: true, message: '请输入内容', trigger: 'blur' }],
+  image: [{ required: true, message: '请上传图片', trigger: 'change' }]
 });
 
 // 加载最新动态列表
@@ -167,6 +187,17 @@ const editNews = (row) => {
   };
   // MongoDB使用_id作为唯一标识，但也可能有id字段
   currentId.value = row._id || row.id;
+  
+  // 初始化图片列表
+  if (row.image) {
+    fileList.value = [{
+      url: row.image,
+      name: row.image.split('/').pop()
+    }];
+  } else {
+    fileList.value = [];
+  }
+  
   console.log('编辑动态ID:', currentId.value);
 };
 
@@ -210,6 +241,49 @@ const resetForm = () => {
     status: true
   };
   currentId.value = null;
+  fileList.value = [];
+};
+
+// 上传前检查
+const beforeUpload = (file) => {
+  const isImage = /^image\//.test(file.type);
+  const isLt5M = file.size / 1024 / 1024 < 5;
+  if (!isImage) {
+    ElMessage.error('只能上传图片文件!');
+    return false;
+  }
+  if (!isLt5M) {
+    ElMessage.error('图片大小不能超过5MB!');
+    return false;
+  }
+  return true;
+};
+
+// 文件选择处理，转换为base64
+const handleFileChange = (file) => {
+  if (file.status === 'ready') {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const base64Data = e.target.result;
+      form.value.image = base64Data;
+      // 更新文件列表，显示预览
+      fileList.value = [{ 
+        url: base64Data, 
+        name: file.name,
+        status: 'success'
+      }];
+      ElMessage.success('图片加载成功');
+    };
+    reader.onerror = () => {
+      ElMessage.error('图片加载失败');
+    };
+    reader.readAsDataURL(file.raw);
+  }
+};
+
+// 移除图片处理
+const handleRemove = (file, fileList) => {
+  form.value.image = '';
 };
 
 // 初始加载

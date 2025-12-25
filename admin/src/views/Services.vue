@@ -17,6 +17,16 @@
     >
       <el-table-column type="selection" width="55" />
       <el-table-column prop="title" label="服务名称" min-width="180" />
+      <el-table-column prop="image" label="服务图片" min-width="120">
+        <template #default="scope">
+          <el-image 
+            v-if="scope.row.image" 
+            :src="scope.row.image" 
+            :preview-src-list="[scope.row.image]" 
+            style="width: 80px; height: 80px; object-fit: cover"
+          />
+        </template>
+      </el-table-column>
       <el-table-column prop="content" label="内容" min-width="400" />
       <el-table-column prop="icon" label="图标名称" min-width="150" />
       <el-table-column prop="order" label="排序" min-width="100" />
@@ -51,6 +61,9 @@
         <el-form-item label="内容" prop="content">
           <el-input v-model="form.content" type="textarea" placeholder="请输入内容" :rows="3" />
         </el-form-item>
+        <el-form-item label="服务图片">
+          <ImageUpload v-model="form.image" />
+        </el-form-item>
         <el-form-item label="图标名称" prop="icon">
           <el-input v-model="form.icon" placeholder="请输入Element Plus图标名称，如：el-icon-s-grid" />
         </el-form-item>
@@ -73,6 +86,7 @@
 import { ref, onMounted, nextTick } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { servicesAPI } from '../utils/api';
+import ImageUpload from '../components/ImageUpload.vue';
 
 // 服务数据列表
 const services = ref([]);
@@ -80,7 +94,7 @@ const loading = ref(false);
 
 // 对话框状态管理
 const showDialog = ref(false);
-const form = ref({ title: '', content: '', icon: '', order: 1, isActive: true });
+const form = ref({ title: '', content: '', image: '', icon: '', order: 1, isActive: true });
 const currentId = ref(null); // 当前编辑的服务ID
 
 // 表单验证规则
@@ -113,6 +127,7 @@ const loadServices = async () => {
       _id: service._id || service.id || `temp-${Date.now()}-${Math.random()}`,
       title: service.title || '',
       content: service.content || service.description || '',
+      image: service.image || '',
       icon: service.icon || '',
       order: service.order || 0,
       isActive: service.isActive !== undefined ? service.isActive : true
@@ -171,39 +186,41 @@ const handleSubmit = async () => {
     };
 
     if (currentId.value) {
-      // 编辑：更新现有数据
-      await servicesAPI.update(currentId.value, submitData);
-      const index = services.value.findIndex(item => item._id === currentId.value || item.id === currentId.value);
-      if (index !== -1) {
-        // 使用统一的数据处理逻辑更新服务项
-        services.value[index] = {
-          ...services.value[index],
-          ...form.value,
-          _id: services.value[index]._id || services.value[index].id,
-          content: form.value.content,
-          description: form.value.content
-        };
-      }
-      ElMessage.success('编辑成功');
-    } else {
-      // 新增：添加新数据
-      const newService = await servicesAPI.create(submitData);
-      console.log('新增服务数据:', newService);
-      // 确保返回的数据包含所有必要字段
-      services.value.push({
-        _id: newService._id || newService.id || `temp-${Date.now()}-${Math.random()}`,
-        title: newService.title || '',
-        content: newService.content || newService.description || '',
-        icon: newService.icon || '',
-        order: newService.order || 0,
-        isActive: newService.isActive !== undefined ? newService.isActive : true
-      });
-      ElMessage.success('新增成功');
-    }
+          // 编辑：更新现有数据
+          await servicesAPI.update(currentId.value, submitData);
+          const index = services.value.findIndex(item => item._id === currentId.value || item.id === currentId.value);
+          if (index !== -1) {
+            // 使用统一的数据处理逻辑更新服务项
+            services.value[index] = {
+              ...services.value[index],
+              ...form.value,
+              _id: services.value[index]._id || services.value[index].id,
+              content: form.value.content,
+              description: form.value.content,
+              image: form.value.image
+            };
+          }
+          ElMessage.success('编辑成功');
+        } else {
+          // 新增：添加新数据
+          const newService = await servicesAPI.create(submitData);
+          console.log('新增服务数据:', newService);
+          // 确保返回的数据包含所有必要字段
+          services.value.push({
+            _id: newService._id || newService.id || `temp-${Date.now()}-${Math.random()}`,
+            title: newService.title || '',
+            content: newService.content || newService.description || '',
+            image: newService.image || form.value.image || '',
+            icon: newService.icon || '',
+            order: newService.order || 0,
+            isActive: newService.isActive !== undefined ? newService.isActive : true
+          });
+          ElMessage.success('新增成功');
+        }
 
     // 重置对话框状态
     showDialog.value = false;
-    form.value = { title: '', content: '', icon: '', order: 1, isActive: true };
+    form.value = { title: '', content: '', image: '', icon: '', order: 1, isActive: true };
     currentId.value = null;
     // 重新加载列表确保数据一致性
     loadServices();
@@ -221,6 +238,7 @@ const editService = (row) => {
   form.value = {
     title: row.title || '',
     content: row.description || row.content || '',
+    image: row.image || '',
     icon: row.icon || '',
     order: row.order || 0,
     isActive: row.isActive !== undefined ? row.isActive : true
