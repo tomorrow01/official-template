@@ -170,17 +170,33 @@ const fetchServices = async () => {
 // 获取公司logo
 const fetchCompanyLogo = async () => {
   try {
+    console.log('开始获取公司logo...');
     const response = await request.get('/configs/key/company_logo');
-    // 检查响应格式并获取logo数据
+    console.log('获取公司logo响应:', response);
+    console.log('响应类型:', typeof response);
+    
+    // 简化响应处理逻辑，直接获取value属性
     if (response && response.value) {
       companyLogo.value = response.value;
-    } else if (response && response.data && response.data.value) {
-      companyLogo.value = response.data.value;
-    } else if (response && response.value) {
-      companyLogo.value = response.value;
+      console.log('使用response.value作为logo:', response.value.substring(0, 50) + '...');
+    } 
+    // 处理响应拦截器可能返回的直接数据对象
+    else if (response && typeof response === 'object') {
+      console.log('响应是对象，检查属性:', Object.keys(response));
+      // 检查是否是配置对象
+      if (response.key === 'company_logo') {
+        companyLogo.value = response.value;
+        console.log('使用配置对象的value作为logo:', response.value.substring(0, 50) + '...');
+      } else {
+        console.log('响应不是配置对象，使用默认logo');
+        companyLogo.value = '';
+      }
     }
+    
+    console.log('当前companyLogo:', companyLogo.value ? companyLogo.value.substring(0, 50) + '...' : '空');
   } catch (error) {
     console.error('获取公司logo失败:', error);
+    console.error('错误详情:', error.response || error.message || error);
     // 使用默认logo
     companyLogo.value = '';
   }

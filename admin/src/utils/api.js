@@ -131,6 +131,7 @@ export const contactsAPI = {
 export const configsAPI = {
   getList: () => api.get('/api/configs'),
   getById: (id) => api.get(`/api/configs/${id}`),
+  create: (data) => api.post('/api/configs', data),
   update: (id, data) => api.put(`/api/configs/${id}`, data),
   getByKey: (key) => api.get(`/api/configs/key/${key}`)
 };

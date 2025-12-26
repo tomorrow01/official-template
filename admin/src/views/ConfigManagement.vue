@@ -222,7 +222,9 @@ export default {
             }
           }
           
-          this.configIds[config.key] = config.id;
+          // 保存配置项的id，优先使用_id（MongoDB默认），兼容id字段
+          this.configIds[config.key] = config._id || config.id;
+          console.log(`保存配置项 ${config.key} 的id: ${this.configIds[config.key]}`);
           
           switch (config.key) {
             case 'about_company':
@@ -242,6 +244,7 @@ export default {
               break;
             case 'company_logo':
               this.aboutConfigs.logo = config.value || '';
+              console.log(`加载公司logo: ${this.aboutConfigs.logo.substring(0, 50)}${this.aboutConfigs.logo.length > 50 ? '...' : ''}`);
               break;
             case 'team_members':
               try {
@@ -263,30 +266,72 @@ export default {
     async saveAboutConfigs() {
       this.loading = true;
       const configUpdates = [
-        { key: 'about_company', value: this.aboutConfigs.companyIntro },
-        { key: 'about_company_detail', value: this.aboutConfigs.companyDetail },
-        { key: 'company_mission', value: this.aboutConfigs.mission },
-        { key: 'company_vision', value: this.aboutConfigs.vision },
-        { key: 'company_values', value: this.aboutConfigs.values },
-        { key: 'company_logo', value: this.aboutConfigs.logo },
-        { key: 'team_members', value: JSON.stringify(this.aboutConfigs.teamMembers) }
+        { key: 'about_company', value: this.aboutConfigs.companyIntro, name: '公司简介' },
+        { key: 'about_company_detail', value: this.aboutConfigs.companyDetail, name: '公司详细介绍' },
+        { key: 'company_mission', value: this.aboutConfigs.mission, name: '企业使命' },
+        { key: 'company_vision', value: this.aboutConfigs.vision, name: '企业愿景' },
+        { key: 'company_values', value: this.aboutConfigs.values, name: '企业价值观' },
+        { key: 'company_logo', value: this.aboutConfigs.logo, name: '公司Logo' },
+        { key: 'team_members', value: JSON.stringify(this.aboutConfigs.teamMembers), name: '团队成员' }
       ];
       
       try {
-        // 逐个更新配置项
+        console.log('开始保存配置，configUpdates:', configUpdates);
+        console.log('当前configIds:', this.configIds);
+        
+        // 逐个处理配置项，添加更详细的错误处理
         for (const config of configUpdates) {
-          // 无论id是否存在，都尝试更新配置
-          // 确保即使是新增的配置项也能被保存
-          await configsAPI.update(this.configIds[config.key], {
-            value: config.value
-          });
+          console.log(`处理配置项: ${config.key}`);
+          try {
+            if (this.configIds[config.key]) {
+              // 如果有id，更新配置
+              console.log(`更新配置，id: ${this.configIds[config.key]}, value: ${config.value.substring(0, 50)}${config.value.length > 50 ? '...' : ''}`);
+              const updateResponse = await configsAPI.update(this.configIds[config.key], {
+                value: config.value
+              });
+              console.log(`更新成功，响应:`, updateResponse);
+            } else {
+              // 如果没有id，创建新配置
+              console.log(`创建新配置，key: ${config.key}, name: ${config.name}, value: ${config.value.substring(0, 50)}${config.value.length > 50 ? '...' : ''}`);
+              const newConfig = await configsAPI.create({
+                key: config.key,
+                name: config.name,
+                value: config.value
+              });
+              console.log(`创建成功，新配置:`, newConfig);
+              // 保存新配置的id，以便下次更新
+              this.configIds[config.key] = newConfig.id || newConfig._id;
+              console.log(`更新configIds:`, this.configIds);
+            }
+          } catch (itemError) {
+            console.error(`处理配置项 ${config.key} 失败:`, itemError);
+            // 继续处理其他配置项，而不是立即中断
+          }
         }
+        
+        // 保存成功后重新加载配置，确保显示最新的logo
+        console.log('保存成功，重新加载配置...');
+        await this.loadConfigs();
         
         ElMessage.success('配置保存成功');
         this.lastUpdateTime = new Date().toISOString();
+        console.log('配置保存完成，最后更新时间:', this.lastUpdateTime);
       } catch (error) {
-        ElMessage.error('配置保存失败，请稍后重试');
+        // 显示更详细的错误信息
+        let errorMsg = '配置保存失败';
+        if (error.response) {
+          // 服务器返回了错误响应
+          errorMsg = `配置保存失败: ${error.response.status} - ${error.response.data?.message || '未知错误'}`;
+        } else if (error.request) {
+          // 请求已发送但没有收到响应
+          errorMsg = '配置保存失败: 服务器无响应，请检查网络连接';
+        } else {
+          // 请求配置时发生错误
+          errorMsg = `配置保存失败: ${error.message}`;
+        }
+        ElMessage.error(errorMsg);
         console.error('保存配置失败:', error);
+        console.error('错误详情:', error.response || error.message || error);
       } finally {
         this.loading = false;
       }

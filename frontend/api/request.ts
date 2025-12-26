@@ -50,28 +50,44 @@ request.interceptors.request.use(
 // 响应拦截器：统一处理业务错误码、HTTP状态码
 request.interceptors.response.use(
   (response: AxiosResponse) => {
-    console.log('Response interceptor - 原始响应:', JSON.stringify(response));
+    console.log('Response interceptor - 原始响应:', { 
+      status: response.status, 
+      statusText: response.statusText,
+      url: response.config?.url,
+      method: response.config?.method
+    });
     
     // 直接使用response.data作为响应数据
     const res = response.data;
-    console.log('Response interceptor - 处理后响应:', JSON.stringify(res));
-    console.log('Response interceptor - 响应类型:', typeof res);
+    console.log('Response interceptor - 处理后响应:', { 
+      hasDataField: res && typeof res === 'object' && 'data' in res,
+      responseType: typeof res,
+      isObject: typeof res === 'object',
+      keys: res && typeof res === 'object' ? Object.keys(res) : []
+    });
     
     // 检查是否有data字段（后端实际返回格式）
     if (res && typeof res === 'object' && 'data' in res) {
-      console.log('Response interceptor - 发现data字段:', JSON.stringify(res.data));
-      console.log('Response interceptor - data类型:', typeof res.data);
+      console.log('Response interceptor - 发现data字段:', { 
+        dataType: typeof res.data,
+        hasValue: res.data && typeof res.data === 'object' && 'value' in res.data,
+        isConfig: res.data && typeof res.data === 'object' && 'key' in res.data
+      });
       // 直接返回data字段
       return res.data;
     }
     
     // 如果没有data字段，直接返回数据
-    console.log('Response interceptor - 无data字段，直接返回:', JSON.stringify(res));
+    console.log('Response interceptor - 无data字段，直接返回数据');
     return res;
   },
   (error) => {
     // 处理HTTP状态码错误
-    console.error('Response interceptor - HTTP错误:', JSON.stringify(error));
+    console.error('Response interceptor - HTTP错误:', {
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.message
+    });
     const status = error.response?.status;
     const errorData = error.response?.data;
     const errorMessage = errorData?.message || errorData?.error || error.message || '网络请求失败';

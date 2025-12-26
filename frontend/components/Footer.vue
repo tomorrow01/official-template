@@ -5,22 +5,20 @@
     
     <div class="footer-container">
       <!-- 主要内容区 - 参考IoT设计 -->
-      <!-- <div class="footer-content">
+      <div class="footer-content">
         <div class="footer-main">
           <div class="footer-brand">
             <NuxtLink to="/" class="footer-logo flex items-center mb-6">
               <img 
-                src="/images/logo.png" 
+                :src="companyLogo || '/images/logo.png'" 
                 alt="官网logo" 
                 class="h-12"
               >
-              <span class="ml-3 text-2xl font-bold text-white">
-                明日科技
-              </span>
+              <!-- 移除文字，只保留logo图片 -->
             </NuxtLink>
           </div>
         </div>
-      </div> -->
+      </div>
       
       <!-- 导航链接区域 - 参考美的IoT的多列布局 -->
       <div class="footer-nav">
@@ -101,6 +99,51 @@
 <script setup>
 // 美的IoT风格的Footer组件
 // 简化了脚本部分，移除了订阅功能，专注于导航和链接展示
+import { ref, onMounted } from 'vue'
+import request from '../api/request'
+
+// 公司logo
+const companyLogo = ref('')
+
+// 获取公司logo
+const fetchCompanyLogo = async () => {
+  try {
+    console.log('Footer - 开始获取公司logo...')
+    const response = await request.get('/configs/key/company_logo')
+    console.log('Footer - 获取公司logo响应:', response)
+    console.log('Footer - 响应类型:', typeof response)
+    
+    // 简化响应处理逻辑，直接获取value属性
+    if (response && response.value) {
+      companyLogo.value = response.value
+      console.log('Footer - 使用response.value作为logo:', response.value.substring(0, 50) + '...')
+    } 
+    // 处理响应拦截器可能返回的直接数据对象
+    else if (response && typeof response === 'object') {
+      console.log('Footer - 响应是对象，检查属性:', Object.keys(response))
+      // 检查是否是配置对象
+      if (response.key === 'company_logo') {
+        companyLogo.value = response.value
+        console.log('Footer - 使用配置对象的value作为logo:', response.value.substring(0, 50) + '...')
+      } else {
+        console.log('Footer - 响应不是配置对象，使用默认logo')
+        companyLogo.value = ''
+      }
+    }
+    
+    console.log('Footer - 当前companyLogo:', companyLogo.value ? companyLogo.value.substring(0, 50) + '...' : '空')
+  } catch (error) {
+    console.error('Footer - 获取公司logo失败:', error)
+    console.error('Footer - 错误详情:', error.response || error.message || error)
+    // 使用默认logo
+    companyLogo.value = ''
+  }
+}
+
+// 组件挂载时获取logo
+onMounted(() => {
+  fetchCompanyLogo()
+})
 </script>
 
 <style scoped>
@@ -136,7 +179,11 @@
 }
 
 .footer-logo img {
-  filter: brightness(0) invert(1);
+  /* 移除可能导致logo显示异常的滤镜效果，让logo显示本来的颜色 */
+  filter: none;
+  /* 确保logo在深色背景上可见 */
+  max-height: 48px;
+  object-fit: contain;
 }
 
 /* 导航链接区域样式 */

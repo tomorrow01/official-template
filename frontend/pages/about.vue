@@ -136,9 +136,10 @@ async function fetchConfigs() {
                 configs.value.teamMembers = members.map(member => ({
                   name: member.name || '未知',
                   role: member.role || '未知职位',
-                  // 检查图片路径，如果是以/team/开头的，使用默认图片，否则使用提供的路径
-                  image: (member.image && member.image.startsWith('/team/')) ? '/images/logo.png' : (member.image || '/images/logo.png')
+                  // 检查图片路径，如果是空的，使用默认图片；否则直接使用提供的路径（支持base64格式）
+                  image: member.image || '/images/logo.png'
                 }));
+                console.log('解析后的团队成员:', configs.value.teamMembers);
               }
             } catch (e) {
               console.error('解析团队成员数据失败:', e);
