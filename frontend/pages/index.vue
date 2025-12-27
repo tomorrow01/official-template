@@ -252,24 +252,24 @@
         
         <div class="team-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;">
           <div 
-            v-for="i in 3" 
-            :key="i" 
+            v-for="(member, index) in teamMembers" 
+            :key="index" 
             class="team-member"
-            :style="{animationDelay: `${i * 100}ms`, transition: 'all 0.3s ease'}"
+            :style="{animationDelay: `${index * 100}ms`, transition: 'all 0.3s ease'}"
             onmouseover="this.style.transform='translateY(-8px)';"
             onmouseout="this.style.transform='translateY(0)';"
           >
             <div class="team-image-container overflow-hidden rounded-xl mb-4">
               <img 
-                :src="`https://picsum.photos/seed/member${i}/400/400`" 
+                :src="member.image" 
                 alt="团队成员" 
                 style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease; transform: scale(1);" 
                 onmouseover="this.style.transform='scale(1.1)'" 
                 onmouseout="this.style.transform='scale(1)'"
               >
             </div>
-            <h3 class="team-name text-lg font-semibold text-center">{{ getTeamMemberName(i) }}</h3>
-            <p class="team-position text-gray-500 text-center mb-3">{{ getTeamMemberPosition(i) }}</p>
+            <h3 class="team-name text-lg font-semibold text-center">{{ member.name }}</h3>
+            <p class="team-position text-gray-500 text-center mb-3">{{ member.role }}</p>
             <div class="team-social flex justify-center space-x-3">
               <ClientOnly>
                 <a href="#" class="text-gray-400 hover:text-primary transition-colors"><el-icon><Link /></el-icon></a>
@@ -348,16 +348,12 @@ import { getServiceList } from '@/api/services';
 import type { ServiceItem } from '@/api/services';
 import { getArticleList } from '@/api/articles';
 import type { Article } from '@/api/articles';
+import request from '@/api/request';
 
 const services = ref<ServiceItem[]>([]);
 const banners = ref<any[]>([]);
 // 添加调试信息
 console.log('首页轮播图数据初始值:', banners.value);
-// 页面加载时获取数据
-onMounted(async () => {
-  console.log('页面挂载，开始获取数据...');
-  await Promise.all([fetchBanners(), fetchServices(), fetchCaseList(), fetchLatestArticles()]);
-});
 const cases = ref<CaseItem[]>([]);
 const latestArticles = ref<Partial<Article>[]>([]);
 const showBackToTop = ref(false);
@@ -365,6 +361,22 @@ const loadingCases = ref(true);
 const loadingServices = ref(true);
 const loadingArticles = ref(true);
 const error = ref<string | null>(null);
+// 添加团队成员数据
+const teamMembers = ref<any[]>([]);
+
+// 页面加载时获取数据
+onMounted(async () => {
+  console.log('页面挂载，开始获取数据...');
+  await Promise.all([fetchBanners(), fetchServices(), fetchCaseList(), fetchLatestArticles(), fetchTeamMembers()]);
+  
+  // 添加滚动事件监听
+  window.addEventListener('scroll', handleScroll);
+  
+  // 初始动画检查
+  setTimeout(() => {
+    handleScroll();
+  }, 300);
+});
 
 // 获取轮播图数据
 const fetchBanners = async () => {
@@ -565,12 +577,6 @@ const fetchCaseList = async () => {
     
     if (Array.isArray(res)) {
       caseData = res as CaseItem[];
-    } else if (typeof res === 'object' && res !== null) {
-      if ('data' in res) {
-        // 处理嵌套的数据格式
-        const resData = res as any;
-        caseData = Array.isArray(resData.data) ? (resData.data as CaseItem[]) : [];
-      }
     }
     
     console.log(`成功获取到${caseData.length}个客户案例数据`);
@@ -788,6 +794,68 @@ const getTeamMemberPosition = (index: number) => {
   return positions[index - 1];
 };
 
+// 获取团队成员数据
+const fetchTeamMembers = async () => {
+  try {
+    console.log('开始获取团队成员数据...');
+    // 获取所有配置
+    const response = await request.get('/configs');
+    
+    // 处理API响应，response已经是response interceptor处理过的数据
+    let configs = [];
+    if (Array.isArray(response)) {
+      // 如果直接返回数组，使用整个数组
+      configs = response;
+    } else {
+      // 否则，使用response本身作为配置项（可能是单个配置对象）
+      configs = [response];
+    }
+    
+    // 查找团队成员配置项
+    const teamConfig = configs.find(config => config && config.key === 'team_members');
+    if (teamConfig && teamConfig.value) {
+      try {
+        // 解析团队成员数据
+        let members = teamConfig.value;
+        if (typeof members === 'string') {
+          members = JSON.parse(members);
+        }
+        if (Array.isArray(members)) {
+          // 确保每个成员对象都有必要的属性，避免渲染错误
+          teamMembers.value = members.map(member => ({
+            name: member.name || '未知',
+            role: member.role || '未知职位',
+            image: member.image || 'https://picsum.photos/seed/team' + Math.random() + '/200/200'
+          }));
+          console.log('成功获取团队成员数据:', teamMembers.value);
+        }
+      } catch (e) {
+        console.error('解析团队成员数据失败:', e);
+        teamMembers.value = [];
+      }
+    }
+    
+    // 确保至少有3条数据显示
+    if (teamMembers.value.length < 3) {
+      console.log('团队成员数据不足3条，使用模拟数据补充...');
+      // 使用模拟数据作为后备
+      teamMembers.value = [
+        { name: '张明', role: '技术总监', image: 'https://picsum.photos/seed/team1/200/200' },
+        { name: '李华', role: '产品经理', image: 'https://picsum.photos/seed/team2/200/200' },
+        { name: '王芳', role: 'UI设计师', image: 'https://picsum.photos/seed/team3/200/200' }
+      ];
+    }
+  } catch (error) {
+    console.error('获取团队成员数据失败:', error);
+    // 使用模拟数据作为后备
+    teamMembers.value = [
+      { name: '张明', role: '技术总监', image: 'https://picsum.photos/seed/team1/200/200' },
+      { name: '李华', role: '产品经理', image: 'https://picsum.photos/seed/team2/200/200' },
+      { name: '王芳', role: 'UI设计师', image: 'https://picsum.photos/seed/team3/200/200' }
+    ];
+  }
+};
+
 // 返回顶部函数
 const backToTop = () => {
   window.scrollTo({
@@ -801,7 +869,7 @@ const handleScroll = () => {
   showBackToTop.value = window.scrollY > 300;
   
   // 添加滚动动画效果
-  const elements = document.querySelectorAll('.service-card, .case-card, .article-card, .team-member');
+  const elements = document.querySelectorAll('.team-member');
   elements.forEach(element => {
     const elementPosition = element.getBoundingClientRect().top;
     const screenPosition = window.innerHeight / 1.3;
@@ -812,20 +880,7 @@ const handleScroll = () => {
   });
 };
 
-onMounted(() => {
-  // 页面加载时获取所有数据
-  fetchCaseList();
-  fetchServices();
-  fetchLatestArticles();
-  
-  // 添加滚动事件监听
-  window.addEventListener('scroll', handleScroll);
-  
-  // 初始动画检查
-  setTimeout(() => {
-    handleScroll();
-  }, 300);
-});
+
 
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll);
