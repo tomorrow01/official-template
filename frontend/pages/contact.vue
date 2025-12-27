@@ -55,6 +55,8 @@
               type="text" 
               placeholder="请输入您的姓名"
               :class="{ 'error': formErrors.name }"
+              @input="validateFormField('name')"
+              @blur="validateFormField('name')"
             >
             <span v-if="formErrors.name" class="error-message">{{ formErrors.name }}</span>
           </div>
@@ -66,28 +68,32 @@
               type="email" 
               placeholder="请输入您的邮箱"
               :class="{ 'error': formErrors.email }"
+              @input="validateFormField('email')"
+              @blur="validateFormField('email')"
             >
             <span v-if="formErrors.email" class="error-message">{{ formErrors.email }}</span>
           </div>
           
           <div class="form-group">
-            <label>电话</label>
+            <label>电话 <span class="required">*</span></label>
             <input 
               v-model="formData.phone" 
               type="tel" 
               placeholder="请输入您的联系电话"
               :class="{ 'error': formErrors.phone }"
+              @input="validateFormField('phone')"
             >
             <span v-if="formErrors.phone" class="error-message">{{ formErrors.phone }}</span>
           </div>
           
           <div class="form-group">
-            <label>主题</label>
+            <label>主题 <span class="required">*</span></label>
             <input 
               v-model="formData.subject" 
               type="text" 
               placeholder="请输入消息主题"
               :class="{ 'error': formErrors.subject }"
+              @input="validateFormField('subject')"
             >
             <span v-if="formErrors.subject" class="error-message">{{ formErrors.subject }}</span>
           </div>
@@ -99,6 +105,8 @@
               placeholder="请输入您的留言内容"
               rows="5"
               :class="{ 'error': formErrors.content }"
+              @input="validateFormField('content')"
+              @blur="validateFormField('content')"
             ></textarea>
             <span v-if="formErrors.content" class="error-message">{{ formErrors.content }}</span>
           </div>
@@ -139,7 +147,7 @@ import { reactive, ref, onMounted, nextTick } from 'vue'
 import { ElMessage } from 'element-plus'
 import Footer from '@/components/Footer.vue'
 import Navbar from '@/components/Navbar.vue'
-import contactService from '@/api/contacts'
+import { contactService } from '@/api/contacts'
 
 // 表单数据
 const formData = reactive({
@@ -292,6 +300,9 @@ const validateForm = () => {
   } else if (formData.name.trim().length < 2) {
     formErrors.name = '姓名长度至少为2个字符'
     isValid = false
+  } else if (formData.name.trim().length > 20) {
+    formErrors.name = '姓名长度不能超过20个字符'
+    isValid = false
   }
   
   // 邮箱验证
@@ -304,17 +315,24 @@ const validateForm = () => {
     isValid = false
   }
   
-  // 电话验证（可选字段，但如果填写了则验证格式）
-  if (formData.phone.trim()) {
-    const phoneRegex = /^1[3-9]\d{9}$/
-    if (!phoneRegex.test(formData.phone.trim())) {
-      formErrors.phone = '请输入有效的手机号码'
-      isValid = false
-    }
+  // 电话验证（必填字段）
+  const phoneRegex = /^1[3-9]\d{9}$/
+  if (!formData.phone.trim()) {
+    formErrors.phone = '请输入您的联系电话'
+    isValid = false
+  } else if (!phoneRegex.test(formData.phone.trim())) {
+    formErrors.phone = '请输入有效的手机号码'
+    isValid = false
   }
   
-  // 主题验证（可选字段，但如果填写了则验证长度）
-  if (formData.subject.trim() && formData.subject.trim().length > 50) {
+  // 主题验证（必填字段）
+  if (!formData.subject.trim()) {
+    formErrors.subject = '请输入消息主题'
+    isValid = false
+  } else if (formData.subject.trim().length < 2) {
+    formErrors.subject = '主题长度至少为2个字符'
+    isValid = false
+  } else if (formData.subject.trim().length > 50) {
     formErrors.subject = '主题长度不能超过50个字符'
     isValid = false
   }
@@ -332,6 +350,58 @@ const validateForm = () => {
   }
   
   return isValid
+}
+
+// 单个字段验证函数，用于实时校验
+const validateFormField = (field) => {
+  const value = formData[field].trim()
+  formErrors[field] = ''
+  
+  switch (field) {
+    case 'name':
+      if (!value) {
+        formErrors.name = '请输入您的姓名'
+      } else if (value.length < 2) {
+        formErrors.name = '姓名长度至少为2个字符'
+      } else if (value.length > 20) {
+        formErrors.name = '姓名长度不能超过20个字符'
+      }
+      break
+    case 'email':
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      if (!value) {
+        formErrors.email = '请输入您的邮箱'
+      } else if (!emailRegex.test(value)) {
+        formErrors.email = '请输入有效的邮箱地址'
+      }
+      break
+    case 'phone':
+      const phoneRegex = /^1[3-9]\d{9}$/
+      if (!value) {
+        formErrors.phone = '请输入您的联系电话'
+      } else if (!phoneRegex.test(value)) {
+        formErrors.phone = '请输入有效的手机号码'
+      }
+      break
+    case 'subject':
+      if (!value) {
+        formErrors.subject = '请输入消息主题'
+      } else if (value.length < 2) {
+        formErrors.subject = '主题长度至少为2个字符'
+      } else if (value.length > 50) {
+        formErrors.subject = '主题长度不能超过50个字符'
+      }
+      break
+    case 'content':
+      if (!value) {
+        formErrors.content = '请输入您的留言内容'
+      } else if (value.length < 10) {
+        formErrors.content = '留言内容至少为10个字符'
+      } else if (value.length > 500) {
+        formErrors.content = '留言内容不能超过500个字符'
+      }
+      break
+  }
 }
 
 // 提交表单函数
@@ -364,13 +434,9 @@ const submitForm = async () => {
     
     console.log('表单提交成功，响应数据:', response)
     
-    // 检查响应状态
-    if (response.code === 200) {
-      ElMessage.success('提交成功！我们会尽快与您联系。')
-      resetForm()
-    } else {
-      ElMessage.error(response.message || '提交失败，请稍后重试')
-    }
+    // 提交成功，显示成功提示
+    ElMessage.success('提交成功')
+    resetForm()
   } catch (error) {
     console.error('提交表单失败:', error)
     // 添加更详细的错误信息
