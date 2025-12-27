@@ -40,6 +40,9 @@
         <el-col :span="2">
           <el-button type="primary" @click="handleSearch">搜索</el-button>
         </el-col>
+        <el-col :span="2">
+          <el-button type="danger" @click="deleteSelectedContacts" :disabled="multipleSelection.length === 0">批量删除</el-button>
+        </el-col>
       </el-row>
     </div>
 
@@ -74,7 +77,7 @@
             {{ formatDate(scope.row.createdAt) }}
           </template>
         </el-table-column>
-        <el-table-column label="操作" min-width="150" fixed="right">
+        <el-table-column label="操作" min-width="200" fixed="right">
           <template #default="scope">
             <el-button type="primary" size="small" @click="viewContact(scope.row)">查看详情</el-button>
             <el-dropdown @command="handleStatusChange(scope.row, $event)">
@@ -90,6 +93,7 @@
                 </el-dropdown-menu>
               </template>
             </el-dropdown>
+            <el-button type="danger" size="small" @click="deleteContact(scope.row)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -148,7 +152,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { ElMessage } from 'element-plus';
+import { ElMessage, ElMessageBox } from 'element-plus';
 import { contactsAPI } from '../utils/api';
 
 // 状态映射
@@ -259,6 +263,67 @@ const handleStatusChange = async (row, status) => {
 // 处理选择变化
 const handleSelectionChange = (val) => {
   multipleSelection.value = val;
+};
+
+// 删除单个联系表单
+const deleteContact = async (row) => {
+  try {
+    await ElMessageBox.confirm('确定要删除这条联系表单吗？', '删除确认', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    });
+    
+    const response = await contactsAPI.delete(row._id);
+    
+    if (response.code === 200) {
+      ElMessage.success('删除成功');
+      // 重新获取数据
+      fetchContacts();
+    } else {
+      ElMessage.error(response.message || '删除失败');
+    }
+  } catch (error) {
+    if (error === 'cancel') {
+      return;
+    }
+    ElMessage.error('删除失败');
+    console.error('删除失败:', error);
+  }
+};
+
+// 批量删除联系表单
+const deleteSelectedContacts = async () => {
+  if (multipleSelection.value.length === 0) {
+    ElMessage.warning('请选择要删除的联系表单');
+    return;
+  }
+  
+  try {
+    await ElMessageBox.confirm(`确定要删除选中的${multipleSelection.value.length}条联系表单吗？`, '批量删除确认', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning'
+    });
+    
+    // 批量删除，这里假设后端支持批量删除接口
+    // 如果后端不支持，可以循环调用单个删除接口
+    for (const contact of multipleSelection.value) {
+      await contactsAPI.delete(contact._id);
+    }
+    
+    ElMessage.success('批量删除成功');
+    // 重新获取数据
+    fetchContacts();
+    // 清空选择
+    multipleSelection.value = [];
+  } catch (error) {
+    if (error === 'cancel') {
+      return;
+    }
+    ElMessage.error('批量删除失败');
+    console.error('批量删除失败:', error);
+  }
 };
 
 // 格式化日期
