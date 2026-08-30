@@ -9,26 +9,37 @@
     
     <!-- 案例详情内容 -->
     <div class="container">
-      <!-- 返回按钮 - 使用简单的a标签 -->
-      <a href="/cases" class="back-link">
+      <!-- 返回链接 -->
+      <NuxtLink to="/cases" class="back-link">
         &lt; 返回列表
-      </a>
+      </NuxtLink>
+      
+      <!-- 加载状态 -->
+      <div v-if="loading" class="loading-container">
+        <div class="loading-spinner"></div>
+        <p>加载中...</p>
+      </div>
+      
+      <!-- 错误/空状态 -->
+      <div v-else-if="!detail" class="loading-container">
+        <p>案例不存在</p>
+        <NuxtLink to="/cases" class="back-link">返回列表</NuxtLink>
+      </div>
       
       <!-- 案例内容 -->
-      <div class="case-content">
-        <h2 class="case-title">{{ currentCase.description }}</h2>
-        <p class="case-date">{{ currentCase.publishTime }}</p>
+      <div v-else class="case-content">
+        <h2 class="case-title">{{ detail.title || '客户案例' }}</h2>
+        <p v-if="detail.createTime" class="case-date">{{ formatDate(detail.createTime) }}</p>
         
         <!-- 案例图片 -->
-        <div class="case-image-wrapper">
-          <img :src="currentCase.image" :alt="currentCase.description" class="case-image">
+        <div v-if="detail.image" class="case-image-wrapper">
+          <img :src="detail.image" :alt="detail.title || detail.description" class="case-image">
         </div>
         
         <!-- 案例描述 -->
         <div class="case-description">
           <h3>案例详情</h3>
-          <p>这是ID为 {{ route.params.id }} 的客户案例详细信息。通过我们的解决方案，客户实现了显著的业务增长和效率提升。</p>
-          <p>我们的专业团队为客户提供了全方位的技术支持和咨询服务，帮助客户成功应对业务挑战，实现数字化转型。</p>
+          <p>{{ detail.description }}</p>
         </div>
       </div>
     </div>
@@ -36,53 +47,42 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { ref, onMounted, watch } from 'vue';
+import { useRoute } from '#app';
+import { getCaseDetail } from '@/api/cases';
 
-// 获取路由参数
+definePageMeta({ ssr: false });
+
 const route = useRoute();
 
-// 模拟案例数据，使用与列表页相同的图片URL
-const mockCases = {
-  '1': {
-    id: '1',
-    description: 'XX教育使用我们的内容管理系统，内容发布效率提升60%',
-    image: 'https://picsum.photos/seed/case1/400/300',
-    publishTime: '2024年01月15日'
-  },
-  '2': {
-    id: '2',
-    description: 'YY电商通过轮播图运营，首页点击率增长35%',
-    image: 'https://picsum.photos/seed/case2/400/300',
-    publishTime: '2024年01月10日'
-  },
-  '3': {
-    id: '3',
-    description: 'ZZ金融平台使用我们的解决方案，转化率提升28%',
-    image: 'https://picsum.photos/seed/case3/400/300',
-    publishTime: '2024年01月05日'
-  },
-  '4': {
-    id: '4',
-    description: 'AA医疗系统部署我们的应用，用户满意度提高42%',
-    image: 'https://picsum.photos/seed/case4/400/300',
-    publishTime: '2024年01月01日'
+const detail = ref(null);
+const loading = ref(true);
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  return `${d.getFullYear()}年${String(d.getMonth() + 1).padStart(2, '0')}月${String(d.getDate()).padStart(2, '0')}日`;
+};
+
+const fetchDetail = async () => {
+  loading.value = true;
+  detail.value = null;
+  const id = route.params.id;
+  if (!id) { loading.value = false; return; }
+  try {
+    detail.value = await getCaseDetail(String(id));
+  } catch (err) {
+    console.error('获取案例详情失败:', err);
+  } finally {
+    loading.value = false;
   }
 };
 
-// 计算当前案例数据
-const currentCase = computed(() => {
-  const caseId = route.params.id;
-  return mockCases[caseId] || {
-    id: caseId,
-    description: `案例 ${caseId} 详情`,
-    image: '/images/case1.png',
-    publishTime: '2024年01月01日'
-  };
-});
+watch(() => route.params.id, () => fetchDetail());
 
-// 页面加载时的日志
-console.log('案例详情页加载，ID:', route.params.id);
+onMounted(() => {
+  fetchDetail();
+});
 </script>
 
 <style scoped>
@@ -121,6 +121,29 @@ console.log('案例详情页加载，ID:', route.params.id);
 
 .back-link:hover {
   color: #66b1ff;
+}
+
+.loading-container {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 .case-content {

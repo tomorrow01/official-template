@@ -23,24 +23,24 @@
       
       <!-- 案例卡片容器 -->
       <div v-else class="cases-grid">
-        <a 
-          v-for="(caseItem, index) in cases" 
+        <NuxtLink 
+          v-for="caseItem in cases" 
           :key="caseItem.id" 
-          :href="`/cases/${caseItem.id}`"
+          :to="`/cases/${caseItem.id}`"
           class="case-card"
         >
           <!-- 案例图片 -->
           <div class="case-image-container">
             <img 
-              :src="getCaseImage(index)" 
-              :alt="caseItem.description" 
+              :src="caseItem.image || `https://picsum.photos/seed/${caseItem.title || caseItem._id}/400/300`" 
+              :alt="caseItem.title || caseItem.description" 
               class="case-image"
             >
           </div>
           
           <!-- 案例描述 -->
           <div class="case-desc">
-            <h3>{{ getCaseTitle(index) }}</h3>
+            <h3>{{ caseItem.title || '客户案例' }}</h3>
             <p>{{ caseItem.description }}</p>
             <!-- 查看详情链接 -->
             <span class="view-detail-link">
@@ -48,7 +48,7 @@
               <span class="arrow">→</span>
             </span>
           </div>
-        </a>
+        </NuxtLink>
       </div>
     </div>
     
@@ -59,56 +59,26 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import Footer from '@/components/Footer.vue';
+import { getCaseList } from '@/api/cases';
 
 // 状态管理
 const cases = ref([]);
 const loadingCases = ref(true);
 const error = ref('');
 
-// 模拟获取案例数据的函数
+// 获取案例列表
 const fetchCaseList = async () => {
   loadingCases.value = true;
+  error.value = '';
   try {
-    // 这里应该是实际的API调用
-    // const res = await getCaseList();
-    
-    // 模拟网络延迟
-    await new Promise(resolve => setTimeout(resolve, 300));
-    
-    // 使用模拟数据
-    cases.value = [
-      { id: '1', description: 'XX教育使用我们的内容管理系统，内容发布效率提升60%' },
-      { id: '2', description: 'YY电商通过轮播图运营，首页点击率增长35%' },
-      { id: '3', description: 'ZZ金融平台使用我们的解决方案，转化率提升28%' },
-      { id: '4', description: 'AA医疗系统部署我们的应用，用户满意度提高42%' }
-    ];
-    
-    console.log('案例列表页面加载，数据:', cases.value);
+    const list = await getCaseList();
+    cases.value = list;
   } catch (err) {
     console.error('获取案例数据失败:', err);
     error.value = '获取案例数据失败，请稍后重试';
   } finally {
     loadingCases.value = false;
   }
-};
-
-// 获取案例图片
-const getCaseImage = (index) => {
-  const imageIds = ['case1', 'case2', 'case3', 'case4'];
-  const imageIndex = index % imageIds.length;
-  return `https://picsum.photos/seed/${imageIds[imageIndex]}/400/300`;
-};
-
-// 获取案例标题
-const getCaseTitle = (index) => {
-  const titles = [
-    '企业数字化转型案例',
-    '电子商务平台开发案例',
-    '数据智能分析系统案例',
-    '医疗健康信息化解决方案'
-  ];
-  const titleIndex = index % titles.length;
-  return titles[titleIndex];
 };
 
 // 组件挂载时获取数据

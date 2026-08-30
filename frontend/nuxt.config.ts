@@ -33,15 +33,12 @@ export default defineNuxtConfig({
       ]
     }
   },
-  // 确保API代理仍然工作
-  vite: {
-    server: {
-      proxy: {       
-        // 保留原有的API路径代理
-        '/api': {
-          target: 'http://127.0.0.1:3000',
-          changeOrigin: true
-        }
+  // API 代理：使用 nitro.devProxy（Nuxt 3 下 vite.server.proxy 不会生效）
+  nitro: {
+    devProxy: {
+      '/api': {
+        target: 'http://127.0.0.1:3000',
+        changeOrigin: true
       }
     }
   }

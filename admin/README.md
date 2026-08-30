@@ -22,6 +22,17 @@ npm install
 npm run dev
 ```
 
+开发环境启动后访问 [http://localhost:5173/login](http://localhost:5173/login)
+
+### 开发环境登录账号
+
+| 项目 | 值 |
+| --- | --- |
+| 用户名 | `admin` |
+| 密码 | `123456` |
+
+> 说明：当前登录校验为前端写死逻辑，仅用于开发环境调试，请勿用于生产环境。详见 [Login.vue](src/views/Login.vue)。
+
 ### Compile and Minify for Production
 
 ```sh

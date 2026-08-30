@@ -2,12 +2,15 @@ import axios from 'axios';
 import type { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
 import { ElMessage } from 'element-plus';
 
+// 开发环境直连后端（3001 → 3000），生产环境走相对路径依赖反向代理
+const baseURL = import.meta.dev ? 'http://localhost:3000' : '';
+
 // 创建默认的Axios实例
 const request: AxiosInstance = axios.create({
-  baseURL: '', // 使用相对路径，确保通过代理转发
-  timeout: 10000, // 请求超时时间
-  headers: { 'Content-Type': 'application/json' }, // 默认请求头
-  validateStatus: (status) => status >= 200 && status < 500, // 仅将5xx错误视为网络错误
+  baseURL,
+  timeout: 10000,
+  headers: { 'Content-Type': 'application/json' },
+  validateStatus: (status) => status >= 200 && status < 500,
 });
 
 // 请求拦截器：统一处理请求头

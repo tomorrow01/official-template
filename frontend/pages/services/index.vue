@@ -13,7 +13,24 @@
     
     <!-- 服务列表 -->
     <div class="container">
-      <div class="services-grid">
+      <!-- 加载状态 -->
+      <div v-if="loading" class="loading-container">
+        <div class="loading-spinner"></div>
+        <p>加载服务中...</p>
+      </div>
+      
+      <!-- 错误状态 -->
+      <div v-else-if="error" class="error-message">
+        <p>{{ error }}</p>
+      </div>
+      
+      <!-- 空状态 -->
+      <div v-else-if="services.length === 0" class="empty-message">
+        <p>暂无服务</p>
+      </div>
+      
+      <!-- 服务卡片列表 -->
+      <div v-else class="services-grid">
         <div 
           v-for="service in services" 
           :key="service.id" 
@@ -69,49 +86,36 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import Navbar from '~/components/Navbar.vue'
 import Footer from '~/components/Footer.vue'
+import { getServiceList } from '@/api/services'
 
 // 服务数据
-const services = ref([
-  {
-    id: '1',
-    title: '软件开发',
-    desc: '提供定制化的软件开发服务，包括Web应用、移动应用和桌面应用开发',
-    image: 'https://picsum.photos/seed/software/600/400'
-  },
-  {
-    id: '2',
-    title: '网站建设',
-    desc: '专业网站设计与开发，为企业打造现代化、响应式的官方网站',
-    image: 'https://picsum.photos/seed/webdev/600/400'
-  },
-  {
-    id: '3',
-    title: 'UI/UX设计',
-    desc: '提供用户体验设计和用户界面设计服务，打造直观易用的产品',
-    image: 'https://picsum.photos/seed/design/600/400'
-  },
-  {
-    id: '4',
-    title: '数据分析',
-    desc: '专业的数据分析和可视化服务，帮助企业挖掘数据价值',
-    image: 'https://picsum.photos/seed/data/600/400'
-  },
-  {
-    id: '5',
-    title: '云计算服务',
-    desc: '提供云基础设施搭建、迁移和管理服务，确保业务弹性扩展',
-    image: 'https://picsum.photos/seed/cloud/600/400'
-  },
-  {
-    id: '6',
-    title: 'IT咨询',
-    desc: '专业的IT战略咨询服务，帮助企业实现数字化转型',
-    image: 'https://picsum.photos/seed/consulting/600/400'
+const services = ref([])
+const loading = ref(true)
+const error = ref('')
+
+const fetchServices = async () => {
+  loading.value = true
+  error.value = ''
+  try {
+    const list = await getServiceList()
+    services.value = list.map(item => ({
+      ...item,
+      image: item.image || `https://picsum.photos/seed/${item.title || item._id}/600/400`,
+    }))
+  } catch (err) {
+    console.error('获取服务列表失败:', err)
+    error.value = '获取服务列表失败，请稍后重试'
+  } finally {
+    loading.value = false
   }
-])
+}
+
+onMounted(() => {
+  fetchServices()
+})
 </script>
 
 <style scoped>
@@ -281,6 +285,37 @@ const services = ref([
 .advantage-desc {
   color: #666;
   line-height: 1.6;
+}
+
+/* 加载和错误状态 */
+.loading-container,
+.error-message,
+.empty-message {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-message {
+  color: #e74c3c;
+}
+
+.empty-message {
+  color: #999;
 }
 
 /* 响应式设计 */

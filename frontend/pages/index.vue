@@ -133,7 +133,7 @@
             class="bg-white rounded-xl overflow-hidden">
             <!-- 卡片内部：图片在上 -->
             <div class="h-52 overflow-hidden">
-              <img :src="getServiceImage(index)" alt="服务图片" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease; transform: scale(1);" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+              <img :src="service.image" alt="服务图片" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease; transform: scale(1);" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
             </div>
             
             <!-- 卡片内部：标题和详情在下 -->
@@ -156,52 +156,23 @@
       </div>
     </section>
 
-    <!-- 客户案例 - 左图右文布局（添加边框和阴影效果） -->
+    <!-- 客户案例 - 动态渲染 -->
     <div>
       <div style="max-width: 1100px; margin: 0 auto; padding: 50px 20px;">
         <h2 style="text-align: center; margin-bottom: 30px;">成功合作案例</h2>
         
-        <!-- 案例1 -->
-        <div style="display: flex; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); overflow: hidden; margin-bottom: 30px;">
+        <div v-for="caseItem in cases" :key="caseItem.id" style="display: flex; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); overflow: hidden; margin-bottom: 30px;">
           <!-- 左侧图片 -->
           <div style="width: 350px; height: 250px; overflow: hidden;">
-            <img src="https://picsum.photos/seed/case1/350/250" alt="企业数字化转型案例" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease; transform: scale(1);" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+            <img :src="caseItem.image" :alt="caseItem.title || caseItem.description" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease; transform: scale(1);" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
           </div>
           <!-- 右侧内容 -->
           <div style="padding: 30px; flex: 1; background-color: white;">
-            <h3 style="margin-bottom: 15px; font-size: 22px; font-weight: 600;">企业数字化转型案例</h3>
-            <p style="line-height: 1.6; margin-bottom: 20px; color: #333;">我们帮助一家传统制造企业实现了全面的数字化转型，通过引入智能制造系统，生产效率提升了40%，成本降低了25%。</p>
-            <NuxtLink to="/cases" style="text-decoration: none;">
-                <button style="background: #1677ff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; box-shadow: 0 2px 8px rgba(22, 119, 255, 0.3); transition: all 0.3s ease;">了解更多</button>
-              </NuxtLink>
-          </div>
-        </div>
-        
-        <!-- 案例2 -->
-        <div style="display: flex; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); overflow: hidden; margin-bottom: 30px;">
-          <!-- 左侧图片 -->
-          <div style="width: 350px; height: 250px; overflow: hidden;">
-            <img src="https://picsum.photos/seed/case2/350/250" alt="电子商务平台开发案例" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease; transform: scale(1);" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
-          </div>
-          <!-- 右侧内容 -->
-          <div style="padding: 30px; flex: 1; background-color: white;">
-            <h3 style="margin-bottom: 15px; font-size: 22px; font-weight: 600;">电子商务平台开发案例</h3>
-            <p style="line-height: 1.6; margin-bottom: 20px; color: #333;">为一家连锁零售企业打造了全渠道电子商务平台，整合线上线下业务，上线三个月内用户增长率达到200%，销售额提升35%。</p>
-            <button style="background: #1677ff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; box-shadow: 0 2px 8px rgba(22, 119, 255, 0.3); transition: all 0.3s ease;">了解更多</button>
-          </div>
-        </div>
-        
-        <!-- 案例3 -->
-        <div style="display: flex; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); overflow: hidden;">
-          <!-- 左侧图片 -->
-          <div style="width: 350px; height: 250px; overflow: hidden;">
-            <img src="https://picsum.photos/seed/case3/350/250" alt="数据智能分析系统案例" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease; transform: scale(1);" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
-          </div>
-          <!-- 右侧内容 -->
-          <div style="padding: 30px; flex: 1; background-color: white;">
-            <h3 style="margin-bottom: 15px; font-size: 22px; font-weight: 600;">数据智能分析系统案例</h3>
-            <p style="line-height: 1.6; margin-bottom: 20px; color: #333;">为金融服务企业构建了先进的数据智能分析系统，通过大数据和人工智能技术，风险预测准确率提高了30%，决策效率提升50%。</p>
-            <button style="background: #1677ff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; box-shadow: 0 2px 8px rgba(22, 119, 255, 0.3); transition: all 0.3s ease;">了解更多</button>
+            <h3 style="margin-bottom: 15px; font-size: 22px; font-weight: 600;">{{ caseItem.title || '客户案例' }}</h3>
+            <p style="line-height: 1.6; margin-bottom: 20px; color: #333;">{{ caseItem.description }}</p>
+            <NuxtLink :to="`/cases/${caseItem.id}`" style="text-decoration: none;">
+              <button style="background: #1677ff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; box-shadow: 0 2px 8px rgba(22, 119, 255, 0.3); transition: all 0.3s ease;">了解更多</button>
+            </NuxtLink>
           </div>
         </div>
       </div>
@@ -397,371 +368,54 @@ import { ref, onMounted, onUnmounted } from 'vue';
 import Navbar from '@/components/Navbar.vue';
 import Footer from '@/components/Footer.vue';
 import { ArrowUp } from '@element-plus/icons-vue';
-// 暂时注释掉API导入以避免可能的错误
-// import { getBannerList } from '@/api/banner';
-// import { getCaseList } from '@/api/cases';
 import { getServiceList } from '@/api/services';
+import { getCaseList } from '@/api/cases';
+import { getArticleList } from '@/api/articles';
 
+// 数据状态
 const services = ref([]);
-// 页面加载时获取服务数据
-onMounted(async () => {
-  console.log('页面挂载，开始获取服务数据...');
-  await fetchServices();
-});
 const cases = ref([]);
-const latestArticles = ref([
-  {
-    id: '1',
-    title: 'Vue 3新特性解读',
-    excerpt: '深入解析Vue 3组合式API的优势，对比选项式API的性能提升与开发体验优化...',
-    createTime: '2024-07-10',
-    image: '/images/article1-placeholder.jpg'
-  },
-  {
-    id: '2',
-    title: '前端性能优化指南',
-    excerpt: '从资源加载（懒加载/预加载）到渲染优化（虚拟列表/防抖节流）的全流程实践方案...',
-    createTime: '2024-07-09',
-    image: '/images/article2-placeholder.jpg'
-  },
-  {
-    id: '3',
-    title: 'Nuxt 3实战经验分享',
-    excerpt: '使用Nuxt 3构建SEO友好的企业级应用，包含路由、状态管理、API集成等关键点...',
-    createTime: '2024-07-05',
-    image: '/images/article3-placeholder.jpg'
-  }
-]);
+const latestArticles = ref([]);
 const showBackToTop = ref(false);
-const loadingCases = ref(true);
-const loadingServices = ref(true);
-const loadingArticles = ref(true);
-const error = ref(null);
 
-// 获取服务数据
+// 获取服务数据（后端真实数据）
 const fetchServices = async () => {
-  loadingServices.value = true;
-  error.value = null;
   try {
-    console.log('开始获取服务数据...');
-    // 使用API获取数据
-    const res = await getServiceList();
-    console.log('服务API返回结果:', res);
-    
-    // 精确处理后端返回的{code, data, error}格式
-    if (typeof res === 'object' && res !== null && res.data && Array.isArray(res.data)) {
-      console.log(`成功获取到${res.data.length}个服务数据`);
-      services.value = res.data;
-    } else {
-      console.warn('服务数据格式不正确，使用空数组');
-      services.value = [];
-    }
-    
-    // 如果没有数据，使用模拟数据
-    if (!services.value.length) {
-      services.value = [
-        {
-          _id: '1',
-          id: '1',
-          icon: 'Management',
-          title: '软件开发',
-          description: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。',
-          desc: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。',
-          order: 1,
-          isActive: true
-        },
-        {
-          _id: '2',
-          id: '2',
-          icon: 'Monitor',
-          title: '数字化转型',
-          description: '帮助企业实现数字化转型，优化业务流程，提升运营效率。',
-          desc: '帮助企业实现数字化转型，优化业务流程，提升运营效率。',
-          order: 2,
-          isActive: true
-        },
-        {
-          _id: '3',
-          id: '3',
-          icon: 'Cloud',
-          title: '云服务',
-          description: '提供云计算解决方案，包括云迁移、云托管和云安全服务。',
-          desc: '提供云计算解决方案，包括云迁移、云托管和云安全服务。',
-          order: 3,
-          isActive: true
-        },
-        {
-          _id: '4',
-          id: '4',
-          icon: 'StarFilled',
-          title: '人工智能',
-          description: '利用人工智能技术为企业提供智能决策支持和自动化解决方案。',
-          desc: '利用人工智能技术为企业提供智能决策支持和自动化解决方案。',
-          order: 4,
-          isActive: true
-        },
-        {
-          _id: '5',
-          id: '5',
-          icon: 'Histogram',
-          title: '大数据分析',
-          description: '通过大数据分析帮助企业挖掘数据价值，优化业务决策。',
-          desc: '通过大数据分析帮助企业挖掘数据价值，优化业务决策。',
-          order: 5,
-          isActive: true
-        },
-        {
-          _id: '6',
-          id: '6',
-          icon: 'Briefcase',
-          title: 'IT咨询',
-          description: '提供专业的IT战略咨询服务，帮助企业制定技术发展规划。',
-          desc: '提供专业的IT战略咨询服务，帮助企业制定技术发展规划。',
-          order: 6,
-          isActive: true
-        }
-      ];
-      console.log('使用模拟服务数据:', services.value);
-    }
+    const list = await getServiceList();
+    services.value = list.map(item => ({
+      ...item,
+      image: item.image || `https://picsum.photos/seed/${item.title || item._id}/600/400`,
+    }));
   } catch (err) {
-      console.error('获取服务数据失败:', err);
-      error.value = '获取服务数据失败，请稍后重试';
-      // 提供默认服务数据，与后端保持一致
-      services.value = [
-        {
-          _id: '1',
-          id: '1',
-          icon: 'Management',
-          title: '软件开发',
-          description: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。',
-          desc: '为客户提供定制化的软件开发服务，包括Web应用、移动应用和企业级解决方案。',
-          order: 1,
-          isActive: true
-        },
-        {
-          _id: '2',
-          id: '2',
-          icon: 'Monitor',
-          title: '数字化转型',
-          description: '帮助企业实现数字化转型，优化业务流程，提升运营效率。',
-          desc: '帮助企业实现数字化转型，优化业务流程，提升运营效率。',
-          order: 2,
-          isActive: true
-        },
-        {
-          _id: '3',
-          id: '3',
-          icon: 'Cloud',
-          title: '云服务',
-          description: '提供云计算解决方案，包括云迁移、云托管和云安全服务。',
-          desc: '提供云计算解决方案，包括云迁移、云托管和云安全服务。',
-          order: 3,
-          isActive: true
-        },
-        {
-          _id: '4',
-          id: '4',
-          icon: 'StarFilled',
-          title: '人工智能',
-          description: '利用人工智能技术为企业提供智能决策支持和自动化解决方案。',
-          desc: '利用人工智能技术为企业提供智能决策支持和自动化解决方案。',
-          order: 4,
-          isActive: true
-        },
-        {
-          _id: '5',
-          id: '5',
-          icon: 'Histogram',
-          title: '大数据分析',
-          description: '通过大数据分析帮助企业挖掘数据价值，优化业务决策。',
-          desc: '通过大数据分析帮助企业挖掘数据价值，优化业务决策。',
-          order: 5,
-          isActive: true
-        },
-        {
-          _id: '6',
-          id: '6',
-          icon: 'Briefcase',
-          title: 'IT咨询',
-          description: '提供专业的IT战略咨询服务，帮助企业制定技术发展规划。',
-          desc: '提供专业的IT战略咨询服务，帮助企业制定技术发展规划。',
-          order: 6,
-          isActive: true
-        }
-      ];
-    } finally {
-    loadingServices.value = false;
+    console.error('获取服务数据失败:', err);
   }
 };
 
-// 获取客户案例数据
+// 获取客户案例数据（后端真实数据）
 const fetchCaseList = async () => {
-  loadingCases.value = true;
-  error.value = null;
   try {
-    console.log('开始获取客户案例数据...');
-    // 直接使用模拟数据避免API调用可能的问题
-    // const res = await getCaseList();
-    
-    // 正确提取数据，确保数据格式一致
-    // cases.value = Array.isArray(res) ? res : (res.data || []).filter(item => item && item.isActive !== false);
-    // 使用模拟数据
-    cases.value = [
-      {
-        id: '1',
-        description: '通过实施智能制造解决方案，帮助企业提升生产效率30%，降低运营成本25%。'
-      },
-      {
-        id: '2',
-        description: '为金融机构打造安全可靠的交易平台，支持日均交易量超过10万笔。'
-      },
-      {
-        id: '3',
-        description: '对现有电商系统进行全面升级，提升用户体验和系统性能，销售额增长45%。'
-      }
-    ];
-    console.log('使用模拟客户案例数据:', cases.value);
-    
-    // 如果没有数据，使用模拟数据
-    if (!cases.value.length) {
-      cases.value = [
-        {
-          id: '1',
-          description: '通过实施智能制造解决方案，帮助企业提升生产效率30%，降低运营成本25%。'
-        },
-        {
-          id: '2',
-          description: '为金融机构打造安全可靠的交易平台，支持日均交易量超过10万笔。'
-        },
-        {
-          id: '3',
-          description: '对现有电商系统进行全面升级，提升用户体验和系统性能，销售额增长45%。'
-        }
-      ];}
+    const list = await getCaseList();
+    cases.value = list.map(item => ({
+      ...item,
+      image: item.image || `https://picsum.photos/seed/${item.title || item._id}/350/250`,
+    }));
   } catch (err) {
     console.error('获取客户案例数据失败:', err);
-    error.value = '获取客户案例数据失败，请稍后重试';
-    // 出错时使用模拟数据
-    cases.value = [
-      {
-        id: '1',
-        description: '通过实施智能制造解决方案，帮助企业提升生产效率30%，降低运营成本25%。'
-      },
-      {
-        id: '2',
-        description: '为金融机构打造安全可靠的交易平台，支持日均交易量超过10万笔。'
-      },
-      {
-        id: '3',
-        description: '对现有电商系统进行全面升级，提升用户体验和系统性能，销售额增长45%。'
-      }
-    ];
-  } finally {
-    loadingCases.value = false;
   }
 };
 
-// 获取最新文章数据
+// 获取最新文章数据（后端真实数据，取前3条）
 const fetchLatestArticles = async () => {
-  loadingArticles.value = true;
-  error.value = null;
   try {
-    console.log('开始获取最新文章数据...');
-    // 由于没有单独的获取最新文章API，这里我们调用通用的文章API并限制返回数量
-    try {
-      const request = (await import('@/api/request')).getRequestInstance();
-      const response = await request.get('/api/articles?limit=3');
-      const articles = response.data.data || [];
-      
-      // 格式化文章数据以匹配前端组件期望的格式
-      latestArticles.value = articles.map(article => ({
-        id: article._id || article.id,
-        title: article.title,
-        excerpt: article.content ? article.content.substring(0, 100) + '...' : '',
-        createTime: article.createTime || article.createdAt,
-        image: ''
-      }));
-    } catch (apiError) {
-      console.warn('API调用失败，使用模拟数据');
-      // 使用模拟数据
-      latestArticles.value = [
-        {
-          id: '1',
-          title: '2024年企业数字化转型趋势分析',
-          excerpt: '随着技术的快速发展，企业数字化转型已成为必然趋势。本文深入分析了2024年数字化转型的主要方向和策略。',
-          createTime: '2024-03-15',
-          image: ''
-        },
-        {
-          id: '2',
-          title: '人工智能在企业决策中的应用',
-          excerpt: '人工智能技术正在改变企业的决策方式，从数据中提取有价值的洞察，帮助企业做出更明智的决策。',
-          createTime: '2024-03-10',
-          image: ''
-        },
-        {
-          id: '3',
-          title: '云计算如何提升企业IT效率',
-          excerpt: '云计算技术为企业带来了灵活性和可扩展性，本文介绍了如何利用云服务优化IT基础设施。',
-          createTime: '2024-03-05',
-          image: ''
-        }
-      ];
-    }
-    
-    console.log('获取到的最新文章数据:', latestArticles.value);
+    const list = await getArticleList();
+    latestArticles.value = list.slice(0, 3).map(item => ({
+      ...item,
+      image: item.image || `https://picsum.photos/seed/${item.title || item._id}/600/400`,
+      excerpt: item.content ? item.content.replace(/<[^>]+>/g, '').substring(0, 100) + '...' : '',
+    }));
   } catch (err) {
     console.error('获取文章数据失败:', err);
-    error.value = '获取文章数据失败，请稍后重试';
-    // 出错时使用模拟数据
-    latestArticles.value = [
-      {
-        id: '1',
-        title: '2024年企业数字化转型趋势分析',
-        excerpt: '随着技术的快速发展，企业数字化转型已成为必然趋势。本文深入分析了2024年数字化转型的主要方向和策略。',
-        createTime: '2024-03-15',
-        image: ''
-      },
-      {
-        id: '2',
-        title: '人工智能在企业决策中的应用',
-        excerpt: '人工智能技术正在改变企业的决策方式，从数据中提取有价值的洞察，帮助企业做出更明智的决策。',
-        createTime: '2024-03-10',
-        image: ''
-      },
-      {
-        id: '3',
-        title: '云计算如何提升企业IT效率',
-        excerpt: '云计算技术为企业带来了灵活性和可扩展性，本文介绍了如何利用云服务优化IT基础设施。',
-        createTime: '2024-03-05',
-        image: ''
-      }
-    ];
-  } finally {
-    loadingArticles.value = false;
   }
-};
-
-// 获取服务图片
-const getServiceImage = (index) => {
-  const imageIds = [180, 239, 24, 119, 96, 101];
-  return `https://picsum.photos/id/${imageIds[index % imageIds.length]}/600/400`;
-};
-
-// 获取案例图片
-const getCaseImage = (index) => {
-  const imageIds = [239, 24, 119];
-  return `https://picsum.photos/id/${imageIds[index % imageIds.length]}/800/600`;
-};
-
-// 获取案例标题
-const getCaseTitle = (index) => {
-  const titles = [
-    '某大型制造企业数字化转型项目',
-    '金融科技平台开发项目',
-    '电商系统升级改造项目'
-  ];
-  return titles[index % titles.length];
 };
 
 // 获取团队成员姓名
@@ -787,32 +441,13 @@ const backToTop = () => {
 // 监听滚动事件，显示/隐藏返回顶部按钮
 const handleScroll = () => {
   showBackToTop.value = window.scrollY > 300;
-  
-  // 添加滚动动画效果
-  const elements = document.querySelectorAll('.service-card, .case-card, .article-card, .team-member');
-  elements.forEach(element => {
-    const elementPosition = element.getBoundingClientRect().top;
-    const screenPosition = window.innerHeight / 1.3;
-    
-    if (elementPosition < screenPosition) {
-      element.classList.add('fade-in-up');
-    }
-  });
 };
 
 onMounted(() => {
-  // 页面加载时获取所有数据
-  fetchCaseList();
   fetchServices();
+  fetchCaseList();
   fetchLatestArticles();
-  
-  // 添加滚动事件监听
   window.addEventListener('scroll', handleScroll);
-  
-  // 初始动画检查
-  setTimeout(() => {
-    handleScroll();
-  }, 300);
 });
 
 onUnmounted(() => {

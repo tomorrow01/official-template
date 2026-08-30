@@ -89,37 +89,31 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute, useRouter } from '#app';
 import { ElMessage, ElButton } from 'element-plus';
 import { getServiceDetail, getServiceList } from '@/api/services';
 import type { ServiceItem } from '@/api/services';
 import Navbar from '@/components/Navbar.vue';
 import Footer from '@/components/Footer.vue';
 
+// 禁用 SSR，纯客户端渲染（避免 hydration 问题）
+definePageMeta({ ssr: false });
+
 // 路由和状态
 const route = useRoute();
 const router = useRouter();
 // 获取并验证路由参数
 const serviceId = computed(() => {
-  console.log('计算serviceId，当前route.params:', route.params);
   const id = route.params.id as string;
-  console.log('当前路由参数ID:', id, '类型:', typeof id);
   return id;
 });
 
 // 监听路由参数变化
-watch(() => route.params.id, (newId, oldId) => {
-  console.log('路由参数变化:', {
-    oldId,
-    newId
-  });
-  // 如果参数变化，重新获取数据
+watch(() => route.params.id, (newId) => {
   if (newId) {
     fetchServiceDetail();
   }
 });
-
-console.log('详情页组件初始化，初始路由参数:', route.params);
 
 // 数据状态
 const serviceDetail = ref<ServiceItem | null>(null);
@@ -133,8 +127,11 @@ const fetchServiceDetail = async () => {
     loading.value = true;
     error.value = null;
     
-    // 使用新添加的API获取服务详情
     const detail = await getServiceDetail(serviceId.value);
+    if (!detail) {
+      error.value = '未找到该服务';
+      return;
+    }
     serviceDetail.value = detail;
     
     // 设置页面标题
@@ -146,8 +143,7 @@ const fetchServiceDetail = async () => {
     const allServices = await getServiceList();
     recommendedServices.value = allServices.filter(
       service => service.id !== serviceId.value && service.id !== undefined
-    ).slice(0, 3); // 最多显示3个推荐服务
-    
+    ).slice(0, 3);
   } catch (err) {
     console.error('获取服务详情失败:', err);
     error.value = '获取服务详情失败，请稍后重试';
@@ -161,13 +157,6 @@ const fetchServiceDetail = async () => {
 onMounted(() => {
   fetchServiceDetail();
 });
-</script>
-
-<script lang="ts">
-export default {
-  // 使用客户端渲染避免hydration问题
-  ssr: false
-}
 </script>
 
 <style scoped>
