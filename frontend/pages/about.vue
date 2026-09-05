@@ -1,5 +1,6 @@
 <template>
   <div class="about-page">
+    <Navbar />
     <!-- 页面标题 -->
     <div class="page-header">
       <div class="container">
@@ -58,7 +59,11 @@
         <p class="section-subtitle">我们拥有一支经验丰富、技术精湛的专业团队</p>
         <div class="team-grid">
           <div v-for="(member, index) in configs.teamMembers" :key="index" class="team-member">
-            <img :src="member.image || '/images/logo.png'" alt="团队成员" class="team-img">
+            <!-- 有有效图片 → 渲染 img；没图片或路径无效 → 渐变色占位 + 首字母 -->
+            <img v-if="hasValidImage(member.image, index)" :src="member.image" :alt="member.name" class="team-img" @error="onImgError($event, index)">
+            <div v-else class="team-placeholder" :style="{ background: avatarBg(index) }">
+              {{ avatarInitial(member.name) }}
+            </div>
             <h3 class="team-name">{{ member.name || '未知' }}</h3>
             <p class="team-role">{{ member.role || '未知职位' }}</p>
           </div>
@@ -76,68 +81,97 @@ import Navbar from '@/components/Navbar.vue';
 import { ref, onMounted } from 'vue';
 import request from '@/api/request';
 
-// 配置数据
+// 默认兜底数据（API 失败时显示）
 const configs = ref({
   companyIntro: '我们是一家专注于前端开发和内容管理系统解决方案的高科技企业，致力于为客户提供高质量、高性能的Web应用和数字体验。',
   companyDetail: '自成立以来，我们始终坚持技术创新和客户至上的理念，不断提升服务质量和技术水平，已成功为数百个客户提供了专业的Web开发服务。',
   mission: '通过技术创新，赋能企业数字化转型，为客户创造更大价值。',
   vision: '成为行业领先的Web应用解决方案提供商，引领技术发展潮流。',
   values: '诚信、创新、协作、卓越，始终以客户需求为中心。',
-  teamMembers: [
-    { name: '张三', role: '技术总监', image: '/images/banner1.jpg' },
-    { name: '李四', role: '产品经理', image: '/images/banner2.jpg' },
-    { name: '王五', role: 'UI设计师', image: '/images/case2.jpg' },
-    { name: '赵六', role: '前端开发工程师', image: '/images/logo.png' }
-  ]
+  teamMembers: []
 });
 
-// 获取配置数据
+// 获取配置数据（后端 JSON 文件存储的 key-value 配置）
 async function fetchConfigs() {
   try {
-    // 获取所有配置
-    const response = await request.get('/api/configs');
-    // 检查响应是否存在且包含必要的数据结构
-    if (response && response.data && response.data.code === 200 && response.data.data && Array.isArray(response.data.data)) {
-      response.data.data.forEach(config => {
-        // 确保config对象有效
-        if (!config || !config.key) return;
-        
-        switch (config.key) {
-          case 'about_company':
-            configs.value.companyIntro = config.value || configs.value.companyIntro;
-            break;
-          case 'about_company_detail':
-            configs.value.companyDetail = config.value || configs.value.companyDetail;
-            break;
-          case 'company_mission':
-            configs.value.mission = config.value || configs.value.mission;
-            break;
-          case 'company_vision':
-            configs.value.vision = config.value || configs.value.vision;
-            break;
-          case 'company_values':
-            configs.value.values = config.value || configs.value.values;
-            break;
-          case 'team_members':
-            try {
-              const members = config.value ? JSON.parse(config.value) : null;
-              if (Array.isArray(members)) {
-                configs.value.teamMembers = members;
-              }
-            } catch (e) {
-              console.error('解析团队成员数据失败:', e);
-            }
-            break;
-        }
-      });
-    }
+    // request 拦截器已解包，response 直接是后端返回的数组
+    const list = await request.get('/api/configs');
+    if (!Array.isArray(list)) return;
+
+    list.forEach(config => {
+      if (!config || !config.key) return;
+      switch (config.key) {
+        case 'about_company':
+          if (config.value) configs.value.companyIntro = config.value;
+          break;
+        case 'about_company_detail':
+          if (config.value) configs.value.companyDetail = config.value;
+          break;
+        case 'company_mission':
+          if (config.value) configs.value.mission = config.value;
+          break;
+        case 'company_vision':
+          if (config.value) configs.value.vision = config.value;
+          break;
+        case 'company_values':
+          if (config.value) configs.value.values = config.value;
+          break;
+        case 'team_members':
+          try {
+            const members = config.value ? JSON.parse(config.value) : null;
+            if (Array.isArray(members)) configs.value.teamMembers = members;
+          } catch (e) {
+            console.error('解析团队成员数据失败:', e);
+          }
+          break;
+      }
+    });
   } catch (error) {
     console.error('获取配置数据失败:', error);
-    // 失败时使用默认数据，确保不会出现undefined错误
+    // API 失败时保留默认数据，不让页面空白
   }
 }
 
-// 页面加载时获取配置
+// ===== 团队成员默认头像 =====
+// 6 种预设渐变色，按成员 index 循环分配
+const AVATAR_GRADIENTS = [
+  'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',  // 紫
+  'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',  // 粉
+  'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',  // 蓝青
+  'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',  // 绿
+  'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',  // 粉橙
+  'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',  // 浅粉青
+];
+
+function avatarBg(index) {
+  return AVATAR_GRADIENTS[index % AVATAR_GRADIENTS.length];
+}
+
+function avatarInitial(name) {
+  if (!name) return '?';
+  // 中文取第一个字，英文取首字母大写
+  const first = name.trim().charAt(0);
+  return first.toUpperCase();
+}
+
+// 记录哪些成员的图片加载失败了 → fallback 到占位头像
+const brokenImgIndexes = ref(new Set());
+
+// 判断图片路径是否有效（非空 + http 开头的完整 URL + 没加载失败过）
+function hasValidImage(url, index) {
+  if (!url || typeof url !== 'string') return false;
+  if (!/^https?:\/\//i.test(url)) return false;
+  if (index !== undefined && brokenImgIndexes.value.has(index)) return false;
+  return true;
+}
+
+// 图片加载失败 → 标记该索引，自动切换到占位头像
+function onImgError(_e, index) {
+  brokenImgIndexes.value.add(index);
+  // 强制刷新（Set 本身不是 reactive 的，用新 Set 触发 Vue 响应）
+  brokenImgIndexes.value = new Set(brokenImgIndexes.value);
+}
+
 onMounted(() => {
   fetchConfigs();
 });
@@ -325,6 +359,33 @@ onMounted(() => {
   object-fit: cover;
   margin-bottom: 20px;
   border: 4px solid var(--border-color);
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+}
+
+/* 默认头像占位 —— 渐变色圆形 + 首字母 */
+.team-placeholder {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 64px;
+  font-weight: 600;
+  font-family: 'PingFang SC', 'Microsoft YaHei', system-ui, sans-serif;
+  letter-spacing: 2px;
+  margin-bottom: 20px;
+  border: 4px solid var(--border-color);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.team-member:hover .team-img,
+.team-member:hover .team-placeholder {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.25);
 }
 
 .team-name {
