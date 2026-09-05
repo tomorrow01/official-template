@@ -206,13 +206,18 @@ onMounted(() => {
   margin: 40px 0;
 }
 
+/* 列表页文章卡片 — flex 布局，meta 贴底，图片截断不溢出 */
 .article-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
   background: #fff;
-  border-radius: 8px;
-  overflow: hidden;
+  border-radius: 12px;
+  overflow: hidden;           /* 双层截断图片 scale 放大 */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   text-decoration: none;
+  color: inherit;
 }
 
 .article-card:hover {
@@ -220,60 +225,83 @@ onMounted(() => {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
+/* 图片容器 — overflow:hidden 截断 scale(1.1) */
 .article-image {
+  width: 100%;
   height: 200px;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .article-image img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.5s ease;
+  display: block;
+  transition: transform 0.7s ease;
 }
 
 .article-card:hover .article-image img {
-  transform: scale(1.05);
+  transform: scale(1.1);
 }
 
+/* 内容区 — flex:1 + flex-col，meta 用 margin-top:auto 贴底 */
 .article-info {
+  flex: 1;
   padding: 20px;
+  display: flex;
+  flex-direction: column;
 }
 
 .article-info h3 {
-  font-size: 20px;
-  margin-bottom: 6px;
+  font-size: 18px;
+  font-weight: 600;
   color: #333;
+  margin: 0 0 6px 0;
+  line-height: 1.4;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
+.article-card:hover h3 {
+  color: #1677ff;
+}
+
 .subtitle {
   font-size: 13px;
   color: #999;
-  margin-bottom: 12px;
+  margin: 0 0 10px 0;
 }
 
+/* 简介 — 固定 2 行 + min-height 保证占位 */
 .excerpt {
   font-size: 14px;
   color: #666;
   line-height: 1.6;
-  margin-bottom: 16px;
+  margin: 0;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  min-height: 44px;
+  margin-bottom: 16px;
 }
 
+/* meta 区 — margin-top:auto 推到底部，所有卡片对齐 */
 .article-meta {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-size: 13px;
   color: #999;
 }
+
+/* 相关：列表页文章卡片也给首页用（但首页已有独立类名，不冲突） */
 
 .pagination-container {
   text-align: center;

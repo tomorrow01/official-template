@@ -215,42 +215,24 @@
             v-for="(article, index) in latestArticles" 
             :key="article.id" 
             :to="`/articles/${article.id}`"
-            style="display: block; background: white; border: 1px solid #e0e0e0; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); overflow: hidden; transition: all 0.3s ease; transform: translateY(0);"
-            onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.15)';"
-            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)';"
-            class="group"
-          >
-            <!-- 图片区域 -->
-            <div style="height: 200px; overflow: hidden;">
+            class="article-card-link">
+            <!-- 图片区域（overflow:hidden 截断 scale 放大） -->
+            <div class="article-card-image">
               <img 
                 :src="article.image || `https://picsum.photos/seed/article${index}/600/400`" 
                 alt="文章封面" 
-                style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease; transform: scale(1);" 
-                onmouseover="this.style.transform='scale(1.1)'" 
-                onmouseout="this.style.transform='scale(1)'"
+                class="article-card-img"
               >
             </div>
-            <!-- 文字内容区域 -->
-            <div style="padding: 20px;">
-              <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; color: #333;" class="group-hover:text-primary">
-                {{ article.title || '文章标题' }}
-              </h3>
-              <p v-if="article.subtitle" style="font-size: 13px; color: #999; margin-bottom: 10px;">{{ article.subtitle }}</p>
-              <p style="font-size: 14px; line-height: 1.6; color: #666; margin-bottom: 16px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
-                {{ article.intro || article.excerpt || '这是一篇关于技术趋势和解决方案的文章...' }}
-              </p>
-              <!-- 底部信息区域 -->
-              <ClientOnly>
-                  <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div style="display: flex; align-items: center; color: #1677ff; font-size: 14px; font-weight: 500; transition: transform 0.3s ease;" class="group-hover:translate-x-2">
-                      阅读全文 <el-icon style="margin-left: 8px;"><ArrowRight /></el-icon>
-                    </div>
-                    <div style="display: flex; align-items: center; color: #999; font-size: 13px;">
-                      <el-icon style="margin-right: 4px; font-size: 12px;"><Calendar /></el-icon>
-                      <span>{{ article.createTime || '2024-01-01' }}</span>
-                    </div>
-                  </div>
-                </ClientOnly>
+            <!-- 文字内容区（flex-column + 底部 meta margin-top:auto 贴底） -->
+            <div class="article-card-body">
+              <h3 class="article-card-title">{{ article.title || '文章标题' }}</h3>
+              <p v-if="article.subtitle" class="article-card-subtitle">{{ article.subtitle }}</p>
+              <p class="article-card-desc">{{ article.intro || stripHtml(article.content).slice(0, 100) || '这是一篇关于技术趋势和解决方案的文章...' }}</p>
+              <div class="article-card-meta">
+                <span class="article-card-link-text">阅读全文 →</span>
+                <span class="article-card-date">{{ formatDate(article.createTime) }}</span>
+              </div>
             </div>
           </NuxtLink>
         </div>
@@ -401,6 +383,16 @@ const stripHtml = (html) => {
   if (!html) return ''
   return html.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim()
 }
+
+// 格式化日期
+const formatDate = (dateStr) => {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+// 首页文章卡片（flex 布局 + 图片截断 + 按钮贴底）
+// .article-card-link / .article-card-image / .article-card-body 等样式已在 <style scoped> 中定义
 
 // 获取最新文章数据（后端真实数据，取前3条）
 const fetchLatestArticles = async () => {
@@ -788,11 +780,6 @@ onUnmounted(() => {
   /* 确保不影响内部flex布局 */
 }
 
-/* 移除可能影响布局的样式 */
-.case-image-container {
-  /* 移除可能干扰的flex属性 */
-}
-
 /* 更新图片样式以适应我们的布局 */
 .case-image {
   max-width: 100%;
@@ -828,84 +815,102 @@ onUnmounted(() => {
   opacity: 1;
 }
 
-/* 文章区域样式 */
-.latest-articles {
-  position: relative;
-}
-
-.article-grid {
-  position: relative;
-}
-
-.article-card {
-  border-radius: var(--radius-xl);
-  overflow: hidden;
-  transition: all var(--transition-normal);
+/* ===== 首页文章卡片（新版 - flex 布局 + 图片截断 + meta 贴底） ===== */
+.article-card-link {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  background: white;
+  overflow: hidden;           /* 双层截断：和 .article-card-image 一起保证图片不溢出 */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   text-decoration: none;
   color: inherit;
 }
-
-.article-card:hover {
-  transform: translateY(-6px);
-  box-shadow: var(--shadow-lg);
+.article-card-link:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
-
-.article-image-container {
+/* 图片容器 — overflow:hidden 截断 scale 放大 */
+.article-card-image {
+  width: 100%;
+  height: 200px;
   overflow: hidden;
-  height: 180px;
+  flex-shrink: 0;
+  border-radius: 0;
 }
-
-.article-image {
+.article-card-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform var(--transition-normal);
+  display: block;
+  transition: transform 0.7s ease;
 }
-
-.article-card:hover .article-image {
+.article-card-link:hover .article-card-img {
   transform: scale(1.1);
 }
-
-.article-info {
-  padding: var(--spacing-lg);
-}
-
-.article-title {
-  line-height: 1.3;
-  color: var(--text-dark);
-  margin-bottom: var(--spacing-sm);
-  transition: color var(--transition-fast);
-}
-
-.article-card:hover .article-title {
-  color: var(--primary-color);
-}
-
-.article-meta {
+/* 内容区 — flex:1 + flex-col，meta 用 margin-top:auto 贴底 */
+.article-card-body {
+  flex: 1;
+  padding: 20px;
   display: flex;
-  align-items: center;
-  color: var(--text-muted);
-  font-size: 0.875rem;
-  margin-bottom: var(--spacing-sm);
+  flex-direction: column;
 }
-
-.excerpt {
-  line-height: 1.7;
-  color: var(--text-muted);
-  font-size: 0.875rem;
+.article-card-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 6px 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
-
-.article-link {
-  display: inline-flex;
+.article-card-link:hover .article-card-title {
+  color: #1677ff;
+}
+.article-card-subtitle {
+  font-size: 13px;
+  color: #999;
+  margin: 0 0 10px 0;
+}
+/* 简介 — 固定 2 行，min-height 保证占位稳定 */
+.article-card-desc {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #666;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 44px;
+  margin-bottom: 16px;
+}
+/* meta 区 — margin-top:auto 贴底，所有卡片按钮对齐 */
+.article-card-meta {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  color: var(--primary-color);
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+}
+.article-card-link-text {
+  font-size: 14px;
+  color: #1677ff;
   font-weight: 500;
-  margin-top: var(--spacing-md);
-  transition: transform var(--transition-fast);
+  transition: transform 0.3s ease;
 }
-
-.article-card:hover .article-link {
+.article-card-link:hover .article-card-link-text {
   transform: translateX(4px);
+}
+.article-card-date {
+  font-size: 13px;
+  color: #999;
 }
 
 /* 团队网格样式 */
