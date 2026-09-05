@@ -112,8 +112,7 @@ const fetchDetail = async () => {
     
     // 获取相关服务（排除当前项）
     const allServices = await getServiceList();
-    const list = Array.isArray(allServices) ? allServices : (allServices?.data || []);
-    recommendedServices.value = list
+    recommendedServices.value = (allServices as ServiceItem[])
       .filter((s: ServiceItem) => s.id && s.id !== String(id))
       .slice(0, 3);
   } catch (err) {

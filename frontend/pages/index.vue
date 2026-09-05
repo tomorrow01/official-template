@@ -281,18 +281,12 @@
           <div 
             v-for="i in 3" 
             :key="i" 
-            class="team-member"
-            :style="{animationDelay: `${i * 100}ms`, transition: 'all 0.3s ease'}"
-            onmouseover="this.style.transform='translateY(-8px)';"
-            onmouseout="this.style.transform='translateY(0)';"
-          >
-            <div class="team-image-container overflow-hidden rounded-xl mb-4">
+            class="team-member">
+            <div class="team-image-container">
               <img 
                 :src="`https://picsum.photos/seed/member${i}/400/400`" 
                 alt="团队成员" 
-                style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease; transform: scale(1);" 
-                onmouseover="this.style.transform='scale(1.1)'" 
-                onmouseout="this.style.transform='scale(1)'"
+                class="team-image"
               >
             </div>
             <h3 class="team-name text-lg font-semibold text-center">{{ getTeamMemberName(i) }}</h3>
@@ -916,16 +910,46 @@ onUnmounted(() => {
 
 /* 团队网格样式 */
 .team-grid {
-  display: grid !important;
-  grid-template-columns: repeat(3, 1fr) !important;
-  gap: 2rem !important;
-  width: 100% !important;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.team-member {
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.team-member:hover {
+  transform: translateY(-8px);
+}
+
+/* 团队成员图片容器 — overflow:hidden + border-radius 截断 scale 放大效果 */
+.team-image-container {
+  width: 100%;
+  aspect-ratio: 1 / 1;      /* 正方形 */
+  overflow: hidden;         /* 关键：截断 scale 放大的图片 */
+  border-radius: 12px;
+  margin-bottom: 1rem;
+}
+
+.team-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.7s ease;
+}
+
+.team-member:hover .team-image {
+  transform: scale(1.1);    /* 放大被父级 overflow:hidden 截断，不溢出 */
 }
 
 /* 响应式团队网格 */
 @media (max-width: 768px) {
   .team-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
