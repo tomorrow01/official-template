@@ -120,39 +120,27 @@
           <p class="section-subtitle text-gray-600">我们提供全方位的技术服务，助力企业数字化转型</p>
         </div>
         
-        <!-- 服务卡片网格 - 强制3列布局 -->
-        <div style="display: grid !important; grid-template-columns: 1fr 1fr 1fr !important; gap: 24px !important; width: 100% !important; max-width: none !important; min-width: 0 !important;">
+        <!-- 服务卡片网格 -->
+        <div class="service-grid">
           <!-- 每个服务项是一个独立卡片 -->
           <NuxtLink 
             v-for="(service, index) in services" 
             :key="service.id" 
             :to="`/services/${service.id}`" 
-            style="display: block !important; width: auto !important; min-width: 0 !important; border: 1px solid #e0e0e0; box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: all 0.3s ease; transform: translateY(0);"
-            onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.15)';"
-            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)';"
-            class="bg-white rounded-xl overflow-hidden">
-            <!-- 卡片内部：图片在上 -->
-            <div class="h-52 overflow-hidden">
-              <img :src="service.image" alt="服务图片" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease; transform: scale(1);" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+            class="service-card-link">
+            <!-- 卡片图片区（overflow-hidden 截断放大效果） -->
+            <div class="service-card-image">
+              <img :src="service.image" alt="服务图片" class="service-card-img">
             </div>
             
-            <!-- 卡片内部：标题和详情在下 -->
-            <div style="padding: 24px !important; width: 100%; box-sizing: border-box;">
-              <!-- 标题 -->
-              <h3 style="font-size: 20px; font-weight: 600; margin: 0 0 6px 0 !important; padding: 0 !important; color: #333; width: 100%; box-sizing: border-box;">{{ service.title }}</h3>
-              
-              <!-- 副标题 -->
-              <p v-if="service.subtitle" style="font-size: 13px; color: #999; margin: 0 0 10px 0 !important;">{{ service.subtitle }}</p>
-              
-              <!-- 详情 -->
-              <p style="line-height: 1.6; margin: 0 0 20px 0 !important; padding: 0 !important; color: #666; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; width: 100%; box-sizing: border-box;">{{ service.intro || stripHtml(service.description) || '为客户提供专业的技术解决方案，助力业务增长和数字化转型。' }}</p>
-              
-              <!-- 跳转到详情页面的按钮 -->
-              <ClientOnly>
-                <button style="background: #1677ff; color: white; border: none; margin: 0 !important; padding: 10px 20px !important; border-radius: 4px; cursor: pointer; box-shadow: 0 2px 8px rgba(22, 119, 255, 0.3); transition: all 0.3s ease; display: inline-flex; align-items: center; font-weight: 500;">
-                  查看详情
-                </button>
-              </ClientOnly>
+            <!-- 卡片内容区（flex 布局让按钮始终贴底） -->
+            <div class="service-card-body">
+              <h3 class="service-card-title">{{ service.title }}</h3>
+              <p v-if="service.subtitle" class="service-card-subtitle">{{ service.subtitle }}</p>
+              <p class="service-card-desc">{{ service.intro || stripHtml(service.description) || '为客户提供专业的技术解决方案，助力业务增长和数字化转型。' }}</p>
+              <div class="service-card-footer">
+                <span class="service-card-btn">查看详情 →</span>
+              </div>
             </div>
           </NuxtLink>
         </div>
@@ -601,6 +589,123 @@ onUnmounted(() => {
   overflow: hidden;
 }
 
+/* ===== 首页服务卡片（新版） ===== */
+.service-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 24px;
+  width: 100%;
+}
+
+.service-card-link {
+  display: flex;          /* flex 纵向布局 */
+  flex-direction: column;
+  min-width: 0;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  background: white;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  text-decoration: none;
+  color: inherit;
+}
+
+.service-card-link:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* 图片容器 — overflow:hidden 保证放大不溢出 */
+.service-card-image {
+  width: 100%;
+  height: 208px;         /* h-52 = 208px，固定高度 */
+  overflow: hidden;      /* 关键：截断 scale 放大的图片 */
+  flex-shrink: 0;        /* 图片区不被压缩 */
+}
+
+.service-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.7s ease;
+}
+
+.service-card-link:hover .service-card-img {
+  transform: scale(1.1);
+}
+
+/* 内容区 — flex:1 撑满剩余空间，让按钮贴底 */
+.service-card-body {
+  flex: 1;                /* 关键：内容区撑满 */
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.service-card-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 6px 0;
+  line-height: 1.4;
+}
+
+.service-card-subtitle {
+  font-size: 13px;
+  color: #999;
+  margin: 0 0 10px 0;
+}
+
+/* 简介 — 固定 2 行，超出截断，保持稳定高度 */
+.service-card-desc {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #666;
+  margin: 0;
+  /* 关键：固定 2 行，防止高度漂移 */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 44px;       /* 2 行 × 22px 行高 ≈ 44px，保证占位 */
+  margin-bottom: 20px;
+}
+
+/* 按钮区 — mt-auto 自动贴底 */
+.service-card-footer {
+  margin-top: auto;       /* 关键：把按钮推到卡片底部 */
+}
+
+.service-card-btn {
+  display: inline-flex;
+  align-items: center;
+  background: #1677ff;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-weight: 500;
+  font-size: 14px;
+  box-shadow: 0 2px 8px rgba(22, 119, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.service-card-link:hover .service-card-btn {
+  background: #0958d9;
+  box-shadow: 0 4px 12px rgba(22, 119, 255, 0.4);
+}
+
+/* 响应式：平板 2 列，手机 1 列 */
+@media (max-width: 1024px) {
+  .service-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 640px) {
+  .service-grid { grid-template-columns: 1fr; }
+}
+
+/* ===== 旧的 .service-card 样式（保留兼容，可能其他地方引用） ===== */
 .services-grid {
   position: relative;
   z-index: 1;
