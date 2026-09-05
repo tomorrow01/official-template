@@ -2,53 +2,57 @@
   <div class="article-detail-page">
     <Navbar />
     
+    <!-- 渐变 header 条（与 cases/services 详情页统一风格） -->
+    <div class="page-header">
+      <div class="container">
+        <h1 class="page-title">最新动态详情</h1>
+      </div>
+    </div>
+    
     <div class="container">
-      <!-- 返回按钮 -->
-      <div class="back-button-container">
-        <NuxtLink to="/articles" class="back-link">
-          <ArrowLeft style="vertical-align: middle; margin-right: 4px;" />
-          返回文章列表
-        </NuxtLink>
-      </div>
-      
-      <!-- 文章详情卡片 -->
-      <div v-if="!loading && article" class="article-detail-card">
-        <!-- 文章标题 -->
-        <h1 class="article-title">{{ article.title }}</h1>
-        <p v-if="article.subtitle" class="article-subtitle">{{ article.subtitle }}</p>
-        
-        <!-- 文章元信息 -->
-        <div class="article-meta">
-          <span v-if="article.createTime" class="publish-date">发布时间：{{ formatDate(article.createTime) }}</span>
-          <span class="author" v-if="article.author">作者：{{ article.author }}</span>
-        </div>
-        
-        <!-- 文章简介 -->
-        <div v-if="article.intro" class="article-intro">
-          {{ article.intro }}
-        </div>
-        
-        <!-- 文章封面图 -->
-        <div v-if="article.image" class="article-cover">
-          <img :src="article.image" :alt="article.title" class="cover-image">
-        </div>
-        
-        <!-- 文章内容 -->
-        <div class="article-content rich-text" v-html="article.content"></div>
-      </div>
+      <!-- 返回链接（和 cases/services 详情页统一写法） -->
+      <NuxtLink to="/articles" class="back-link">
+        &lt; 返回列表
+      </NuxtLink>
       
       <!-- 加载状态 -->
-      <div v-else-if="loading" class="loading-container">
+      <div v-if="loading" class="loading-container">
         <div class="loading-spinner"></div>
         <p>正在加载文章...</p>
       </div>
       
-      <!-- 错误状态 -->
-      <div v-else class="error-container">
+      <!-- 错误/空状态 -->
+      <div v-else-if="!article" class="loading-container">
         <p>文章不存在或已被删除</p>
-        <NuxtLink to="/articles" class="back-link" style="margin-top: 16px; display: inline-block;">
-          返回文章列表
-        </NuxtLink>
+        <NuxtLink to="/articles" class="back-link">返回文章列表</NuxtLink>
+      </div>
+      
+      <!-- 文章详情内容（白色圆角卡片） -->
+      <div v-else class="article-content">
+        <!-- 标题区 -->
+        <h2 class="article-title">{{ article.title }}</h2>
+        <p v-if="article.subtitle" class="article-subtitle">{{ article.subtitle }}</p>
+        
+        <!-- 文章元信息 -->
+        <div v-if="article.createTime || article.author" class="article-meta">
+          <span v-if="article.createTime" class="meta-item">{{ formatDate(article.createTime) }}</span>
+          <span v-if="article.author" class="meta-item">作者：{{ article.author }}</span>
+        </div>
+        
+        <!-- 简介（左侧竖条，与 cases/services 的 intro 同款） -->
+        <div v-if="article.intro" class="article-intro">
+          {{ article.intro }}
+        </div>
+        
+        <!-- 封面图 -->
+        <div v-if="article.image" class="article-cover">
+          <img :src="article.image" :alt="article.title" class="cover-image">
+        </div>
+        
+        <!-- 文章内容（富文本） -->
+        <div class="article-body">
+          <div class="rich-text" v-html="article.content"></div>
+        </div>
       </div>
     </div>
     
@@ -57,9 +61,8 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useRoute } from '#app';
-import { ArrowLeft } from '@element-plus/icons-vue';
 import Navbar from '@/components/Navbar.vue';
 import Footer from '@/components/Footer.vue';
 import { getArticleDetail } from '@/api/articles';
@@ -67,29 +70,27 @@ import { getArticleDetail } from '@/api/articles';
 definePageMeta({ ssr: false });
 
 const route = useRoute();
-const articleId = computed(() => String(route.params.id));
 
 const article = ref(null);
 const loading = ref(true);
 
-// 格式化日期
 const formatDate = (dateString) => {
   if (!dateString) return '';
-  const date = new Date(dateString);
-  return date.toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit'
-  });
+  const d = new Date(dateString);
+  return `${d.getFullYear()}年${String(d.getMonth() + 1).padStart(2, '0')}月${String(d.getDate()).padStart(2, '0')}日`;
 };
 
-// 获取文章详情
-const fetchArticleDetail = async () => {
+const fetchDetail = async () => {
   loading.value = true;
   article.value = null;
+  const id = route.params.id;
+  if (!id) { loading.value = false; return; }
   try {
-    const detail = await getArticleDetail(articleId.value);
-    article.value = detail;
+    article.value = await getArticleDetail(String(id));
+    
+    if (article.value?.title) {
+      document.title = `${article.value.title} - 最新动态`;
+    }
   } catch (err) {
     console.error('获取文章详情失败:', err);
   } finally {
@@ -97,37 +98,46 @@ const fetchArticleDetail = async () => {
   }
 };
 
-// 监听路由参数变化
-watch(() => route.params.id, () => fetchArticleDetail());
+watch(() => route.params.id, () => fetchDetail());
 
-// 页面加载时获取数据
 onMounted(() => {
-  fetchArticleDetail();
+  fetchDetail();
 });
 </script>
 
 <style scoped>
+/* ===== 与 cases/services 详情页共用的视觉结构 ===== */
 .article-detail-page {
-  padding: 40px 0;
-  background: var(--bg-base);
+  background: #f5f5f5;
+  min-height: 100vh;
+}
+
+/* 渐变 header（60px 详情页高度，统一） */
+.page-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 60px 0;
+  text-align: center;
+}
+
+.page-title {
+  font-size: 36px;
+  font-weight: 700;
+  margin: 0;
 }
 
 .container {
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 0 20px;
-}
-
-.back-button-container {
-  margin-bottom: 20px;
+  padding: 40px 20px;
 }
 
 .back-link {
-  display: inline-flex;
-  align-items: center;
+  display: inline-block;
+  margin-bottom: 30px;
   color: #409eff;
   text-decoration: none;
-  font-size: 14px;
+  font-size: 16px;
   transition: color 0.3s;
 }
 
@@ -135,52 +145,79 @@ onMounted(() => {
   color: #66b1ff;
 }
 
-.article-detail-card {
-  background: var(--bg-container);
+/* ===== 加载/空状态 ===== */
+.loading-container {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* ===== 白色圆角卡片 ===== */
+.article-content {
+  background: white;
   border-radius: 12px;
   padding: 40px;
-  box-shadow: var(--shadow-light);
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 }
 
 .article-title {
   font-size: 28px;
   font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 8px;
+  color: #333;
+  margin: 0 0 8px 0;
   line-height: 1.4;
 }
 
 .article-subtitle {
   font-size: 16px;
   color: #909399;
-  margin-bottom: 20px;
+  margin: 0 0 16px 0;
 }
 
+/* 元信息行 */
+.article-meta {
+  display: flex;
+  gap: 24px;
+  padding-bottom: 20px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #ebeef5;
+}
+
+.meta-item {
+  font-size: 14px;
+  color: #909399;
+}
+
+/* 简介块（与 cases/services 的 intro 完全同款） */
 .article-intro {
   background: #f8f9fa;
-  border-left: 4px solid #409eff;
+  border-left: 4px solid #667eea;
   padding: 16px 20px;
   margin-bottom: 30px;
-  font-size: 15px;
+  font-size: 16px;
   color: #606266;
   line-height: 1.8;
   border-radius: 4px;
 }
 
-.article-meta {
-  display: flex;
-  gap: 30px;
-  margin-bottom: 30px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.publish-date,
-.author {
-  font-size: 14px;
-  color: var(--text-tertiary);
-}
-
+/* 封面图 */
 .article-cover {
   margin-bottom: 30px;
   border-radius: 8px;
@@ -190,46 +227,32 @@ onMounted(() => {
 .cover-image {
   width: 100%;
   height: auto;
-  object-fit: cover;
+  display: block;
   max-height: 500px;
-  border-radius: 8px;
+  object-fit: cover;
 }
 
-.article-content {
+/* 富文本区 */
+.article-body {
   /* 富文本详细样式见 assets/css/main.css 的 .rich-text */
 }
 
-.loading-container,
-.error-container {
-  min-height: 300px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background: var(--bg-container);
-  border-radius: 12px;
-  padding: 40px;
-  text-align: center;
-}
-
-.loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #f3f3f3;
-  border-top: 4px solid #409eff;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-  margin-bottom: 20px;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
+/* ===== 响应式 ===== */
 @media (max-width: 768px) {
-  .article-detail-card {
+  .page-header {
+    padding: 40px 0;
+  }
+  
+  .page-title {
+    font-size: 28px;
+  }
+  
+  .container {
     padding: 20px;
+  }
+  
+  .article-content {
+    padding: 24px;
   }
   
   .article-title {
@@ -238,7 +261,7 @@ onMounted(() => {
   
   .article-meta {
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
   }
 }
 </style>

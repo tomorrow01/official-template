@@ -1,202 +1,192 @@
 <template>
   <div class="service-detail-page">
-    <!-- 引入公共导航 -->
     <Navbar />
     
+    <!-- 页面标题渐变条（与 cases 详情页统一风格） -->
+    <div class="page-header">
+      <div class="container">
+        <h1 class="page-title">核心服务详情</h1>
+      </div>
+    </div>
+    
+    <!-- 详情内容 -->
     <div class="container">
+      <!-- 返回链接 -->
+      <NuxtLink to="/services" class="back-link">
+        &lt; 返回列表
+      </NuxtLink>
+      
       <!-- 加载状态 -->
       <div v-if="loading" class="loading-container">
         <div class="loading-spinner"></div>
         <p>加载中...</p>
       </div>
       
-      <!-- 错误状态 -->
-      <div v-else-if="error" class="error-container">
-        <p>{{ error }}</p>
-        <el-button type="primary" @click="fetchServiceDetail">重试</el-button>
+      <!-- 空状态 -->
+      <div v-else-if="!serviceDetail" class="loading-container">
+        <p>服务不存在</p>
+        <NuxtLink to="/services" class="back-link">返回列表</NuxtLink>
       </div>
       
-      <!-- 服务详情内容 -->
-      <div v-else-if="serviceDetail" class="service-detail-content">
-        <div class="page-header">
-          <el-button type="text" @click="$router.back()" class="back-btn">
-            <el-icon style="margin-right: 4px;"><ArrowLeft /></el-icon>
-            返回
-          </el-button>
-          <h1 class="page-title">{{ serviceDetail.title }}</h1>
-          <p v-if="serviceDetail.subtitle" class="page-subtitle">{{ serviceDetail.subtitle }}</p>
-        </div>
-        
-        <div class="service-card">
-          <div class="service-icon" v-if="serviceDetail.icon">
-            <i :class="['iconfont', `icon-${serviceDetail.icon}`]"></i>
-          </div>
-          <div class="service-info">
+      <!-- 服务内容（白色圆角卡片，与 cases 统一） -->
+      <div v-else class="service-content">
+        <!-- 标题区 -->
+        <div class="title-area">
+          <span v-if="serviceDetail.icon" class="service-icon-badge" :class="`icon-${serviceDetail.icon}`"></span>
+          <div class="title-text">
             <h2 class="service-title">{{ serviceDetail.title }}</h2>
             <p v-if="serviceDetail.subtitle" class="service-subtitle">{{ serviceDetail.subtitle }}</p>
-            <div class="service-description" v-if="serviceDetail.intro">
-              {{ serviceDetail.intro }}
-            </div>
-            
-            <!-- 服务附加信息 -->
-            <div class="service-meta">
-              <div class="meta-item" v-if="serviceDetail.order !== undefined">
-                排序: {{ serviceDetail.order }}
-              </div>
-              <div class="meta-item" v-if="serviceDetail.isActive !== undefined">
-                状态: {{ serviceDetail.isActive ? '激活' : '未激活' }}
-              </div>
-            </div>
           </div>
         </div>
         
-        <!-- 服务详情补充内容 -->
-        <div class="service-detail-section">
-          <h3 class="section-title">服务详情</h3>
-          <div class="detail-content rich-text" v-html="serviceDetail.description"></div>
+        <!-- 简介（左侧竖条，与 cases 的 intro 块统一） -->
+        <div v-if="serviceDetail.intro" class="service-intro">
+          {{ serviceDetail.intro }}
         </div>
         
-        <!-- 推荐服务 -->
-        <div class="recommended-services">
-          <h3 class="section-title">相关服务</h3>
-          <div class="services-grid">
-            <div 
-              v-for="service in recommendedServices" 
-              :key="service.id"
-              class="recommended-service-card"
-              @click="$router.push(`/services/${service.id}`)"
-            >
-              <div class="recommended-service-icon">
-                <i :class="['iconfont', `icon-${service.icon}`]"></i>
-              </div>
-              <h4 class="recommended-service-title">{{ service.title }}</h4>
-              <p class="recommended-service-desc">{{ service.desc || service.description }}</p>
-            </div>
-          </div>
+        <!-- 服务详情（富文本） -->
+        <div class="service-description">
+          <h3>服务详情</h3>
+          <div class="rich-text" v-html="serviceDetail.description"></div>
         </div>
       </div>
       
-      <!-- 未找到状态 -->
-      <div v-else class="not-found">
-        <p>未找到服务详情</p>
-        <el-button type="primary" @click="$router.back()">返回</el-button>
+      <!-- 相关服务推荐（保留，风格统一） -->
+      <div v-if="recommendedServices.length > 0" class="recommended-section">
+        <h3 class="section-title">相关服务</h3>
+        <div class="recommended-grid">
+          <NuxtLink
+            v-for="service in recommendedServices"
+            :key="service.id"
+            :to="`/services/${service.id}`"
+            class="recommended-card"
+          >
+            <span v-if="service.icon" class="recommended-icon" :class="`icon-${service.icon}`"></span>
+            <h4 class="recommended-title">{{ service.title }}</h4>
+            <p class="recommended-desc">{{ service.intro || stripHtml(service.description) }}</p>
+          </NuxtLink>
+        </div>
       </div>
     </div>
     
-    <!-- 引入公共页脚 -->
     <Footer />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from 'vue';
-import { useRoute, useRouter } from '#app';
-import { ElMessage, ElButton } from 'element-plus';
-import { ArrowLeft } from '@element-plus/icons-vue';
+import { ref, onMounted, watch } from 'vue';
+import { useRoute } from '#app';
 import { getServiceDetail, getServiceList } from '@/api/services';
 import type { ServiceItem } from '@/api/services';
 import Navbar from '@/components/Navbar.vue';
 import Footer from '@/components/Footer.vue';
 
-// 禁用 SSR，纯客户端渲染（避免 hydration 问题）
 definePageMeta({ ssr: false });
 
-// 路由和状态
 const route = useRoute();
-const router = useRouter();
-// 获取并验证路由参数
-const serviceId = computed(() => {
-  const id = route.params.id as string;
-  return id;
-});
 
-// 监听路由参数变化
-watch(() => route.params.id, (newId) => {
-  if (newId) {
-    fetchServiceDetail();
-  }
-});
-
-// 数据状态
 const serviceDetail = ref<ServiceItem | null>(null);
 const recommendedServices = ref<ServiceItem[]>([]);
 const loading = ref(true);
-const error = ref<string | null>(null);
 
-// 获取服务详情数据
-const fetchServiceDetail = async () => {
+// 从富文本中剥离 HTML 标签，取纯文本前 80 字
+const stripHtml = (html: string | undefined): string => {
+  if (!html) return '';
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  return (tmp.textContent || tmp.innerText || '').slice(0, 80);
+};
+
+const fetchDetail = async () => {
+  loading.value = true;
+  serviceDetail.value = null;
+  const id = route.params.id;
+  if (!id) { loading.value = false; return; }
   try {
-    loading.value = true;
-    error.value = null;
+    const detail = await getServiceDetail(String(id));
+    serviceDetail.value = detail || null;
     
-    const detail = await getServiceDetail(serviceId.value);
-    if (!detail) {
-      error.value = '未找到该服务';
-      return;
-    }
-    serviceDetail.value = detail;
-    
-    // 设置页面标题
-    if (detail.title) {
-      document.title = `${detail.title} - 服务详情`;
+    if (detail?.title) {
+      document.title = `${detail.title} - 核心服务`;
     }
     
-    // 获取推荐服务（排除当前服务）
+    // 获取相关服务（排除当前项）
     const allServices = await getServiceList();
-    recommendedServices.value = allServices.filter(
-      service => service.id !== serviceId.value && service.id !== undefined
-    ).slice(0, 3);
+    const list = Array.isArray(allServices) ? allServices : (allServices?.data || []);
+    recommendedServices.value = list
+      .filter((s: ServiceItem) => s.id && s.id !== String(id))
+      .slice(0, 3);
   } catch (err) {
     console.error('获取服务详情失败:', err);
-    error.value = '获取服务详情失败，请稍后重试';
-    ElMessage.error('获取服务详情失败');
   } finally {
     loading.value = false;
   }
 };
 
-// 页面加载时获取数据
+watch(() => route.params.id, () => fetchDetail());
+
 onMounted(() => {
-  fetchServiceDetail();
+  fetchDetail();
 });
 </script>
 
 <style scoped>
+/* ===== 与 cases 详情页共用的视觉结构 ===== */
 .service-detail-page {
+  background: #f5f5f5;
   min-height: 100vh;
-  background-color: #f5f7fa;
-  display: flex;
-  flex-direction: column;
+}
+
+.page-header {
+  /* 与 cases 详情页同一款渐变 */
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 60px 0;
+  text-align: center;
+}
+
+.page-title {
+  font-size: 36px;
+  font-weight: 700;
+  margin: 0;
 }
 
 .container {
-  flex: 1;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
-  width: 100%;
+  padding: 40px 20px;
 }
 
-/* 加载状态 */
-.loading-container,
-.error-container,
-.not-found {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 400px;
+.back-link {
+  display: inline-block;
+  margin-bottom: 30px;
+  color: #409eff;
+  text-decoration: none;
+  font-size: 16px;
+  transition: color 0.3s;
+}
+
+.back-link:hover {
+  color: #66b1ff;
+}
+
+/* ===== 加载/空状态 ===== */
+.loading-container {
   text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
 }
 
 .loading-spinner {
   width: 40px;
   height: 40px;
-  border: 3px solid #f3f3f3;
-  border-top: 3px solid #409eff;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #667eea;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-  margin-bottom: 20px;
+  margin: 0 auto 20px;
 }
 
 @keyframes spin {
@@ -204,174 +194,160 @@ onMounted(() => {
   100% { transform: rotate(360deg); }
 }
 
-/* 页面头部 */
-.page-header {
+/* ===== 服务内容白色卡片 ===== */
+.service-content {
+  background: white;
+  border-radius: 12px;
+  padding: 40px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
   margin-bottom: 30px;
 }
 
-.back-btn {
-  margin-bottom: 10px;
-}
-
-.page-title {
-  font-size: 32px;
-  color: #303133;
-  margin: 0;
-  font-weight: 600;
-}
-
-.page-subtitle {
-  font-size: 16px;
-  color: #909399;
-  margin: 8px 0 0 0;
-}
-
-/* 服务卡片 */
-.service-card {
-  background: #fff;
-  padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-  margin-bottom: 30px;
+.title-area {
   display: flex;
   align-items: flex-start;
-  gap: 20px;
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
-.service-icon {
-  font-size: 48px;
-  color: #409eff;
+.service-icon-badge {
   flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  color: white;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
 }
 
-.service-info {
+.title-text {
   flex: 1;
 }
 
 .service-title {
-  font-size: 24px;
-  color: #303133;
-  margin: 0 0 15px 0;
+  font-size: 28px;
   font-weight: 600;
+  color: #333;
+  margin: 0 0 6px 0;
 }
 
 .service-subtitle {
-  font-size: 14px;
-  color: #909399;
-  margin-bottom: 15px;
-}
-
-.service-description {
-  line-height: 1.8;
-  color: #606266;
   font-size: 16px;
-  margin-bottom: 15px;
-}
-
-/* 服务元信息 */
-.service-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  margin-top: 15px;
-}
-
-.meta-item {
-  background: #f0f0f0;
-  padding: 8px 16px;
-  border-radius: 4px;
-  font-size: 14px;
-  color: #666;
-  border-left: 3px solid #409eff;
-}
-
-/* 详情部分 */
-.service-detail-section,
-.recommended-services {
-  background: #fff;
-  padding: 30px;
-  border-radius: 8px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-  margin-bottom: 30px;
-}
-
-.section-title {
-  font-size: 20px;
-  color: #303133;
-  margin: 0 0 20px 0;
-  font-weight: 600;
-  border-left: 4px solid #409eff;
-  padding-left: 15px;
-}
-
-.detail-content {
-  /* 富文本详细样式见 assets/css/main.css 的 .rich-text */
-}
-
-/* 推荐服务 */
-.services-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 20px;
-}
-
-.recommended-service-card {
-  padding: 20px;
-  background: #f8f9fa;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  border: 1px solid #e4e7ed;
-}
-
-.recommended-service-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border-color: #409eff;
-}
-
-.recommended-service-icon {
-  font-size: 32px;
-  color: #409eff;
-  margin-bottom: 15px;
-}
-
-.recommended-service-title {
-  font-size: 18px;
-  color: #303133;
-  margin: 0 0 10px 0;
-  font-weight: 500;
-}
-
-.recommended-service-desc {
-  line-height: 1.6;
-  color: #606266;
-  font-size: 14px;
+  color: #909399;
   margin: 0;
 }
 
-/* 响应式设计 */
+/* 简介块（与 cases 的 intro 完全同款） */
+.service-intro {
+  background: #f8f9fa;
+  border-left: 4px solid #667eea;
+  padding: 16px 20px;
+  margin-bottom: 30px;
+  font-size: 16px;
+  color: #606266;
+  line-height: 1.8;
+  border-radius: 4px;
+}
+
+/* 富文本区 */
+.service-description h3 {
+  font-size: 22px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+/* ===== 相关服务推荐 ===== */
+.recommended-section {
+  background: white;
+  border-radius: 12px;
+  padding: 40px;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+}
+
+.section-title {
+  font-size: 22px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 24px 0;
+}
+
+.recommended-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.recommended-card {
+  display: block;
+  padding: 24px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e4e7ed;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  color: inherit;
+}
+
+.recommended-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.2);
+  border-color: #667eea;
+}
+
+.recommended-icon {
+  display: inline-block;
+  font-size: 24px;
+  color: #667eea;
+  margin-bottom: 12px;
+}
+
+.recommended-title {
+  font-size: 18px;
+  color: #303133;
+  margin: 0 0 8px 0;
+  font-weight: 600;
+}
+
+.recommended-desc {
+  font-size: 14px;
+  color: #909399;
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ===== 响应式 ===== */
 @media (max-width: 768px) {
-  .container {
-    padding: 15px;
-  }
-  
-  .service-card {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    padding: 20px;
+  .page-header {
+    padding: 40px 0;
   }
   
   .page-title {
-    font-size: 24px;
+    font-size: 28px;
+  }
+  
+  .container {
+    padding: 20px;
+  }
+  
+  .service-content,
+  .recommended-section {
+    padding: 24px;
   }
   
   .service-title {
-    font-size: 20px;
+    font-size: 24px;
   }
   
-  .services-grid {
+  .title-area {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .recommended-grid {
     grid-template-columns: 1fr;
   }
 }
