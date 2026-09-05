@@ -20,12 +20,12 @@ export default defineConfig({
     proxy: {
       // API 请求代理到后端
       '/api': {
-        target: 'http://localhost:3000',
+        target: 'http://localhost:3002',
         changeOrigin: true,
       },
       // 图片静态资源也代理
       '/uploads': {
-        target: 'http://localhost:3000',
+        target: 'http://localhost:3002',
         changeOrigin: true,
       },
     },

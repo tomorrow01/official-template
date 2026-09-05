@@ -6,7 +6,7 @@ module.exports = {
   dbName: 'official-template',
   
   // 服务端口
-  port: process.env.PORT || 3000,
+  port: process.env.PORT || 3002,
   
   // 环境变量
   env: process.env.NODE_ENV || 'development'

@@ -14,7 +14,7 @@ const contactsRouter = require('./routes/contacts'); // 引入 contacts 路由
 const configsRouter = require('./routes/configs'); // 引入 configs 路由
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3002;
 
 // 确保上传目录存在
 const uploadDir = path.join(__dirname, '../uploads');
@@ -77,7 +77,9 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
       return res.status(400).json({ success: false, message: '没有文件上传' });
     }
     // 拼完整 URL，这样 admin 和 frontend 都能直接显示
-    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    // 生产环境 nginx 反代时通过 X-Forwarded-Proto 传递原始协议
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+    const baseUrl = `${protocol}://${req.get('host')}`;
     const fileUrl = `${baseUrl}/uploads/${req.file.filename}`;
     res.status(200).json({
       errno: 0,

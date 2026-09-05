@@ -2,8 +2,8 @@ import axios from 'axios';
 import type { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse } from 'axios';
 import { ElMessage } from 'element-plus';
 
-// 开发环境直连后端（3001 → 3000），生产环境走相对路径依赖反向代理
-const baseURL = import.meta.dev ? 'http://localhost:3000' : '';
+// 开发环境直连后端（3001 → 3002），生产环境走相对路径依赖反向代理
+const baseURL = import.meta.dev ? 'http://localhost:3002' : '';
 
 // 创建默认的Axios实例
 const request: AxiosInstance = axios.create({

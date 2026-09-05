@@ -3,7 +3,9 @@ import { ElMessage } from 'element-plus';
 
 // 创建axios实例
 const api = axios.create({
-  baseURL: 'http://localhost:3000', // 后端服务地址
+  // 开发环境通过 vite.config.js 的 proxy 代理到 localhost:3000
+  // 生产环境通过 nginx 的 /api/ location 代理到 backend:3000
+  baseURL: '',
   timeout: 10000, // 请求超时时间
   headers: {
     'Content-Type': 'application/json'

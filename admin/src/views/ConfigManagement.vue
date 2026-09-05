@@ -240,7 +240,7 @@ async function handleTeamImageUpload(event, index) {
   try {
     const formData = new FormData();
     formData.append('file', file);
-    const res = await axios.post('http://localhost:3000/api/upload', formData, {
+    const res = await axios.post('/api/upload', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
     // 后端返回: { errno: 0, data: ["完整URL"] }

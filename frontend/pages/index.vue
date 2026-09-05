@@ -210,7 +210,7 @@
         </div>
         
         <!-- 文章网格 -->
-        <div class="article-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px;">
+        <div class="article-grid">
           <NuxtLink 
             v-for="(article, index) in latestArticles" 
             :key="article.id" 
@@ -259,7 +259,7 @@
           <p class="section-subtitle text-gray-600">汇聚行业精英，为您提供最专业的技术支持</p>
         </div>
         
-        <div class="team-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;">
+        <div class="team-grid">
           <div 
             v-for="i in 3" 
             :key="i" 
@@ -1060,7 +1060,15 @@ onUnmounted(() => {
   }
 }
 
-/* 响应式设计 */
+/* ===== 响应式设计 ===== */
+/* 基础：桌面 3 列 */
+.article-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+/* 平板：自动适配 */
 @media (max-width: 1024px) {
   .article-grid {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));

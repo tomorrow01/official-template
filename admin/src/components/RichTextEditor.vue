@@ -60,8 +60,8 @@ const toolbarConfig = {};
 
 // 自定义上传函数
 const customUpload = (file, insertFn) => {
-  // 后端 upload 接口地址（和 admin api.js 保持一致）
-  const uploadUrl = 'http://localhost:3000/api/upload';
+  // 后端 upload 接口（开发 vite proxy / 生产 nginx proxy 都代理到 backend）
+  const uploadUrl = '/api/upload';
 
   const formData = new FormData();
   formData.append('file', file);
