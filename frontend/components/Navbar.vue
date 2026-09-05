@@ -28,8 +28,8 @@
               </NuxtLink>
             </div>
           </div>
-          <NuxtLink to="/cases" class="nav-item" active-class="nav-item-active" @click.stop>客户案例</NuxtLink>
-          <NuxtLink to="/articles" class="nav-item" active-class="nav-item-active" @click.stop>最新动态</NuxtLink>
+          <NuxtLink to="/cases" class="nav-item" :class="{ 'nav-item-active': $route.path.startsWith('/cases') }" @click.stop>客户案例</NuxtLink>
+          <NuxtLink to="/articles" class="nav-item" :class="{ 'nav-item-active': $route.path.startsWith('/articles') }" @click.stop>最新动态</NuxtLink>
           <NuxtLink to="/contact" class="nav-item" active-class="nav-item-active" @click.stop>联系我们</NuxtLink>
         </div>
       </div>
@@ -82,8 +82,8 @@
                 </div>
               </transition>
             </div>
-            <NuxtLink to="/cases" class="mobile-nav-item" active-class="nav-item-active" @click="toggleMenu">客户案例</NuxtLink>
-            <NuxtLink to="/articles" class="mobile-nav-item" active-class="nav-item-active" @click="toggleMenu">最新动态</NuxtLink>
+            <NuxtLink to="/cases" class="mobile-nav-item" :class="{ 'nav-item-active': $route.path.startsWith('/cases') }" @click="toggleMenu">客户案例</NuxtLink>
+            <NuxtLink to="/articles" class="mobile-nav-item" :class="{ 'nav-item-active': $route.path.startsWith('/articles') }" @click="toggleMenu">最新动态</NuxtLink>
             <NuxtLink to="/contact" class="mobile-nav-item" active-class="nav-item-active" @click="toggleMenu">联系我们</NuxtLink>
           </div>
         </div>

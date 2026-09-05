@@ -19,10 +19,12 @@
       <!-- 服务详情内容 -->
       <div v-else-if="serviceDetail" class="service-detail-content">
         <div class="page-header">
-          <el-button type="text" icon="el-icon-arrow-left" @click="$router.back()" class="back-btn">
+          <el-button type="text" @click="$router.back()" class="back-btn">
+            <el-icon style="margin-right: 4px;"><ArrowLeft /></el-icon>
             返回
           </el-button>
           <h1 class="page-title">{{ serviceDetail.title }}</h1>
+          <p v-if="serviceDetail.subtitle" class="page-subtitle">{{ serviceDetail.subtitle }}</p>
         </div>
         
         <div class="service-card">
@@ -31,8 +33,9 @@
           </div>
           <div class="service-info">
             <h2 class="service-title">{{ serviceDetail.title }}</h2>
-            <div class="service-description">
-              {{ serviceDetail.description }}
+            <p v-if="serviceDetail.subtitle" class="service-subtitle">{{ serviceDetail.subtitle }}</p>
+            <div class="service-description" v-if="serviceDetail.intro">
+              {{ serviceDetail.intro }}
             </div>
             
             <!-- 服务附加信息 -->
@@ -50,9 +53,7 @@
         <!-- 服务详情补充内容 -->
         <div class="service-detail-section">
           <h3 class="section-title">服务详情</h3>
-          <div class="detail-content">
-            <p>{{ serviceDetail.description }}</p>
-          </div>
+          <div class="detail-content rich-text" v-html="serviceDetail.description"></div>
         </div>
         
         <!-- 推荐服务 -->
@@ -91,6 +92,7 @@
 import { ref, onMounted, computed, watch } from 'vue';
 import { useRoute, useRouter } from '#app';
 import { ElMessage, ElButton } from 'element-plus';
+import { ArrowLeft } from '@element-plus/icons-vue';
 import { getServiceDetail, getServiceList } from '@/api/services';
 import type { ServiceItem } from '@/api/services';
 import Navbar from '@/components/Navbar.vue';
@@ -218,6 +220,12 @@ onMounted(() => {
   font-weight: 600;
 }
 
+.page-subtitle {
+  font-size: 16px;
+  color: #909399;
+  margin: 8px 0 0 0;
+}
+
 /* 服务卡片 */
 .service-card {
   background: #fff;
@@ -245,6 +253,12 @@ onMounted(() => {
   color: #303133;
   margin: 0 0 15px 0;
   font-weight: 600;
+}
+
+.service-subtitle {
+  font-size: 14px;
+  color: #909399;
+  margin-bottom: 15px;
 }
 
 .service-description {
@@ -291,9 +305,7 @@ onMounted(() => {
 }
 
 .detail-content {
-  line-height: 1.8;
-  color: #606266;
-  font-size: 16px;
+  /* 富文本详细样式见 assets/css/main.css 的 .rich-text */
 }
 
 /* 推荐服务 */

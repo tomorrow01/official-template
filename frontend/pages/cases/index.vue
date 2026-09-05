@@ -41,7 +41,8 @@
           <!-- 案例描述 -->
           <div class="case-desc">
             <h3>{{ caseItem.title || '客户案例' }}</h3>
-            <p>{{ caseItem.description }}</p>
+            <p v-if="caseItem.subtitle" class="case-subtitle">{{ caseItem.subtitle }}</p>
+            <p>{{ caseItem.intro || stripHtml(caseItem.description) || '暂无简介' }}</p>
             <!-- 查看详情链接 -->
             <span class="view-detail-link">
               查看详情
@@ -80,6 +81,12 @@ const fetchCaseList = async () => {
     loadingCases.value = false;
   }
 };
+
+// 把 HTML 标签去掉，取纯文本（列表页展示富文本的 fallback）
+const stripHtml = (html) => {
+  if (!html) return ''
+  return html.replace(/<[^>]+>/g, '').trim().slice(0, 120)
+}
 
 // 组件挂载时获取数据
 onMounted(() => {
@@ -194,8 +201,14 @@ onMounted(() => {
 .case-desc h3 {
   font-size: 1.3rem;
   color: #2c3e50;
-  margin-bottom: 15px;
+  margin-bottom: 6px;
   font-weight: 600;
+}
+
+.case-subtitle {
+  font-size: 0.9rem;
+  color: #999;
+  margin-bottom: 12px;
 }
 
 .case-desc p {

@@ -16,8 +16,11 @@
       width="100%"
     >
       <el-table-column type="selection" width="55" />
-      <el-table-column prop="title" label="标题" min-width="300" />
-      <el-table-column prop="createTime" label="发布时间" min-width="180" />
+      <el-table-column prop="title" label="标题" min-width="180" />
+      <el-table-column prop="subtitle" label="副标题" min-width="150" />
+      <el-table-column prop="intro" label="简介" min-width="200" show-overflow-tooltip />
+      <el-table-column prop="author" label="作者" min-width="100" />
+      <el-table-column prop="createTime" label="发布时间" min-width="170" />
       <el-table-column prop="status" label="状态" min-width="80">
         <template #default="scope">
           <el-switch
@@ -40,25 +43,27 @@
     <el-dialog 
       v-model="showDialog" 
       :title="currentId ? '编辑动态' : '新增动态'" 
-      width="50%"
+      width="70%"
+      destroy-on-close
     >
       <el-form :model="form" :rules="rules" ref="formRef">
         <el-form-item label="标题" prop="title">
-          <el-input v-model="form.title" placeholder="请输入动态标题" />
+          <el-input v-model="form.title" placeholder="请输入动态主标题" />
+        </el-form-item>
+        <el-form-item label="副标题" prop="subtitle">
+          <el-input v-model="form.subtitle" placeholder="请输入动态副标题（选填）" />
+        </el-form-item>
+        <el-form-item label="简介" prop="intro">
+          <el-input v-model="form.intro" type="textarea" :rows="2" placeholder="请输入动态简介，用于列表页展示" />
         </el-form-item>
         <el-form-item label="作者" prop="author">
           <el-input v-model="form.author" placeholder="请输入作者名称" />
         </el-form-item>
-        <el-form-item label="内容" prop="content">
-          <el-input 
-            v-model="form.content" 
-            type="textarea" 
-            :rows="6"
-            placeholder="请输入动态内容"
-          />
+        <el-form-item label="动态内容" prop="content">
+          <RichTextEditor v-model="form.content" placeholder="请输入动态详细内容" />
         </el-form-item>
         <el-form-item label="图片链接" prop="image">
-          <el-input v-model="form.image" placeholder="请输入图片URL" />
+          <el-input v-model="form.image" placeholder="请输入封面图片URL（选填）" />
         </el-form-item>
         <el-form-item label="排序" prop="sort">
           <el-input v-model.number="form.sort" placeholder="数值越小越靠前" />
@@ -76,6 +81,7 @@
 import { ref, onMounted, nextTick } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { articlesAPI } from '../utils/api';
+import RichTextEditor from '../components/RichTextEditor.vue';
 
 // 表格数据
 const newsList = ref([]);
@@ -85,13 +91,15 @@ const loading = ref(false);
 const showDialog = ref(false);
 const form = ref({ 
   title: '', 
+  subtitle: '',
+  intro: '',
   author: '', 
   content: '',
   image: '',
   sort: 0,
   status: true
 });
-const currentId = ref(null); // 当前编辑的动态ID
+const currentId = ref(null);
 const formRef = ref(null);
 
 // 表单验证规则
@@ -105,7 +113,6 @@ const loadNewsList = async () => {
   try {
     loading.value = true;
     const response = await articlesAPI.getList();
-    // 后端返回的数据结构是{code, data, error}，需要提取data字段
     newsList.value = response.data || [];
   } catch (error) {
     ElMessage.error('加载最新动态列表失败');
@@ -118,83 +125,66 @@ const loadNewsList = async () => {
 // 新增/编辑提交逻辑
 const handleSubmit = async () => {
   try {
-    // 表单验证
     await nextTick();
     if (!form.value.title || !form.value.content) {
       ElMessage.error('请填写完整信息');
       return;
     }
 
-    console.log('准备提交动态数据:', form.value);
-    
     if (currentId.value) {
-      // 编辑：更新现有数据
-      console.log('执行更新操作，ID:', currentId.value);
-      const updateResponse = await articlesAPI.update(currentId.value, form.value);
-      console.log('更新响应:', updateResponse);
+      await articlesAPI.update(currentId.value, form.value);
       ElMessage.success('编辑成功');
     } else {
-      // 新增：添加新数据
-      console.log('执行新增操作');
-      const createResponse = await articlesAPI.create(form.value);
-      console.log('新增响应:', createResponse);
+      await articlesAPI.create(form.value);
       ElMessage.success('新增成功');
     }
 
-    // 重置对话框状态并重新加载列表
     resetForm();
     loadNewsList();
   } catch (error) {
-    console.error('提交失败详情:', error);
-    if (error.response) {
-      console.error('响应状态:', error.response.status);
-      console.error('响应数据:', error.response.data);
-    }
+    console.error('提交失败:', error);
     ElMessage.error('操作失败');
   }
 };
 
-// 编辑动态（填充表单数据）
+// 编辑动态
 const editNews = (row) => {
   showDialog.value = true;
   form.value = {
-    title: row.title,
+    title: row.title || '',
+    subtitle: row.subtitle || '',
+    intro: row.intro || '',
     author: row.author || '',
     content: row.content || '',
     image: row.image || '',
     sort: row.sort || 0,
     status: row.status !== undefined ? row.status : true
   };
-  // MongoDB使用_id作为唯一标识，但也可能有id字段
   currentId.value = row._id || row.id;
-  console.log('编辑动态ID:', currentId.value);
 };
 
-// 删除动态（带确认对话框）
+// 删除动态
 const handleDelete = async (row) => {
   try {
     await ElMessageBox.confirm('确定删除该动态？', '提示', { type: 'warning' });
     const deleteId = row._id || row.id;
-    console.log('删除动态ID:', deleteId);
     await articlesAPI.delete(deleteId);
     ElMessage.success('删除成功');
-    loadNewsList(); // 重新加载列表
+    loadNewsList();
   } catch (err) {
     if (err !== 'cancel') ElMessage.error('删除失败');
   }
 };
 
-// 切换动态状态
+// 切换状态
 const toggleStatus = async (row) => {
   try {
     const updateId = row._id || row.id;
-    console.log('更新状态ID:', updateId);
     await articlesAPI.update(updateId, { status: row.status });
     ElMessage.success('状态更新成功');
   } catch (error) {
-    ElMessage.error('状态更新失败');
-    // 回滚状态
     row.status = !row.status;
+    ElMessage.error('状态更新失败');
   }
 };
 
@@ -203,6 +193,8 @@ const resetForm = () => {
   showDialog.value = false;
   form.value = { 
     title: '', 
+    subtitle: '',
+    intro: '',
     author: '', 
     content: '',
     image: '',
@@ -212,7 +204,7 @@ const resetForm = () => {
   currentId.value = null;
 };
 
-// 初始加载
+// 页面加载
 onMounted(() => {
   loadNewsList();
 });
@@ -223,21 +215,19 @@ onMounted(() => {
   font-size: 1.25rem;
   font-weight: 600;
   margin-bottom: 1rem;
-  color: var(--text-primary); /* 同步主题色 */
+  color: var(--text-primary);
 }
 
 .el-table {
-  border: 1px solid var(--border-color); /* 同步主题边框色 */
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   overflow: hidden;
 }
 
-/* 编辑按钮（绿色） */
 .edit-btn {
   color: var(--success-color);
 }
 
-/* 删除按钮（红色） */
 .delete-btn {
   color: var(--danger-color);
 }

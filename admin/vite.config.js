@@ -15,4 +15,19 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
+  server: {
+    port: 5173,
+    proxy: {
+      // API 请求代理到后端
+      '/api': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
+      // 图片静态资源也代理
+      '/uploads': {
+        target: 'http://localhost:3000',
+        changeOrigin: true,
+      },
+    },
+  },
 })

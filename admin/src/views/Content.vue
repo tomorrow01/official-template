@@ -41,7 +41,8 @@
     <el-dialog 
       v-model="showDialog" 
       :title="currentId ? '编辑内容' : '新增内容'" 
-      width="50%"
+      width="70%"
+      destroy-on-close
     >
       <el-form :model="form" :rules="rules" ref="formRef">
         <el-form-item label="标题" prop="title">
@@ -60,12 +61,7 @@
           </el-select>
         </el-form-item>
         <el-form-item label="内容" prop="content">
-          <el-input 
-            v-model="form.content" 
-            type="textarea" 
-            :rows="6"
-            placeholder="请输入内容详情"
-          />
+          <RichTextEditor v-model="form.content" placeholder="请输入内容详情" />
         </el-form-item>
         <el-form-item label="排序" prop="sort">
           <el-input v-model.number="form.sort" placeholder="数值越小越靠前" />
@@ -83,6 +79,7 @@
 import { ref, onMounted, nextTick } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { contentsAPI } from '../utils/api';
+import RichTextEditor from '../components/RichTextEditor.vue';
 
 // 表格数据
 const contents = ref([]);

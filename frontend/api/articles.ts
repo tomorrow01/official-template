@@ -5,6 +5,8 @@ export interface Article {
   id: string;
   _id?: string;
   title: string;
+  subtitle?: string;
+  intro?: string;
   content: string;
   image?: string;
   createTime?: string;

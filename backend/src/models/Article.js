@@ -6,6 +6,16 @@ const articleSchema = new mongoose.Schema({
     required: [true, '文章标题为必填项'],
     trim: true
   },
+  subtitle: {
+    type: String,
+    trim: true,
+    default: ''
+  },
+  intro: {
+    type: String,
+    trim: true,
+    default: ''
+  },
   content: {
     type: String,
     required: [true, '文章内容为必填项'],

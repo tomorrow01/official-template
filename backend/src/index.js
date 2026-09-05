@@ -76,15 +76,16 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
     if (!req.file) {
       return res.status(400).json({ success: false, message: '没有文件上传' });
     }
-    const fileUrl = `/uploads/${req.file.filename}`;
+    // 拼完整 URL，这样 admin 和 frontend 都能直接显示
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const fileUrl = `${baseUrl}/uploads/${req.file.filename}`;
     res.status(200).json({
-      success: true,
-      message: '文件上传成功',
-      data: { fileUrl }
+      errno: 0,
+      data: [fileUrl]
     });
   } catch (error) {
     res.status(500).json({
-      success: false,
+      errno: 1,
       message: `上传失败：${error.message}`
     });
   }

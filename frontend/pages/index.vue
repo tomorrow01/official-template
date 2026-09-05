@@ -139,10 +139,13 @@
             <!-- 卡片内部：标题和详情在下 -->
             <div style="padding: 24px !important; width: 100%; box-sizing: border-box;">
               <!-- 标题 -->
-              <h3 style="font-size: 20px; font-weight: 600; margin: 0 0 15px 0 !important; padding: 0 !important; color: #333; width: 100%; box-sizing: border-box;">{{ service.title }}</h3>
+              <h3 style="font-size: 20px; font-weight: 600; margin: 0 0 6px 0 !important; padding: 0 !important; color: #333; width: 100%; box-sizing: border-box;">{{ service.title }}</h3>
+              
+              <!-- 副标题 -->
+              <p v-if="service.subtitle" style="font-size: 13px; color: #999; margin: 0 0 10px 0 !important;">{{ service.subtitle }}</p>
               
               <!-- 详情 -->
-              <p style="line-height: 1.6; margin: 0 0 20px 0 !important; padding: 0 !important; color: #666; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; width: 100%; box-sizing: border-box;">{{ service.description || service.desc || '为客户提供专业的技术解决方案，助力业务增长和数字化转型。' }}</p>
+              <p style="line-height: 1.6; margin: 0 0 20px 0 !important; padding: 0 !important; color: #666; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; text-overflow: ellipsis; width: 100%; box-sizing: border-box;">{{ service.intro || stripHtml(service.description) || '为客户提供专业的技术解决方案，助力业务增长和数字化转型。' }}</p>
               
               <!-- 跳转到详情页面的按钮 -->
               <ClientOnly>
@@ -161,20 +164,26 @@
       <div style="max-width: 1100px; margin: 0 auto; padding: 50px 20px;">
         <h2 style="text-align: center; margin-bottom: 30px;">成功合作案例</h2>
         
-        <div v-for="caseItem in cases" :key="caseItem.id" style="display: flex; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); overflow: hidden; margin-bottom: 30px;">
+        <NuxtLink 
+          v-for="caseItem in cases" 
+          :key="caseItem.id" 
+          :to="`/cases/${caseItem.id}`"
+          style="display: flex; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); overflow: hidden; margin-bottom: 30px; text-decoration: none; color: inherit; transition: all 0.3s ease;"
+          onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.15)';"
+          onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)';"
+        >
           <!-- 左侧图片 -->
-          <div style="width: 350px; height: 250px; overflow: hidden;">
+          <div style="width: 350px; height: 250px; overflow: hidden; flex-shrink: 0;">
             <img :src="caseItem.image" :alt="caseItem.title || caseItem.description" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease; transform: scale(1);" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
           </div>
           <!-- 右侧内容 -->
           <div style="padding: 30px; flex: 1; background-color: white;">
-            <h3 style="margin-bottom: 15px; font-size: 22px; font-weight: 600;">{{ caseItem.title || '客户案例' }}</h3>
-            <p style="line-height: 1.6; margin-bottom: 20px; color: #333;">{{ caseItem.description }}</p>
-            <NuxtLink :to="`/cases/${caseItem.id}`" style="text-decoration: none;">
-              <button style="background: #1677ff; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; box-shadow: 0 2px 8px rgba(22, 119, 255, 0.3); transition: all 0.3s ease;">了解更多</button>
-            </NuxtLink>
+            <h3 style="margin-bottom: 6px; font-size: 22px; font-weight: 600;">{{ caseItem.title || '客户案例' }}</h3>
+            <p v-if="caseItem.subtitle" style="font-size: 13px; color: #999; margin-bottom: 12px;">{{ caseItem.subtitle }}</p>
+            <p style="line-height: 1.6; margin-bottom: 20px; color: #333;">{{ caseItem.intro || stripHtml(caseItem.description) || '暂无简介' }}</p>
+            <span style="display: inline-block; background: #1677ff; color: white; padding: 10px 20px; border-radius: 4px; font-weight: 500;">了解更多 →</span>
           </div>
-        </div>
+        </NuxtLink>
       </div>
     </div>
 
@@ -235,11 +244,12 @@
             </div>
             <!-- 文字内容区域 -->
             <div style="padding: 20px;">
-              <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 12px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; color: #333;" class="group-hover:text-primary">
+              <h3 style="font-size: 18px; font-weight: 600; margin-bottom: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; color: #333;" class="group-hover:text-primary">
                 {{ article.title || '文章标题' }}
               </h3>
+              <p v-if="article.subtitle" style="font-size: 13px; color: #999; margin-bottom: 10px;">{{ article.subtitle }}</p>
               <p style="font-size: 14px; line-height: 1.6; color: #666; margin-bottom: 16px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
-                {{ article.excerpt || '这是一篇关于技术趋势和解决方案的文章，包含最新的行业动态和专业分析。' }}
+                {{ article.intro || article.excerpt || '这是一篇关于技术趋势和解决方案的文章...' }}
               </p>
               <!-- 底部信息区域 -->
               <ClientOnly>
@@ -404,6 +414,12 @@ const fetchCaseList = async () => {
   }
 };
 
+// 把 HTML 标签去掉，取纯文本
+const stripHtml = (html) => {
+  if (!html) return ''
+  return html.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim()
+}
+
 // 获取最新文章数据（后端真实数据，取前3条）
 const fetchLatestArticles = async () => {
   try {
@@ -411,7 +427,7 @@ const fetchLatestArticles = async () => {
     latestArticles.value = list.slice(0, 3).map(item => ({
       ...item,
       image: item.image || `https://picsum.photos/seed/${item.title || item._id}/600/400`,
-      excerpt: item.content ? item.content.replace(/<[^>]+>/g, '').substring(0, 100) + '...' : '',
+      excerpt: stripHtml(item.content).slice(0, 100) + '...',
     }));
   } catch (err) {
     console.error('获取文章数据失败:', err);

@@ -15,11 +15,17 @@
       <div v-if="!loading && article" class="article-detail-card">
         <!-- 文章标题 -->
         <h1 class="article-title">{{ article.title }}</h1>
+        <p v-if="article.subtitle" class="article-subtitle">{{ article.subtitle }}</p>
         
         <!-- 文章元信息 -->
         <div class="article-meta">
           <span v-if="article.createTime" class="publish-date">发布时间：{{ formatDate(article.createTime) }}</span>
           <span class="author" v-if="article.author">作者：{{ article.author }}</span>
+        </div>
+        
+        <!-- 文章简介 -->
+        <div v-if="article.intro" class="article-intro">
+          {{ article.intro }}
         </div>
         
         <!-- 文章封面图 -->
@@ -28,7 +34,7 @@
         </div>
         
         <!-- 文章内容 -->
-        <div class="article-content" v-html="article.content"></div>
+        <div class="article-content rich-text" v-html="article.content"></div>
       </div>
       
       <!-- 加载状态 -->
@@ -140,8 +146,25 @@ onMounted(() => {
   font-size: 28px;
   font-weight: 600;
   color: var(--text-primary);
-  margin-bottom: 20px;
+  margin-bottom: 8px;
   line-height: 1.4;
+}
+
+.article-subtitle {
+  font-size: 16px;
+  color: #909399;
+  margin-bottom: 20px;
+}
+
+.article-intro {
+  background: #f8f9fa;
+  border-left: 4px solid #409eff;
+  padding: 16px 20px;
+  margin-bottom: 30px;
+  font-size: 15px;
+  color: #606266;
+  line-height: 1.8;
+  border-radius: 4px;
 }
 
 .article-meta {
@@ -173,20 +196,7 @@ onMounted(() => {
 }
 
 .article-content {
-  font-size: 16px;
-  line-height: 1.8;
-  color: var(--text-secondary);
-}
-
-.article-content p {
-  margin-bottom: 20px;
-}
-
-.article-content img {
-  max-width: 100%;
-  height: auto;
-  margin: 20px 0;
-  border-radius: 4px;
+  /* 富文本详细样式见 assets/css/main.css 的 .rich-text */
 }
 
 .loading-container,

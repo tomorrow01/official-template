@@ -34,6 +34,7 @@
           </div>
           <div class="article-info">
             <h3>{{ article.title }}</h3>
+            <p v-if="article.subtitle" class="subtitle">{{ article.subtitle }}</p>
             <p class="excerpt">{{ article.excerpt }}</p>
             <div class="article-meta">
               <span class="date">{{ formatDate(article.createTime) }}</span>
@@ -90,69 +91,29 @@ const fetchArticles = async () => {
   loading.value = true;
   error.value = null;
   try {
-    console.log(`开始获取第${currentPage.value}页的文章列表...`);
-    const res = await getArticleList({ page: currentPage.value, limit: pageSize.value });
+    // getArticleList 已返回数组，且已把 _id 归一化为 id
+    const list = await getArticleList({ page: currentPage.value, limit: pageSize.value });
+    total.value = list.length;
     
-    // 正确提取数据
-    const data = res.data || res;
-    articles.value = Array.isArray(data.records || data.list || data) ? 
-      (data.records || data.list || data) : [];
-    total.value = data.total || articles.value.length;
-    
-    // 格式化文章数据
-    articles.value = articles.value.map(article => ({
-      id: article._id || article.id,
-      title: article.title,
-      excerpt: article.content ? article.content.substring(0, 150) + '...' : '',
-      createTime: article.createTime || article.createdAt,
-      views: article.views || 0,
-      image: article.image || '/images/article-placeholder.jpg'
+    articles.value = list.map(article => ({
+      ...article,
+      id: article.id || article._id,
+      // 优先用 intro，没有就从 content 里剥离 HTML 标签取纯文本
+      excerpt: article.intro || stripHtml(article.content).slice(0, 150) || '暂无简介',
+      image: article.image || `https://picsum.photos/seed/${article.title || article._id}/600/400`,
     }));
-    
-    console.log('获取到的文章列表数据:', articles.value);
   } catch (err) {
     console.error('获取文章列表失败:', err);
     error.value = '获取文章列表失败，请稍后重试';
-    
-    // 出错时使用模拟数据
-    articles.value = [
-      {
-        id: '1',
-        title: 'Vue 3新特性解读',
-        excerpt: '深入解析Vue 3组合式API的优势，对比选项式API的性能提升与开发体验优化...',
-        createTime: '2024-07-10',
-        views: 1253,
-        image: '/images/article1-placeholder.jpg'
-      },
-      {
-        id: '2',
-        title: '前端性能优化指南',
-        excerpt: '从资源加载（懒加载/预加载）到渲染优化（虚拟列表/防抖节流）的全流程实践方案...',
-        createTime: '2024-07-09',
-        views: 987,
-        image: '/images/article2-placeholder.jpg'
-      },
-      {
-        id: '3',
-        title: 'Nuxt 3实战经验分享',
-        excerpt: '使用Nuxt 3构建SEO友好的企业级应用，包含路由、状态管理、API集成等关键点...',
-        createTime: '2024-07-05',
-        views: 764,
-        image: '/images/article3-placeholder.jpg'
-      },
-      {
-        id: '4',
-        title: 'Element Plus组件库使用技巧',
-        excerpt: '如何灵活运用Element Plus组件库构建美观、响应式的企业级界面，包含自定义主题...',
-        createTime: '2024-07-01',
-        views: 892,
-        image: '/images/article4-placeholder.jpg'
-      }
-    ];
-    total.value = articles.value.length;
   } finally {
     loading.value = false;
   }
+};
+
+// 把 HTML 标签去掉，取纯文本
+const stripHtml = (html) => {
+  if (!html) return ''
+  return html.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim()
 };
 
 // 处理分页大小变化
@@ -281,12 +242,18 @@ onMounted(() => {
 
 .article-info h3 {
   font-size: 20px;
-  margin-bottom: 12px;
+  margin-bottom: 6px;
   color: #333;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+.subtitle {
+  font-size: 13px;
+  color: #999;
+  margin-bottom: 12px;
 }
 
 .excerpt {

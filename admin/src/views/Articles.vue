@@ -41,22 +41,24 @@
     <el-dialog 
       v-model="showDialog" 
       :title="currentId ? '编辑文章' : '新增文章'" 
-      width="50%"
+      width="70%"
+      destroy-on-close
     >
       <el-form :model="form" :rules="rules" ref="formRef">
         <el-form-item label="标题" prop="title">
-          <el-input v-model="form.title" placeholder="请输入文章标题" />
+          <el-input v-model="form.title" placeholder="请输入文章主标题" />
+        </el-form-item>
+        <el-form-item label="副标题" prop="subtitle">
+          <el-input v-model="form.subtitle" placeholder="请输入文章副标题（选填）" />
+        </el-form-item>
+        <el-form-item label="简介" prop="intro">
+          <el-input v-model="form.intro" type="textarea" :rows="3" placeholder="请输入文章简介，用于列表页展示" />
         </el-form-item>
         <el-form-item label="作者" prop="author">
           <el-input v-model="form.author" placeholder="请输入作者名称" />
         </el-form-item>
         <el-form-item label="内容" prop="content">
-          <el-input 
-            v-model="form.content" 
-            type="textarea" 
-            :rows="6"
-            placeholder="请输入文章内容"
-          />
+          <RichTextEditor v-model="form.content" placeholder="请输入文章内容" />
         </el-form-item>
         <el-form-item label="排序" prop="sort">
           <el-input v-model.number="form.sort" placeholder="数值越小越靠前" />
@@ -74,6 +76,7 @@
 import { ref, onMounted, nextTick } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { articlesAPI } from '../utils/api';
+import RichTextEditor from '../components/RichTextEditor.vue';
 
 // 表格数据
 const articles = ref([]);
@@ -83,6 +86,8 @@ const loading = ref(false);
 const showDialog = ref(false);
 const form = ref({ 
   title: '', 
+  subtitle: '',
+  intro: '',
   author: '', 
   content: '',
   sort: 0,
@@ -157,6 +162,8 @@ const editArticle = (row) => {
   showDialog.value = true;
   form.value = {
     title: row.title,
+    subtitle: row.subtitle || '',
+    intro: row.intro || '',
     author: row.author,
     content: row.content || '',
     sort: row.sort || 0,
@@ -200,6 +207,8 @@ const resetForm = () => {
   showDialog.value = false;
   form.value = { 
     title: '', 
+    subtitle: '',
+    intro: '',
     author: '', 
     content: '',
     sort: 0,

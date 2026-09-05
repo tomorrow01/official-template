@@ -5,6 +5,8 @@ export interface CaseItem {
   _id?: string;
   id?: string;
   title?: string;
+  subtitle?: string;
+  intro?: string;
   description: string;
   image?: string;
   order?: number;

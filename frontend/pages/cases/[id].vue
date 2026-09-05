@@ -1,5 +1,7 @@
 <template>
   <div class="simple-case-detail">
+    <Navbar />
+    
     <!-- 页面标题 -->
     <div class="page-header">
       <div class="container">
@@ -29,6 +31,7 @@
       <!-- 案例内容 -->
       <div v-else class="case-content">
         <h2 class="case-title">{{ detail.title || '客户案例' }}</h2>
+        <p v-if="detail.subtitle" class="case-subtitle">{{ detail.subtitle }}</p>
         <p v-if="detail.createTime" class="case-date">{{ formatDate(detail.createTime) }}</p>
         
         <!-- 案例图片 -->
@@ -36,13 +39,20 @@
           <img :src="detail.image" :alt="detail.title || detail.description" class="case-image">
         </div>
         
-        <!-- 案例描述 -->
+        <!-- 案例简介 -->
+        <div v-if="detail.intro" class="case-intro">
+          {{ detail.intro }}
+        </div>
+        
+        <!-- 案例详情（富文本） -->
         <div class="case-description">
           <h3>案例详情</h3>
-          <p>{{ detail.description }}</p>
+          <div class="rich-text" v-html="detail.description"></div>
         </div>
       </div>
     </div>
+    
+    <Footer />
   </div>
 </template>
 
@@ -50,6 +60,8 @@
 import { ref, onMounted, watch } from 'vue';
 import { useRoute } from '#app';
 import { getCaseDetail } from '@/api/cases';
+import Navbar from '@/components/Navbar.vue';
+import Footer from '@/components/Footer.vue';
 
 definePageMeta({ ssr: false });
 
@@ -157,7 +169,13 @@ onMounted(() => {
   font-size: 28px;
   font-weight: 600;
   color: #333;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
+}
+
+.case-subtitle {
+  font-size: 16px;
+  color: #909399;
+  margin-bottom: 12px;
 }
 
 .case-date {
@@ -186,11 +204,17 @@ onMounted(() => {
   margin-bottom: 20px;
 }
 
-.case-description p {
+/* 富文本详细样式见 assets/css/main.css 的 .rich-text */
+
+.case-intro {
+  background: #f8f9fa;
+  border-left: 4px solid #667eea;
+  padding: 16px 20px;
+  margin-bottom: 30px;
   font-size: 16px;
-  line-height: 1.8;
   color: #606266;
-  margin-bottom: 15px;
+  line-height: 1.8;
+  border-radius: 4px;
 }
 
 @media (max-width: 768px) {

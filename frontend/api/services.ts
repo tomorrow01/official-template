@@ -6,6 +6,8 @@ export interface ServiceItem {
   id?: string;
   icon?: string;
   title: string;
+  subtitle?: string;
+  intro?: string;
   description: string;
   desc?: string;
   image?: string;

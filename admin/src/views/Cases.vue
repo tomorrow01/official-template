@@ -50,17 +50,24 @@
     <el-dialog 
       v-model="showDialog" 
       :title="currentId ? '编辑案例' : '新增案例'" 
-      width="50%"
+      width="70%"
+      destroy-on-close
     >
       <el-form :model="form" :rules="rules" ref="formRef">
         <el-form-item label="案例标题" prop="title">
-          <el-input v-model="form.title" placeholder="请输入案例标题" />
+          <el-input v-model="form.title" placeholder="请输入案例主标题" />
+        </el-form-item>
+        <el-form-item label="副标题" prop="subtitle">
+          <el-input v-model="form.subtitle" placeholder="请输入案例副标题（选填）" />
+        </el-form-item>
+        <el-form-item label="简介" prop="intro">
+          <el-input v-model="form.intro" type="textarea" :rows="2" placeholder="请输入案例简介，用于列表页展示" />
         </el-form-item>
         <el-form-item label="案例图片" prop="image">
           <el-input v-model="form.image" placeholder="请输入案例图片URL" />
         </el-form-item>
-        <el-form-item label="案例描述" prop="description">
-          <el-input v-model="form.description" type="textarea" placeholder="请输入案例描述" :rows="3" />
+        <el-form-item label="案例详情" prop="description">
+          <RichTextEditor v-model="form.description" placeholder="请输入案例详细描述" />
         </el-form-item>
         <el-form-item label="排序" prop="order">
           <el-input-number v-model="form.order" min="1" placeholder="请输入排序值" />
@@ -81,6 +88,7 @@
 import { ref, onMounted, nextTick } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { casesAPI } from '../utils/api';
+import RichTextEditor from '../components/RichTextEditor.vue';
 
 // 案例数据列表
 const cases = ref([]);
@@ -88,7 +96,7 @@ const loading = ref(false);
 
 // 对话框状态管理
 const showDialog = ref(false);
-const form = ref({ title: '', image: '', description: '', order: 1, isActive: true });
+const form = ref({ title: '', subtitle: '', intro: '', image: '', description: '', order: 1, isActive: true });
 const currentId = ref(null); // 当前编辑的案例ID
 
 // 表单验证规则
@@ -186,7 +194,7 @@ const handleSubmit = async () => {
 
     // 重置对话框状态
     showDialog.value = false;
-    form.value = { title: '', image: '', description: '', order: 1, isActive: true };
+    form.value = { title: '', subtitle: '', intro: '', image: '', description: '', order: 1, isActive: true };
     currentId.value = null;
   } catch (error) {
     console.error('提交案例数据失败:', error);
@@ -199,6 +207,8 @@ const editCase = (row) => {
   showDialog.value = true;
   form.value = {
     title: row.title || '',
+    subtitle: row.subtitle || '',
+    intro: row.intro || '',
     image: row.image,
     description: row.description,
     order: row.order,

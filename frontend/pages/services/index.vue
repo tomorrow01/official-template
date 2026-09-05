@@ -41,8 +41,9 @@
           </div>
           <div class="service-content">
             <h3>{{ service.title }}</h3>
-            <p>{{ service.desc || '服务描述' }}</p>
-            <NuxtLink :to="`/services/${service.id}`" class="service-btn">
+            <p v-if="service.subtitle" class="service-subtitle">{{ service.subtitle }}</p>
+            <p>{{ service.intro || stripHtml(service.description) || '暂无简介' }}</p>
+            <NuxtLink :to="`/services/${service.id || service._id}`" class="service-btn">
               查看详情 →
             </NuxtLink>
           </div>
@@ -111,6 +112,12 @@ const fetchServices = async () => {
   } finally {
     loading.value = false
   }
+}
+
+// 把 HTML 标签去掉，取纯文本（列表页展示富文本的 fallback）
+const stripHtml = (html) => {
+  if (!html) return ''
+  return html.replace(/<[^>]+>/g, '').trim().slice(0, 120)
 }
 
 onMounted(() => {
@@ -192,9 +199,15 @@ onMounted(() => {
 
 .service-content h3 {
   margin-top: 0;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
   font-size: 1.5rem;
   color: #333;
+}
+
+.service-subtitle {
+  font-size: 0.9rem;
+  color: #999;
+  margin-bottom: 10px;
 }
 
 .service-content p {

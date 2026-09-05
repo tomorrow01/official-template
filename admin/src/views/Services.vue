@@ -42,14 +42,21 @@
     <el-dialog 
       v-model="showDialog" 
       :title="currentId ? '编辑服务' : '新增服务'" 
-      width="50%"
+      width="70%"
+      destroy-on-close
     >
       <el-form :model="form" :rules="rules" ref="formRef">
         <el-form-item label="服务名称" prop="title">
-          <el-input v-model="form.title" placeholder="请输入服务名称" />
+          <el-input v-model="form.title" placeholder="请输入服务主标题" />
         </el-form-item>
-        <el-form-item label="服务描述" prop="description">
-          <el-input v-model="form.description" type="textarea" placeholder="请输入服务描述" :rows="3" />
+        <el-form-item label="副标题" prop="subtitle">
+          <el-input v-model="form.subtitle" placeholder="请输入服务副标题（选填）" />
+        </el-form-item>
+        <el-form-item label="简介" prop="intro">
+          <el-input v-model="form.intro" type="textarea" :rows="2" placeholder="请输入服务简介，用于列表页展示" />
+        </el-form-item>
+        <el-form-item label="服务详情" prop="description">
+          <RichTextEditor v-model="form.description" placeholder="请输入服务详细描述" />
         </el-form-item>
         <el-form-item label="图标名称" prop="icon">
           <el-input v-model="form.icon" placeholder="请输入Element Plus图标名称，如：el-icon-s-grid" />
@@ -73,6 +80,7 @@
 import { ref, onMounted, nextTick } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { servicesAPI } from '../utils/api';
+import RichTextEditor from '../components/RichTextEditor.vue';
 
 // 服务数据列表
 const services = ref([]);
@@ -80,7 +88,7 @@ const loading = ref(false);
 
 // 对话框状态管理
 const showDialog = ref(false);
-const form = ref({ title: '', description: '', icon: '', order: 1, isActive: true });
+const form = ref({ title: '', subtitle: '', intro: '', description: '', icon: '', order: 1, isActive: true });
 const currentId = ref(null); // 当前编辑的服务ID
 
 // 表单验证规则
@@ -182,7 +190,7 @@ const handleSubmit = async () => {
 
     // 重置对话框状态
     showDialog.value = false;
-    form.value = { title: '', description: '', icon: '', order: 1, isActive: true };
+    form.value = { title: '', subtitle: '', intro: '', description: '', icon: '', order: 1, isActive: true };
     currentId.value = null;
     // 重新加载列表确保数据一致性
     loadServices();
@@ -197,6 +205,8 @@ const editService = (row) => {
   showDialog.value = true;
   form.value = {
     title: row.title,
+    subtitle: row.subtitle || '',
+    intro: row.intro || '',
     description: row.description,
     icon: row.icon,
     order: row.order,

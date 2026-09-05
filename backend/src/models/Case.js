@@ -6,6 +6,16 @@ const caseSchema = new mongoose.Schema({
     required: [true, '案例标题为必填项'],
     trim: true
   },
+  subtitle: {
+    type: String,
+    trim: true,
+    default: ''
+  },
+  intro: {
+    type: String,
+    trim: true,
+    default: ''
+  },
   description: {
     type: String,
     required: [true, '案例描述为必填项'],
