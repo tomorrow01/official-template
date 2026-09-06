@@ -1,5 +1,4 @@
 import { defineNuxtConfig } from 'nuxt/config'
-import { resolve } from 'path'
 
 export default defineNuxtConfig({
   // 只保留最基本的配置
@@ -28,14 +27,14 @@ export default defineNuxtConfig({
       title: '官方网站',
       meta: [
         { name: 'charset', content: 'utf-8' },
-        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        // viewport-fit=cover 支持 iPhone 刘海屏安全区域
+        { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' },
         { name: 'description', content: '官网描述' }
       ]
     }
   },
-  // API 代理 + 生产端口
+  // API 代理（生产端口通过环境变量 PORT=3001 传入，不在此处配置）
   nitro: {
-    port: 3001, // 生产环境默认监听 3001（避免和服务器老项目 3000 冲突）
     devProxy: {
       '/api': {
         target: 'http://127.0.0.1:3002',

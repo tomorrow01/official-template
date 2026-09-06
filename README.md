@@ -186,9 +186,9 @@ ls -la .output/server/index.mjs
 cd /www/wwwroot/official/backend
 pm2 start "node src/index.js" --name official-backend
 
-# frontend（默认端口已写死 3001）
+# frontend（端口通过 PORT 环境变量传入）
 cd /www/wwwroot/official/frontend
-pm2 start "node .output/server/index.mjs" --name official-frontend
+PORT=3001 pm2 start "node .output/server/index.mjs" --name official-frontend
 
 # 保存 + 开机自启
 pm2 save && pm2 startup

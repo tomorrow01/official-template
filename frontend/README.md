@@ -37,8 +37,8 @@ tar -xzf official-frontend.tar.gz && rm -f official-frontend.tar.gz
 # 确认产物存在
 ls -la .output/server/index.mjs
 
-# 启动（端口 3001 已在 nuxt.config.ts 写死，无需 PORT 环境变量）
-pm2 start "node .output/server/index.mjs" --name official-frontend
+# 启动（生产端口通过 PORT 环境变量传入，nuxt.config.ts 中 nitro 不支持 port 字段）
+PORT=3001 pm2 start "node .output/server/index.mjs" --name official-frontend
 
 # 保存 + 开机自启
 pm2 save && pm2 startup

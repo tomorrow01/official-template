@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
 // 从环境变量获取数据库配置
 // 使用127.0.0.1（IPv4）而不是localhost，解决某些环境下的连接问题
@@ -36,6 +37,22 @@ const insertDefaultData = async () => {
     const Service = require('../models/Service');
     const Case = require('../models/Case');
     const Article = require('../models/Article');
+    const User = require('../models/User');
+
+    // ===== 幂等创建默认管理员账号 =====
+    const adminCount = await User.countDocuments({ role: 'admin' });
+    if (adminCount === 0) {
+      const hash = await bcrypt.hash('123456', 10);
+      await User.create({
+        username: 'admin',
+        passwordHash: hash,
+        role: 'admin',
+        isActive: true
+      });
+      console.log('默认管理员账号已创建：admin / 123456');
+    } else {
+      console.log(`已存在 ${adminCount} 个管理员账号，跳过创建`);
+    }
     
     // 插入默认轮播图数据
     const bannerCount = await Banner.countDocuments();

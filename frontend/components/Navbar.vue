@@ -193,8 +193,9 @@ onUnmounted(() => {
 
 <style scoped>
 .navbar {
-  background-color: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
+  /* 微信 X5 内核不支持 backdrop-filter，会导致子元素不可交互
+     使用更不透明的纯白背景作为兜底，保证可用性 */
+  background-color: rgba(255, 255, 255, 0.98);
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   padding: var(--spacing-md) 0;
   box-shadow: var(--shadow-light);
@@ -332,6 +333,9 @@ onUnmounted(() => {
   align-items: center;
   justify-content: space-between;
   padding: var(--spacing-md) 0;
+  /* 消除移动端点击延迟 + tap 高亮 */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .mobile-dropdown-toggle .dropdown-arrow {
@@ -354,6 +358,9 @@ onUnmounted(() => {
   font-size: 14px;
   color: #666;
   border-bottom: 1px solid #f0f0f0;
+  /* 消除移动端点击延迟 + tap 高亮 */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .mobile-dropdown-menu .dropdown-item:last-child {
@@ -424,6 +431,9 @@ onUnmounted(() => {
   position: relative;
   padding: 0;
   transition: all 0.3s ease;
+  /* 消除移动端 300ms 点击延迟 + iOS/微信 tap 高亮 */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .mobile-menu-btn:hover {
@@ -485,7 +495,7 @@ onUnmounted(() => {
   z-index: 51;
   display: flex;
   justify-content: flex-end;
-  backdrop-filter: blur(2px);
+  /* 移除 backdrop-filter：微信 X5 不支持，会导致子元素不可交互 */
 }
 
 .mobile-menu {
@@ -513,6 +523,9 @@ onUnmounted(() => {
   justify-content: center;
   padding: 0;
   transition: transform 0.3s ease;
+  /* 消除移动端点击延迟 + tap 高亮 */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .mobile-close-btn:hover {
@@ -554,6 +567,9 @@ onUnmounted(() => {
   padding: var(--spacing-lg) var(--spacing-md);
   border-bottom: 1px solid #f0f0f0;
   transition: all 0.3s ease;
+  /* 消除移动端点击延迟 + tap 高亮 */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .mobile-nav-item:hover {

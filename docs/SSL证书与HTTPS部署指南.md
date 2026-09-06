@@ -249,9 +249,9 @@ pm2 start src/index.js --name backend
 pm2 save
 pm2 startup  # 开机自启
 
-# frontend（Nuxt SSR）
+# frontend（Nuxt SSR，端口通过 PORT 环境变量传入）
 cd /www/wwwroot/official/frontend
-pm2 start .output/server/index.mjs --name frontend
+PORT=3001 pm2 start .output/server/index.mjs --name frontend
 pm2 save
 ```
 

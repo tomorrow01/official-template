@@ -5,6 +5,8 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const { connectDB, insertDefaultData } = require('./utils/db'); // 引入数据库连接函数
+const { authMiddleware } = require('./middleware/auth');
+
 const articlesRouter = require('./routes/articles');
 const contentsRouter = require('./routes/contents');
 const bannersRouter = require('./routes/banners');
@@ -12,6 +14,8 @@ const casesRouter = require('./routes/cases'); // 引入 cases 路由
 const servicesRouter = require('./routes/services'); // 引入 services 路由
 const contactsRouter = require('./routes/contacts'); // 引入 contacts 路由
 const configsRouter = require('./routes/configs'); // 引入 configs 路由
+const authRouter = require('./routes/auth'); // 引入 auth 路由
+const usersRouter = require('./routes/users'); // 引入 users 路由
 
 const app = express();
 const port = process.env.PORT || 3002;
@@ -42,6 +46,26 @@ app.get('/api', (req, res) => {
   res.json({ success: true, message: 'API服务正常运行' });
 });
 
+// ===== 鉴权中间件：所有 POST/PUT/DELETE 必须登录 =====
+// GET 请求保持公开（前端官网渲染用）
+// /api/auth/login 本身要放行（不能要求登录才能登录）
+// /api/contacts POST 也要放行（前端官网公开联系表单）
+const PUBLIC_POST_PATHS = ['/auth/login', '/contacts'];
+app.use('/api', (req, res, next) => {
+  if (['POST', 'PUT', 'DELETE'].includes(req.method)) {
+    // 公开写接口放行
+    if (PUBLIC_POST_PATHS.some(p => req.path === p || req.path.startsWith(p + '/'))) {
+      return next();
+    }
+    return authMiddleware(req, res, next);
+  }
+  // GET /api/auth/me 也需要鉴权（验证 token 用）
+  if (req.method === 'GET' && req.path === '/auth/me') {
+    return authMiddleware(req, res, next);
+  }
+  next();
+});
+
 // 配置 multer 用于文件上传
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -70,7 +94,7 @@ const upload = multer({
   }
 });
 
-// 文件上传接口
+// 文件上传接口（POST /api/upload 已被上面的 auth 中间件覆盖）
 app.post('/api/upload', upload.single('file'), (req, res) => {
   try {
     if (!req.file) {
@@ -95,6 +119,10 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
 
 // 添加详细的路由挂载日志（所有路由都使用/api前缀）
 console.log('开始挂载路由...');
+console.log('挂载 /api/auth 路由（登录/改密/me）');
+app.use('/api/auth', authRouter);
+console.log('挂载 /api/users 路由（账号管理，admin only）');
+app.use('/api/users', usersRouter);
 console.log('挂载 /api/articles 路由');
 app.use('/api/articles', articlesRouter);
 console.log('挂载 /api/contents 路由');
@@ -107,8 +135,8 @@ console.log('挂载 /api/services 路由');
 app.use('/api/services', servicesRouter);
 console.log('挂载 /api/contacts 路由');
 app.use('/api/contacts', contactsRouter);
-// 添加不带/api前缀的路由用于处理表单提交
-console.log('挂载 /contacts 路由');
+// 不带/api前缀的路由用于前端官网公开表单提交（POST /contacts 不能加鉴权！）
+console.log('挂载 /contacts 路由（公开表单，无鉴权）');
 app.use('/contacts', contactsRouter);
 console.log('挂载 /api/configs 路由');
 app.use('/api/configs', configsRouter);

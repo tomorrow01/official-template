@@ -82,7 +82,7 @@
           </div>
           
           <div class="form-group">
-            <label>主题</label>
+            <label>主题 <span class="required">*</span></label>
             <input 
               v-model="formData.subject" 
               type="text" 
@@ -201,8 +201,14 @@ const validateForm = () => {
     }
   }
   
-  // 主题验证（可选字段，但如果填写了则验证长度）
-  if (formData.subject.trim() && formData.subject.trim().length > 50) {
+  // 主题验证（必填，后端要求）
+  if (!formData.subject.trim()) {
+    formErrors.subject = '请输入消息主题'
+    isValid = false
+  } else if (formData.subject.trim().length < 2) {
+    formErrors.subject = '主题长度至少为2个字符'
+    isValid = false
+  } else if (formData.subject.trim().length > 50) {
     formErrors.subject = '主题长度不能超过50个字符'
     isValid = false
   }

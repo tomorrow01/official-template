@@ -1,30 +1,32 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { getToken } from '../utils/api'
 import Login from '../views/Login.vue'
-import Dashboard from '../views/Dashboard.vue'  // 新增：导入后台主页
-import Articles from '../views/Articles.vue'    // 新增：文章管理页
-import Banners from '../views/Banners.vue'      // 新增：轮播图管理页
-import Content from '../views/Content.vue'      // 新增：内容管理页
-import LatestNews from '../views/LatestNews.vue' // 新增：最新动态管理页
-import CasesManagement from '../views/CasesManagement.vue' // 新增：客户案例管理页
-import ConfigManagement from '../views/ConfigManagement.vue'  // 新增：配置管理页
+import Dashboard from '../views/Dashboard.vue'
+import Articles from '../views/Articles.vue'
+import Banners from '../views/Banners.vue'
+import Content from '../views/Content.vue'
+import LatestNews from '../views/LatestNews.vue'
+import CasesManagement from '../views/CasesManagement.vue'
+import ConfigManagement from '../views/ConfigManagement.vue'
+import AccountManage from '../views/AccountManage.vue'
 
 const routes = [
   { path: '/', redirect: '/login' },
-  { path: '/login', component: Login },
-  // 新增：后台主页及子路由
+  { path: '/login', component: Login, meta: { public: true } },
   { 
     path: '/dashboard', 
     component: Dashboard,
-    redirect: '/dashboard/config', // 默认重定向到配置管理
+    redirect: '/dashboard/config',
     children: [
-      { path: 'config', component: ConfigManagement },  // 新增：配置管理路由
-      { path: 'articles', component: Articles },   // 文章管理
-      { path: 'banners', component: Banners },     // 轮播图管理
-      { path: 'content', component: Content },     // 内容管理
-      { path: 'services', name: 'ServicesManagement', component: () => import('../views/Services.vue'), meta: { title: '核心服务管理' } },     // 核心服务管理
-      { path: 'cases', name: 'CasesManagement', component: CasesManagement, meta: { title: '客户案例管理' } },           // 客户案例管理
-      { path: 'latest-news', component: LatestNews },                             // 最新动态管理
-      { path: 'contacts', component: () => import('../views/Contacts.vue') }      // 联系表单管理
+      { path: 'config', component: ConfigManagement },
+      { path: 'articles', component: Articles },
+      { path: 'banners', component: Banners },
+      { path: 'content', component: Content },
+      { path: 'services', name: 'ServicesManagement', component: () => import('../views/Services.vue'), meta: { title: '核心服务管理' } },
+      { path: 'cases', name: 'CasesManagement', component: CasesManagement, meta: { title: '客户案例管理' } },
+      { path: 'latest-news', component: LatestNews },
+      { path: 'contacts', component: () => import('../views/Contacts.vue') },
+      { path: 'account', component: AccountManage, meta: { adminOnly: true } }
     ]
   }
 ]
@@ -32,6 +34,29 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes
+})
+
+// ===== 全局路由守卫 =====
+router.beforeEach((to, from, next) => {
+  const token = getToken();
+
+  // 公开路由（登录页）：已登录就跳 dashboard
+  if (to.meta.public) {
+    if (token) {
+      next('/dashboard');
+    } else {
+      next();
+    }
+    return;
+  }
+
+  // 非公开路由：没 token 去登录
+  if (!token) {
+    next({ path: '/login', query: { redirect: to.fullPath } });
+    return;
+  }
+
+  next();
 })
 
 export default router

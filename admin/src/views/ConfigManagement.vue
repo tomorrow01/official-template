@@ -121,7 +121,7 @@
                       class="team-input"
                     />
                   </div>
-                  <!-- 删除按钮 -->
+                  <!-- 删除按钮：默认定位在 card 右上角（移动端好用），PC 端单独覆盖 -->
                   <el-button
                     type="danger"
                     size="small"
@@ -396,8 +396,10 @@ loadConfigs();
   gap: 20px;
 }
 
+/* 团队成员卡片 —— PC 端让它成为删除按钮的定位参照物 */
 .team-card {
   width: 100%;
+  position: relative;
 }
 
 .team-card-inner {
@@ -414,6 +416,7 @@ loadConfigs();
   align-items: center;
   gap: 8px;
   flex-shrink: 0;
+  position: relative;   /* 删除按钮 absolute 定位的参照物 */
 }
 
 .team-image-box {
@@ -465,26 +468,41 @@ loadConfigs();
   width: 100%;
 }
 
-/* 删除按钮 */
+/* 删除按钮 —— 默认（移动端）定位在 card-inner 右上角 */
 .team-delete-btn {
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 6px;
+  right: 6px;
+  z-index: 10;
 }
 
-/* 隐藏 file input */
-.hidden {
-  display: none;
+/* 强制圆形（所有断点通用） */
+:deep(.team-delete-btn.el-button) {
+  width: 32px !important;
+  height: 32px !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+  max-width: 32px !important;
+  max-height: 32px !important;
+  padding: 0 !important;
+  line-height: 32px !important;
+  border-radius: 50% !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+  flex-shrink: 0 !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
-.action-buttons {
-  margin-top: 40px;
-  display: flex;
-  justify-content: center;
-  gap: 20px;
+:deep(.team-delete-btn .el-icon) {
+  font-size: 16px !important;
+  width: 16px !important;
+  height: 16px !important;
+  line-height: 16px !important;
 }
 
-/* 响应式 */
+/* ========== 响应式 ========== */
 @media (max-width: 768px) {
   .team-card-inner {
     flex-direction: column;
@@ -492,6 +510,39 @@ loadConfigs();
   }
   .team-info-col {
     width: 100%;
+  }
+  /* 移动端按钮保持原样，缩小一号 */
+  .team-delete-btn {
+    top: 4px;
+    right: 4px;
+  }
+  :deep(.team-delete-btn.el-button) {
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px !important;
+    min-height: 28px !important;
+    max-width: 28px !important;
+    max-height: 28px !important;
+    line-height: 28px !important;
+  }
+  :deep(.team-delete-btn .el-icon) {
+    font-size: 14px !important;
+    width: 14px !important;
+    height: 14px !important;
+    line-height: 14px !important;
+  }
+}
+
+/* ========== 仅 PC 端 (≥769px) ========== */
+@media (min-width: 769px) {
+  /* 让 el-card 不裁掉探出的删除按钮 */
+  .team-card :deep(.el-card__body) {
+    overflow: visible;
+  }
+  /* 核心修复：给右侧输入框区让出 42px 的右侧空间
+     这样无论删除按钮在哪里都不会盖住输入框 */
+  .team-info-col {
+    padding-right: 42px;
   }
 }
 </style>

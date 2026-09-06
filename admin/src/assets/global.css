@@ -245,4 +245,115 @@ body {
     margin: 10px;
     padding: 15px;
   }
+
+  /* 表格：允许横向滚动，移动端不会挤变形 */
+  .el-table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* 对话框：移动端占 95% 宽度 */
+  .el-dialog {
+    width: 95% !important;
+    margin: 2vh auto !important;
+  }
+  .el-dialog__body {
+    padding: 16px;
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+
+  /* 表单：让表单项更紧凑 */
+  .el-form-item {
+    margin-bottom: 14px;
+  }
+
+  /* 分页：缩小 */
+  .el-pagination {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  .el-pagination button,
+  .el-pagination li {
+    min-width: 28px;
+    height: 28px;
+    line-height: 26px;
+    font-size: 12px;
+  }
+
+  /* 按钮：触控区放大 + 禁用 tap 高亮 */
+  .el-button {
+    padding: 8px 16px;
+    font-size: 14px;
+    min-height: 40px;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* 标签宽度自动，不要固定那么宽 */
+  .el-form-item__label {
+    float: none;
+    display: block;
+    text-align: left !important;
+    margin-bottom: 6px;
+    width: auto !important;
+    line-height: 1.6;
+  }
+  .el-form-item__content {
+    margin-left: 0 !important;
+    width: 100%;
+  }
+
+  /* body 字体缩小一点 */
+  body {
+    font-size: 13px;
+  }
+
+  /* 隐藏滚动条（移动端看着干净），但保证能滚 */
+  ::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+    display: none;
+  }
+
+  /* ========== 表格 fixed 列解锁 ========== */
+  /* Element Plus 的 fixed="right"/"left" 列用 position: sticky，
+     在移动端横向滚动时遮罩层和列会错位，强制解锁让它跟普通列一起滚 */
+  .el-table .el-table__fixed,
+  .el-table .el-table__fixed-right,
+  .el-table .el-table__fixed-left,
+  .el-table .el-table__fixed-patch,
+  .el-table .el-table__fixed-right-patch,
+  .el-table .el-table__fixed-left-patch {
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    box-shadow: none !important;
+  }
+  /* 去掉 fixed 列和普通列之间的分割阴影 */
+  .el-table__inner-wrapper::before,
+  .el-table__inner-wrapper::after {
+    display: none !important;
+  }
+
+  /* ========== 对话框宽度覆盖 ========== */
+  /* Element Plus dialog 的 width 是 inline style，用 !important 覆盖 */
+  .el-dialog {
+    width: 95vw !important;
+    max-width: 95vw !important;
+    margin: 2vh auto !important;
+  }
+
+  /* ========== 富文本编辑器：移动端缩小 ========== */
+  .w-e-text-container {
+    min-height: 180px !important;
+  }
+  .w-e-toolbar {
+    flex-wrap: wrap;
+    gap: 2px;
+  }
+  .w-e-bar-item {
+    margin: 0 !important;
+  }
 }

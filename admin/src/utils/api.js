@@ -1,34 +1,27 @@
 import axios from 'axios';
 import { ElMessage } from 'element-plus';
+import router from '../router';
+
+// 本地存储 token 的 key
+const TOKEN_KEY = 'admin-token';
+const USER_KEY = 'admin-user';
 
 // 创建axios实例
 const api = axios.create({
-  // 开发环境通过 vite.config.js 的 proxy 代理到 localhost:3000
-  // 生产环境通过 nginx 的 /api/ location 代理到 backend:3000
   baseURL: '',
-  timeout: 10000, // 请求超时时间
+  timeout: 15000,
   headers: {
     'Content-Type': 'application/json'
   }
 });
 
-// 添加请求日志拦截器
+// 请求拦截器：注入 Bearer token
 api.interceptors.request.use(
   config => {
-    console.log('请求URL:', config.baseURL + config.url);
-    console.log('请求参数:', config.params || {});
-    return config;
-  },
-  error => {
-    console.error('请求错误:', error);
-    return Promise.reject(error);
-  }
-);
-
-// 请求拦截器
-api.interceptors.request.use(
-  config => {
-    // 可以在这里添加token等认证信息
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
   error => {
@@ -36,38 +29,111 @@ api.interceptors.request.use(
   }
 );
 
-// 响应拦截器
+// 响应拦截器：统一处理 401 + 错误提示
 api.interceptors.response.use(
   response => {
-    return response.data;
+    // 后端返回 { code, data, error } 结构
+    const res = response.data;
+    const isLoginEndpoint = response.config.url?.includes('/auth/login');
+    if (res && typeof res === 'object' && 'code' in res) {
+      if (res.code === 401) {
+        handle401(res.error || '未授权', isLoginEndpoint);
+        return Promise.reject(new Error(res.error || '未授权'));
+      }
+      if (res.code === 403) {
+        ElMessage.error(res.error || '权限不足');
+        return Promise.reject(new Error(res.error || '权限不足'));
+      }
+      if (res.code >= 400) {
+        ElMessage.error(res.error || '请求失败');
+        return Promise.reject(new Error(res.error || '请求失败'));
+      }
+    }
+    return res;
   },
   error => {
-    let errorMessage = '请求失败，请稍后重试';
     if (error.response) {
-      switch (error.response.status) {
-        case 401:
-          errorMessage = '未授权，请重新登录';
-          // 可以在这里添加跳转到登录页的逻辑
-          break;
-        case 404:
-          errorMessage = '请求的资源不存在';
-          break;
-        case 500:
-          errorMessage = '服务器错误';
-          break;
-        default:
-          errorMessage = error.response.data?.message || errorMessage;
+      const status = error.response.status;
+      const msg = error.response.data?.error || error.response.data?.message || `请求失败 (${status})`;
+      const isLoginEndpoint = error.config?.url?.includes('/auth/login');
+
+      if (status === 401) {
+        handle401(msg, isLoginEndpoint);
+      } else if (status === 403) {
+        ElMessage.error(msg || '权限不足');
+      } else {
+        ElMessage.error(msg);
       }
     } else if (error.request) {
-      errorMessage = '网络错误，请检查网络连接';
+      ElMessage.error('网络错误，请检查网络连接');
+    } else {
+      ElMessage.error('请求配置错误');
     }
-    
-    ElMessage.error(errorMessage);
     return Promise.reject(error);
   }
 );
 
-// 导出API方法
+// 处理 401：清 token + 跳登录
+function handle401(msg, isAuthEndpoint = false) {
+  // 登录接口本身返回 401 说明用户名密码错，不该清 token 也不该跳页
+  if (isAuthEndpoint) {
+    ElMessage.error(msg || '用户名或密码错误');
+    return;
+  }
+  // 其他接口的 401 才算 token 过期
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(USER_KEY);
+  if (router.currentRoute.value.path !== '/login') {
+    ElMessage.warning(msg || '登录已过期，请重新登录');
+    router.push('/login');
+  }
+}
+
+// ===== 通用方法 =====
+export function getToken() {
+  return localStorage.getItem(TOKEN_KEY);
+}
+
+export function setToken(token) {
+  localStorage.setItem(TOKEN_KEY, token);
+}
+
+export function clearAuth() {
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(USER_KEY);
+}
+
+export function getCurrentUser() {
+  try {
+    return JSON.parse(localStorage.getItem(USER_KEY)) || null;
+  } catch {
+    return null;
+  }
+}
+
+export function setCurrentUser(user) {
+  localStorage.setItem(USER_KEY, JSON.stringify(user));
+}
+
+// ===== 认证相关 API =====
+export const authAPI = {
+  login: (username, password) => api.post('/api/auth/login', { username, password }),
+  me: () => api.get('/api/auth/me'),
+  changePassword: (oldPassword, newPassword) =>
+    api.post('/api/auth/change-password', { oldPassword, newPassword })
+};
+
+// ===== 用户管理 API (admin only) =====
+export const usersAPI = {
+  getList: () => api.get('/api/users'),
+  create: (data) => api.post('/api/users', data),
+  update: (id, data) => api.put(`/api/users/${id}`, data),
+  delete: (id) => api.delete(`/api/users/${id}`),
+  resetPassword: (id, newPassword) =>
+    api.put(`/api/users/${id}/reset-password`, { newPassword })
+};
+
+// ===== 原有业务 API =====
 export const articlesAPI = {
   getList: () => api.get('/api/articles'),
   getById: (id) => api.get(`/api/articles/${id}`),
@@ -79,43 +145,23 @@ export const articlesAPI = {
 export const bannersAPI = {
   getList: () => api.get('/api/banners'),
   getById: (id) => api.get(`/api/banners/${id}`),
-  create: async (data) => {
-    const response = await api.post('/api/banners', data);
-    console.log('创建轮播图返回:', response);
-    return response;
-  },
-  update: async (id, data) => {
-    const response = await api.put(`/api/banners/${id}`, data);
-    console.log('更新轮播图返回:', response);
-    return response;
-  },
+  create: (data) => api.post('/api/banners', data),
+  update: (id, data) => api.put(`/api/banners/${id}`, data),
   delete: (id) => api.delete(`/api/banners/${id}`)
 };
 
 export const casesAPI = {
   getList: () => api.get('/api/cases'),
   getById: (id) => api.get(`/api/cases/${id}`),
-  create: async (data) => {
-    const response = await api.post('/api/cases', data);
-    console.log('创建案例返回:', response);
-    return response;
-  },
-  update: async (id, data) => {
-    const response = await api.put(`/api/cases/${id}`, data);
-    console.log('更新案例返回:', response);
-    return response;
-  },
+  create: (data) => api.post('/api/cases', data),
+  update: (id, data) => api.put(`/api/cases/${id}`, data),
   delete: (id) => api.delete(`/api/cases/${id}`)
 };
 
 export const servicesAPI = {
   getList: () => api.get('/api/services'),
   getById: (id) => api.get(`/api/services/${id}`),
-  create: async (data) => {
-    const response = await api.post('/api/services', data);
-    console.log('创建服务返回:', response);
-    return response;
-  },
+  create: (data) => api.post('/api/services', data),
   update: (id, data) => api.put(`/api/services/${id}`, data),
   delete: (id) => api.delete(`/api/services/${id}`)
 };
