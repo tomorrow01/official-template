@@ -33,8 +33,9 @@ export default defineNuxtConfig({
       ]
     }
   },
-  // API 代理：使用 nitro.devProxy（Nuxt 3 下 vite.server.proxy 不会生效）
+  // API 代理 + 生产端口
   nitro: {
+    port: 3001, // 生产环境默认监听 3001（避免和服务器老项目 3000 冲突）
     devProxy: {
       '/api': {
         target: 'http://127.0.0.1:3002',
