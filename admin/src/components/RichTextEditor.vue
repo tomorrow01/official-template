@@ -18,18 +18,17 @@
 
     <!-- 编辑器 -->
     <Editor
-      :value="modelValue"
+      v-model="innerHtml"
       :default-config="editorConfig"
       mode="default"
       @onCreated="handleCreated"
-      @onChange="handleChange"
       style="height: 300px; overflow-y: auto;"
     />
   </div>
 </template>
 
 <script setup>
-import { ref, shallowRef, onBeforeUnmount, watch } from 'vue';
+import { shallowRef, computed, onBeforeUnmount } from 'vue';
 import { ElMessage } from 'element-plus';
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue';
 import axios from 'axios';
@@ -58,6 +57,15 @@ const editorRef = shallowRef();
 
 const toolbarConfig = {};
 
+// wangEditor 的 Editor 组件通过 modelValue 双向绑定：
+// 1. 创建编辑器时用 modelValue 作为初始 HTML（编辑回显的关键）
+// 2. 内容变化时组件内部 emit update:modelValue
+// 注意：必须传 modelValue（v-model），传 :value 组件不认，会导致打开编辑时内容空白
+const innerHtml = computed({
+  get: () => props.modelValue || '',
+  set: (val) => emit('update:modelValue', val),
+});
+
 // 自定义上传函数
 const customUpload = (file, insertFn) => {
   // 后端 upload 接口（开发 vite proxy / 生产 nginx proxy 都代理到 backend）
@@ -66,9 +74,13 @@ const customUpload = (file, insertFn) => {
   const formData = new FormData();
   formData.append('file', file);
 
+  // 手动注入 Bearer token（原生 axios 没有拦截器，需自己加）
+  const token = localStorage.getItem('admin-token');
+
   axios.post(uploadUrl, formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
+      'Authorization': token ? `Bearer ${token}` : '',
     },
     timeout: 15000,
   })
@@ -102,19 +114,6 @@ const editorConfig = {
 const handleCreated = (editor) => {
   editorRef.value = editor;
 };
-
-const handleChange = (editor) => {
-  emit('update:modelValue', editor.getHtml());
-};
-
-watch(
-  () => props.modelValue,
-  (newVal) => {
-    if (editorRef.value && newVal !== editorRef.value.getHtml()) {
-      editorRef.value.setHtml(newVal || '');
-    }
-  }
-);
 
 onBeforeUnmount(() => {
   const editor = editorRef.value;

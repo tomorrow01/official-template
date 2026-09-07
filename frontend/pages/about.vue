@@ -157,10 +157,11 @@ function avatarInitial(name) {
 // 记录哪些成员的图片加载失败了 → fallback 到占位头像
 const brokenImgIndexes = ref(new Set());
 
-// 判断图片路径是否有效（非空 + http 开头的完整 URL + 没加载失败过）
+// 判断图片路径是否有效（非空 + http(s) 完整 URL 或以 / 开头的相对路径 + 没加载失败过）
 function hasValidImage(url, index) {
   if (!url || typeof url !== 'string') return false;
-  if (!/^https?:\/\//i.test(url)) return false;
+  // 支持三种格式：https://xxx、http://xxx、/uploads/xxx 相对路径
+  if (!/^https?:\/\//i.test(url) && !url.startsWith('/')) return false;
   if (index !== undefined && brokenImgIndexes.value.has(index)) return false;
   return true;
 }

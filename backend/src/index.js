@@ -100,11 +100,10 @@ app.post('/api/upload', upload.single('file'), (req, res) => {
     if (!req.file) {
       return res.status(400).json({ success: false, message: '没有文件上传' });
     }
-    // 拼完整 URL，这样 admin 和 frontend 都能直接显示
-    // 生产环境 nginx 反代时通过 X-Forwarded-Proto 传递原始协议
-    const protocol = req.headers['x-forwarded-proto'] || req.protocol;
-    const baseUrl = `${protocol}://${req.get('host')}`;
-    const fileUrl = `${baseUrl}/uploads/${req.file.filename}`;
+    // 返回相对路径，避免硬编码域名
+    // 前端请求 admin.meifu.site/uploads/xxx.jpg 或 official.meifu.site/uploads/xxx.jpg
+    // 都会由各自 nginx 反代到后端 3002 的 /uploads/ 静态目录
+    const fileUrl = `/uploads/${req.file.filename}`;
     res.status(200).json({
       errno: 0,
       data: [fileUrl]

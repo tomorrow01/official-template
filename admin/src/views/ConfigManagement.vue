@@ -240,8 +240,13 @@ async function handleTeamImageUpload(event, index) {
   try {
     const formData = new FormData();
     formData.append('file', file);
+    // 手动注入 Bearer token（原生 axios 没有拦截器，需自己加）
+    const token = localStorage.getItem('admin-token');
     const res = await axios.post('/api/upload', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        'Authorization': token ? `Bearer ${token}` : ''
+      }
     });
     // 后端返回: { errno: 0, data: ["完整URL"] }
     const url = res?.data?.data?.[0];
