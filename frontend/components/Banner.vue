@@ -20,7 +20,7 @@
     >
       <el-carousel-item v-for="(item, index) in banners" :key="item.id || index">
         <NuxtLink :to="item.link || '#'" class="banner-link block w-full h-full relative overflow-hidden">
-          <div class="absolute inset-0 bg-gradient-to-r from-black/60 to-black/30 z-10"></div>
+          <div class="banner-overlay absolute inset-0 z-10"></div>
           <img 
             :src="item.image" 
             :alt="item.title || '轮播图'" 
@@ -136,6 +136,14 @@ onUnmounted(() => {
 .banner-link {
   position: relative;
   overflow: hidden;
+}
+
+/* 图片上的深色渐变遮罩（原 Tailwind bg-gradient-to-r from-black/60 to-black/30 类不生效，显式补上，保证白色标题可读） */
+.banner-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.3));
+  pointer-events: none;
 }
 
 /* 轮播图图片样式 */

@@ -11,7 +11,7 @@
           onmouseover="this.style.transform='scale(1.1)'" 
           onmouseout="this.style.transform='scale(1)'"
         >
-        <div class="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40"></div>
+        <div class="hero-overlay absolute inset-0 z-10"></div>
       </div>
       <div class="container relative z-10 py-20 md:py-28">
         <div class="max-w-3xl">
@@ -148,24 +148,30 @@
     </section>
 
     <!-- 客户案例 - 动态渲染 -->
-    <div>
-      <div style="max-width: 1100px; margin: 0 auto; padding: 50px 20px;">
-        <h2 style="text-align: center; margin-bottom: 30px;">成功合作案例</h2>
-        
+    <section class="cases-section py-12 bg-white" style="margin-top: 0; margin-bottom: 0;">
+      <div class="container">
+        <!-- 区块标题 -->
+        <div class="section-header text-center mb-12 max-w-3xl mx-auto">
+          <span class="section-tag text-primary font-medium">客户案例</span>
+          <h2 class="section-title text-3xl md:text-4xl font-bold mt-2 mb-4">成功合作案例</h2>
+          <p class="section-subtitle text-gray-600">我们为众多企业提供了优质的解决方案，赢得了客户的广泛认可</p>
+        </div>
+
         <NuxtLink 
           v-for="caseItem in cases" 
           :key="caseItem.id" 
           :to="`/cases/${caseItem.id}`"
+          class="case-card-link"
           style="display: flex; border: 1px solid #e0e0e0; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); overflow: hidden; margin-bottom: 30px; text-decoration: none; color: inherit; transition: all 0.3s ease;"
           onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.15)';"
           onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)';"
         >
           <!-- 左侧图片 -->
-          <div style="width: 350px; height: 250px; overflow: hidden; flex-shrink: 0;">
+          <div class="case-card-image" style="width: 350px; height: 250px; overflow: hidden; flex-shrink: 0;">
             <img :src="caseItem.image" :alt="caseItem.title || caseItem.description" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease; transform: scale(1);" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
           </div>
           <!-- 右侧内容 -->
-          <div style="padding: 30px; flex: 1; background-color: white;">
+          <div class="case-card-body" style="padding: 30px; flex: 1; background-color: white;">
             <h3 style="margin-bottom: 6px; font-size: 22px; font-weight: 600;">{{ caseItem.title || '客户案例' }}</h3>
             <p v-if="caseItem.subtitle" style="font-size: 13px; color: #999; margin-bottom: 12px;">{{ caseItem.subtitle }}</p>
             <p style="line-height: 1.6; margin-bottom: 20px; color: #333;">{{ caseItem.intro || stripHtml(caseItem.description) || '暂无简介' }}</p>
@@ -173,7 +179,7 @@
           </div>
         </NuxtLink>
       </div>
-    </div>
+    </section>
 
     <!-- 数据统计 -->
     <section class="stats-section py-16 bg-gradient-to-r from-primary to-secondary text-white">
@@ -540,6 +546,32 @@ onUnmounted(() => {
   position: relative;
 }
 
+/* 区块背景（模板里的 Tailwind 类 bg-white / bg-gray-50 不生效，这里显式补上，
+   保持 白→灰→白→蓝→灰→白→蓝 的交替节奏） */
+.features-section {
+  background: #ffffff;
+}
+.services-section {
+  background: #f7f8fa;
+}
+.cases-section {
+  background: #ffffff;
+}
+.latest-articles {
+  background: #f7f8fa;
+}
+.team-section {
+  background: #ffffff;
+}
+
+/* Hero 图片上的深色渐变遮罩（保证白色标题可读） */
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.4));
+  pointer-events: none;
+}
+
 /* 移除顶部边框以消除视觉缝隙 */
 .services-section,
 .cases-section,
@@ -567,6 +599,9 @@ onUnmounted(() => {
 /* 数据统计区域优化 */
 .stats-section {
   padding: 4rem 0;
+  /* 模板的 bg-gradient-to-r from-primary to-secondary 类不生效，显式补渐变背景 */
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  color: #ffffff;
 }
 
 /* 服务区块样式 */
@@ -745,6 +780,17 @@ onUnmounted(() => {
 /* 案例展示样式 */
 .cases-section {
   position: relative;
+}
+
+/* 首页案例卡片：移动端改为上下堆叠，避免固定 350px 图片挤压文字 */
+@media (max-width: 768px) {
+  .case-card-link {
+    flex-direction: column !important;
+  }
+  .case-card-image {
+    width: 100% !important;
+    height: 200px !important;
+  }
 }
 
 .cases-carousel {
@@ -974,6 +1020,8 @@ onUnmounted(() => {
   position: relative;
   overflow: hidden;
   margin-top: 2rem;
+  /* 模板的 bg-gradient-to-r from-primary to-secondary 类不生效，显式补渐变背景 */
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
 }
 
 .cta-content {
@@ -1008,10 +1056,23 @@ onUnmounted(() => {
   text-decoration: none;
 }
 
+/* 主按钮：白底蓝字（模板 bg-white text-primary 类不生效，显式补上，避免蓝按钮压蓝底看不清） */
+.cta-btn {
+  background: #ffffff;
+  color: var(--primary-color);
+}
+.cta-btn:hover {
+  background: #f0f3ff;
+  color: var(--primary-dark);
+}
+
 .cta-btn-outline {
   background: transparent;
   border: 2px solid white;
   color: white;
+}
+.cta-btn-outline:hover {
+  background: rgba(255, 255, 255, 0.15);
 }
 
 /* 快速导航按钮样式 */

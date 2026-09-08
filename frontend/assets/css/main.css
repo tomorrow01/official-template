@@ -23,23 +23,30 @@ body {
 
 /* 现代官网主题变量 */
 :root {
+  /* 强制浅色配色方案：本网站按浅色主题设计（只有 footer 是深色），
+     防止移动端/微信浏览器跟随系统深色模式后整页变黑底白字 */
+  color-scheme: light;
+
   /* 颜色系统 */
   --primary-color: #4361ee;
   --primary-light: #4895ef;
   --primary-dark: #3f37c9;
   --secondary-color: #4cc9f0;
   --accent-color: #f72585;
-  
-  /* 文字颜色 */
+
+  /* 文字颜色（别名变量，供 scoped 样式引用，如 var(--text-dark)） */
   --text-primary: #2b2d42;
   --text-secondary: #6c757d;
   --text-tertiary: #adb5bd;
   --text-light: #f8f9fa;
-  
+  --text-dark: #2b2d42;
+  --text-muted: #6c757d;
+
   /* 背景颜色 */
   --bg-base: #f8f9fa;
   --bg-container: #ffffff;
   --bg-card: #ffffff;
+  --bg-light: #f8f9fa;
   --bg-dark: #2b2d42;
   --bg-gradient: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
   
@@ -75,17 +82,8 @@ body {
   --transition-slow: 0.5s ease;
 }
 
-/* 深色模式支持 */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text-primary: #f8f9fa;
-    --text-secondary: #adb5bd;
-    --bg-base: #121212;
-    --bg-container: #1e1e1e;
-    --bg-card: #252525;
-    --border-color: #333333;
-  }
-}
+/* 深色模式支持已移除：本站为纯浅色主题（仅 footer 为深色），
+   深色模式会把 --bg-base 变成黑色，导致跟随系统深色的手机/微信浏览器整页变黑 */
 
 /* 通用工具类 */
 .text-center {
