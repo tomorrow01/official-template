@@ -57,6 +57,37 @@
         <el-form-item label="作者" prop="author">
           <el-input v-model="form.author" placeholder="请输入作者名称" />
         </el-form-item>
+        <el-form-item label="封面图片" prop="image">
+          <div class="cover-uploader">
+            <div v-if="form.image" class="cover-preview">
+              <img :src="normalizeImageUrl(form.image)" alt="封面预览">
+            </div>
+            <input
+              ref="coverInputRef"
+              type="file"
+              accept="image/*"
+              style="display: none;"
+              @change="handleCoverUpload"
+            >
+            <el-button
+              size="small"
+              :loading="uploading"
+              @click="coverInputRef && coverInputRef.click()"
+            >
+              {{ form.image ? '更换图片' : '上传封面' }}
+            </el-button>
+            <el-button
+              v-if="form.image"
+              size="small"
+              type="danger"
+              plain
+              @click="form.image = ''"
+            >
+              移除
+            </el-button>
+            <span class="cover-tip">支持 jpg/png/gif/webp，大小不超过 5MB（选填）</span>
+          </div>
+        </el-form-item>
         <el-form-item label="内容" prop="content">
           <RichTextEditor v-model="form.content" placeholder="请输入文章内容" />
         </el-form-item>
@@ -75,12 +106,17 @@
 <script setup>
 import { ref, onMounted, nextTick } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
-import { articlesAPI } from '../utils/api';
+import { articlesAPI, uploadAPI } from '../utils/api';
+import { normalizeImageUrl } from '../utils/imageUrl';
 import RichTextEditor from '../components/RichTextEditor.vue';
 
 // 表格数据
 const articles = ref([]);
 const loading = ref(false);
+
+// 封面上传相关
+const coverInputRef = ref(null);
+const uploading = ref(false);
 
 // 对话框状态管理
 const showDialog = ref(false);
@@ -89,6 +125,7 @@ const form = ref({
   subtitle: '',
   intro: '',
   author: '', 
+  image: '',
   content: '',
   sort: 0,
   status: true
@@ -165,6 +202,7 @@ const editArticle = (row) => {
     subtitle: row.subtitle || '',
     intro: row.intro || '',
     author: row.author,
+    image: row.image || '',
     content: row.content || '',
     sort: row.sort || 0,
     status: row.status !== undefined ? row.status : true
@@ -172,6 +210,40 @@ const editArticle = (row) => {
   // MongoDB使用_id作为唯一标识，但也可能有id字段
   currentId.value = row._id || row.id;
   console.log('编辑文章ID:', currentId.value);
+};
+
+// 封面图片上传（复用团队头像上传的成熟模式：原生 input + axios 手动带 token）
+const handleCoverUpload = async (event) => {
+  const file = event.target.files?.[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) {
+    ElMessage.error('请选择图片文件');
+    event.target.value = '';
+    return;
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    ElMessage.error('图片大小不能超过 5MB');
+    event.target.value = '';
+    return;
+  }
+  try {
+    uploading.value = true;
+    // 走统一 api 实例：自动带 token，401 时统一提示并跳登录页
+    const url = await uploadAPI.uploadImage(file);
+    if (url) {
+      form.value.image = url;
+      ElMessage.success('封面上传成功');
+    } else {
+      ElMessage.error('上传失败：未获取到图片地址');
+    }
+  } catch (err) {
+    // 错误提示（含 401 跳登录）已由统一拦截器处理，这里只记录日志
+    console.error('封面上传失败:', err);
+  } finally {
+    // 清空 input，让同一个文件可以重复选择
+    event.target.value = '';
+    uploading.value = false;
+  }
 };
 
 // 删除文章（带确认对话框）
@@ -210,6 +282,7 @@ const resetForm = () => {
     subtitle: '',
     intro: '',
     author: '', 
+    image: '',
     content: '',
     sort: 0,
     status: true
@@ -245,5 +318,36 @@ onMounted(() => {
 /* 删除按钮（红色） */
 .delete-btn {
   color: var(--danger-color);
+}
+
+/* 封面图片上传 */
+.cover-uploader {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.cover-preview {
+  width: 160px;
+  height: 100px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--bg-light, #f5f7fa);
+}
+
+.cover-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cover-tip {
+  width: 100%;
+  font-size: 12px;
+  color: #909399;
+  line-height: 1.4;
 }
 </style>

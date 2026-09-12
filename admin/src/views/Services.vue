@@ -17,6 +17,18 @@
     >
       <el-table-column type="selection" width="55" />
       <el-table-column prop="title" label="服务名称" min-width="180" />
+      <el-table-column prop="image" label="封面图" min-width="120">
+        <template #default="scope">
+          <el-image
+            v-if="scope.row.image"
+            :src="normalizeImageUrl(scope.row.image)"
+            :preview-src-list="[normalizeImageUrl(scope.row.image)]"
+            fit="cover"
+            style="width: 100px; height: 60px; cursor: pointer;"
+          />
+          <span v-else style="color: #999;">无</span>
+        </template>
+      </el-table-column>
       <el-table-column prop="description" label="服务描述" min-width="400" />
       <el-table-column prop="icon" label="图标名称" min-width="150" />
       <el-table-column prop="order" label="排序" min-width="100" />
@@ -55,6 +67,9 @@
         <el-form-item label="简介" prop="intro">
           <el-input v-model="form.intro" type="textarea" :rows="2" placeholder="请输入服务简介，用于列表页展示" />
         </el-form-item>
+        <el-form-item label="封面图片" prop="image">
+          <CoverUploader v-model="form.image" button-text="上传封面" tip="用于首页及服务列表卡片展示，建议 600×400，支持 jpg/png/gif/webp，不超过 5MB（选填）" />
+        </el-form-item>
         <el-form-item label="服务详情" prop="description">
           <RichTextEditor v-model="form.description" placeholder="请输入服务详细描述" />
         </el-form-item>
@@ -80,7 +95,9 @@
 import { ref, onMounted, nextTick } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { servicesAPI } from '../utils/api';
+import { normalizeImageUrl } from '../utils/imageUrl';
 import RichTextEditor from '../components/RichTextEditor.vue';
+import CoverUploader from '../components/CoverUploader.vue';
 
 // 服务数据列表
 const services = ref([]);
@@ -88,7 +105,7 @@ const loading = ref(false);
 
 // 对话框状态管理
 const showDialog = ref(false);
-const form = ref({ title: '', subtitle: '', intro: '', description: '', icon: '', order: 1, isActive: true });
+const form = ref({ title: '', subtitle: '', intro: '', image: '', description: '', icon: '', order: 1, isActive: true });
 const currentId = ref(null); // 当前编辑的服务ID
 
 // 表单验证规则
@@ -120,6 +137,9 @@ const loadServices = async () => {
     services.value = serviceData.map(service => ({
       _id: service._id || service.id || `temp-${Date.now()}-${Math.random()}`,
       title: service.title || '',
+      subtitle: service.subtitle || '',
+      intro: service.intro || '',
+      image: service.image || '',
       description: service.description || '',
       icon: service.icon || '',
       order: service.order || 0,
@@ -190,7 +210,7 @@ const handleSubmit = async () => {
 
     // 重置对话框状态
     showDialog.value = false;
-    form.value = { title: '', subtitle: '', intro: '', description: '', icon: '', order: 1, isActive: true };
+    form.value = { title: '', subtitle: '', intro: '', image: '', description: '', icon: '', order: 1, isActive: true };
     currentId.value = null;
     // 重新加载列表确保数据一致性
     loadServices();
@@ -207,6 +227,7 @@ const editService = (row) => {
     title: row.title,
     subtitle: row.subtitle || '',
     intro: row.intro || '',
+    image: row.image || '',
     description: row.description,
     icon: row.icon,
     order: row.order,

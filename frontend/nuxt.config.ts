@@ -33,10 +33,21 @@ export default defineNuxtConfig({
       ]
     }
   },
-  // API 代理（生产端口通过环境变量 PORT=3001 传入，不在此处配置）
+  // API 与静态资源代理（dev + 生产均生效）
+  // 注意：nitro.devProxy 仅在 dev 模式生效；生产环境（node .output/server/index.mjs）
+  // 必须通过 routeRules.proxy 才能把 /api、/uploads 转发到后端 3002。
+  routeRules: {
+    '/api/**': { proxy: 'http://127.0.0.1:3002/api/**' },
+    '/uploads/**': { proxy: 'http://127.0.0.1:3002/uploads/**' }
+  },
   nitro: {
     devProxy: {
       '/api': {
+        target: 'http://127.0.0.1:3002',
+        changeOrigin: true
+      },
+      // 上传的图片由后端静态托管，本地开发也需要代理，否则 /uploads 会落到 Nuxt 路由
+      '/uploads': {
         target: 'http://127.0.0.1:3002',
         changeOrigin: true
       }

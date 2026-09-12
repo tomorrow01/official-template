@@ -73,20 +73,32 @@ api.interceptors.response.use(
   }
 );
 
-// 处理 401：清 token + 跳登录
+// 处理 401：toast 提示登录态失效 + 清 token + 跳登录页
+// 用标记位防止多个并发请求同时 401 时重复弹 toast / 重复跳转
+let isHandling401 = false;
 function handle401(msg, isAuthEndpoint = false) {
   // 登录接口本身返回 401 说明用户名密码错，不该清 token 也不该跳页
   if (isAuthEndpoint) {
     ElMessage.error(msg || '用户名或密码错误');
     return;
   }
-  // 其他接口的 401 才算 token 过期
+  // 其他接口的 401 才算登录态过期
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(USER_KEY);
-  if (router.currentRoute.value.path !== '/login') {
-    ElMessage.warning(msg || '登录已过期，请重新登录');
-    router.push('/login');
-  }
+
+  const currentPath = router.currentRoute.value.path;
+  if (currentPath === '/login') return;
+  if (isHandling401) return;
+  isHandling401 = true;
+
+  ElMessage.warning('登录态已失效，请重新登录');
+  router.push({
+    path: '/login',
+    query: { redirect: currentPath }
+  }).finally(() => {
+    // 跳转完成后解锁，保留短暂延迟避免极端情况下的并发重复提示
+    setTimeout(() => { isHandling401 = false; }, 500);
+  });
 }
 
 // ===== 通用方法 =====
@@ -114,6 +126,23 @@ export function getCurrentUser() {
 export function setCurrentUser(user) {
   localStorage.setItem(USER_KEY, JSON.stringify(user));
 }
+
+// ===== 文件上传 API =====
+// 必须走统一的 api 实例（自动带 token + 统一 401 处理），
+// 不要在组件里用裸 axios，否则登录态过期时上传只会报“上传失败”，不会提示并跳登录页
+export const uploadAPI = {
+  // 上传图片，成功后返回图片地址（如 /uploads/xxx.jpg）
+  async uploadImage(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    // 拦截器已解包，res 直接是后端返回体 { errno: 0, data: [url] }
+    const res = await api.post('/api/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 15000
+    });
+    return res?.data?.[0] || '';
+  }
+};
 
 // ===== 认证相关 API =====
 export const authAPI = {
@@ -183,6 +212,7 @@ export const contactsAPI = {
 export const configsAPI = {
   getList: () => api.get('/api/configs'),
   getById: (id) => api.get(`/api/configs/${id}`),
+  create: (data) => api.post('/api/configs', data),
   update: (id, data) => api.put(`/api/configs/${id}`, data),
   getByKey: (key) => api.get(`/api/configs/key/${key}`)
 };

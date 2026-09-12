@@ -59,11 +59,11 @@
         <el-form-item label="作者" prop="author">
           <el-input v-model="form.author" placeholder="请输入作者名称" />
         </el-form-item>
+        <el-form-item label="封面图片" prop="image">
+          <CoverUploader v-model="form.image" button-text="上传封面" />
+        </el-form-item>
         <el-form-item label="动态内容" prop="content">
           <RichTextEditor v-model="form.content" placeholder="请输入动态详细内容" />
-        </el-form-item>
-        <el-form-item label="图片链接" prop="image">
-          <el-input v-model="form.image" placeholder="请输入封面图片URL（选填）" />
         </el-form-item>
         <el-form-item label="排序" prop="sort">
           <el-input v-model.number="form.sort" placeholder="数值越小越靠前" />
@@ -82,6 +82,7 @@ import { ref, onMounted, nextTick } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { articlesAPI } from '../utils/api';
 import RichTextEditor from '../components/RichTextEditor.vue';
+import CoverUploader from '../components/CoverUploader.vue';
 
 // 表格数据
 const newsList = ref([]);

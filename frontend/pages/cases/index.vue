@@ -32,7 +32,7 @@
           <!-- 案例图片 -->
           <div class="case-image-container">
             <img 
-              :src="caseItem.image || `https://picsum.photos/seed/${caseItem.title || caseItem._id}/400/300`" 
+              :src="useImageUrl(caseItem.image) || `https://picsum.photos/seed/${caseItem.title || caseItem._id}/400/300`" 
               :alt="caseItem.title || caseItem.description" 
               class="case-image"
             >
@@ -61,6 +61,7 @@
 import { ref, onMounted } from 'vue';
 import Footer from '@/components/Footer.vue';
 import { getCaseList } from '@/api/cases';
+import { useImageUrl } from '@/composables/useImageUrl';
 
 // 状态管理
 const cases = ref([]);

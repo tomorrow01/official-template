@@ -31,7 +31,7 @@
 import { shallowRef, computed, onBeforeUnmount } from 'vue';
 import { ElMessage } from 'element-plus';
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue';
-import axios from 'axios';
+import { uploadAPI } from '../utils/api';
 
 // wangEditor 核心样式
 import '@wangeditor/editor/dist/css/style.css';
@@ -67,38 +67,21 @@ const innerHtml = computed({
 });
 
 // 自定义上传函数
-const customUpload = (file, insertFn) => {
-  // 后端 upload 接口（开发 vite proxy / 生产 nginx proxy 都代理到 backend）
-  const uploadUrl = '/api/upload';
-
-  const formData = new FormData();
-  formData.append('file', file);
-
-  // 手动注入 Bearer token（原生 axios 没有拦截器，需自己加）
-  const token = localStorage.getItem('admin-token');
-
-  axios.post(uploadUrl, formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-      'Authorization': token ? `Bearer ${token}` : '',
-    },
-    timeout: 15000,
-  })
-    .then((response) => {
-      const res = response.data;
-      if (res && res.errno === 0 && res.data && res.data[0]) {
-        const url = res.data[0];
-        // wangEditor 的 insertFn(url, alt, href)
-        insertFn(url, file.name, url);
-        ElMessage.success('图片上传成功');
-      } else {
-        ElMessage.error(res?.message || '图片上传失败');
-      }
-    })
-    .catch((err) => {
-      console.error('图片上传失败:', err);
-      ElMessage.error('图片上传失败: ' + (err.message || '网络错误'));
-    });
+const customUpload = async (file, insertFn) => {
+  try {
+    // 走统一 api 实例：自动带 token，401 时统一提示并跳登录页
+    const url = await uploadAPI.uploadImage(file);
+    if (url) {
+      // wangEditor 的 insertFn(url, alt, href)
+      insertFn(url, file.name, url);
+      ElMessage.success('图片上传成功');
+    } else {
+      ElMessage.error('图片上传失败');
+    }
+  } catch (err) {
+    // 错误提示（含 401 跳登录）已由统一拦截器处理，这里只记录日志
+    console.error('图片上传失败:', err);
+  }
 };
 
 const editorConfig = {

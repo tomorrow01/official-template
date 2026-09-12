@@ -33,6 +33,15 @@
           </div>
 
           <div class="config-section">
+            <h3>公司简介配图</h3>
+            <CoverUploader
+              v-model="aboutConfigs.companyImage"
+              button-text="上传配图"
+              tip="显示在关于我们页面公司简介右侧，建议横向图片（如 800×600），支持 jpg/png/gif/webp，不超过 5MB（选填）"
+            />
+          </div>
+
+          <div class="config-section">
             <h3>企业使命</h3>
             <el-input
               v-model="aboutConfigs.mission"
@@ -77,7 +86,7 @@
                     <div class="team-image-box">
                       <img
                         v-if="member.image"
-                        :src="member.image"
+                        :src="normalizeImageUrl(member.image)"
                         class="team-image-preview"
                         alt="成员头像"
                       >
@@ -179,10 +188,11 @@
 
 <script setup>
 import { ref, reactive } from 'vue';
-import { configsAPI } from '../utils/api';
+import { configsAPI, uploadAPI } from '../utils/api';
+import { normalizeImageUrl } from '../utils/imageUrl';
 import { ElMessage } from 'element-plus';
 import { Delete } from '@element-plus/icons-vue';
-import axios from 'axios';
+import CoverUploader from '../components/CoverUploader.vue';
 
 const activeTab = ref('about');
 const fileInputs = reactive({});   // 存放每个成员的 file input ref
@@ -210,6 +220,7 @@ function adminAvatarInitial(name) {
 const aboutConfigs = reactive({
   companyIntro: '',
   companyDetail: '',
+  companyImage: '',
   mission: '',
   vision: '',
   values: '',
@@ -231,25 +242,17 @@ async function handleTeamImageUpload(event, index) {
   if (!file) return;
   if (!file.type.startsWith('image/')) {
     ElMessage.error('请选择图片文件');
+    event.target.value = '';
     return;
   }
   if (file.size > 5 * 1024 * 1024) {
     ElMessage.error('图片大小不能超过 5MB');
+    event.target.value = '';
     return;
   }
   try {
-    const formData = new FormData();
-    formData.append('file', file);
-    // 手动注入 Bearer token（原生 axios 没有拦截器，需自己加）
-    const token = localStorage.getItem('admin-token');
-    const res = await axios.post('/api/upload', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-        'Authorization': token ? `Bearer ${token}` : ''
-      }
-    });
-    // 后端返回: { errno: 0, data: ["完整URL"] }
-    const url = res?.data?.data?.[0];
+    // 走统一 api 实例：自动带 token，401 时统一提示并跳登录页
+    const url = await uploadAPI.uploadImage(file);
     if (url) {
       aboutConfigs.teamMembers[index].image = url;
       ElMessage.success('图片上传成功');
@@ -257,8 +260,8 @@ async function handleTeamImageUpload(event, index) {
       ElMessage.error('上传失败：未获取到图片地址');
     }
   } catch (err) {
+    // 错误提示（含 401 跳登录）已由统一拦截器处理，这里只记录日志
     console.error('图片上传失败:', err);
-    ElMessage.error('图片上传失败，请稍后重试');
   } finally {
     // 清空 input，让同一个文件可以重复选择
     event.target.value = '';
@@ -292,6 +295,9 @@ async function loadConfigs() {
         case 'about_company_detail':
           aboutConfigs.companyDetail = config.value || '';
           break;
+        case 'company_intro_image':
+          aboutConfigs.companyImage = config.value || '';
+          break;
         case 'company_mission':
           aboutConfigs.mission = config.value || '';
           break;
@@ -322,18 +328,29 @@ async function loadConfigs() {
 async function saveAboutConfigs() {
   loading.value = true;
   const configUpdates = [
-    { key: 'about_company', value: aboutConfigs.companyIntro },
-    { key: 'about_company_detail', value: aboutConfigs.companyDetail },
-    { key: 'company_mission', value: aboutConfigs.mission },
-    { key: 'company_vision', value: aboutConfigs.vision },
-    { key: 'company_values', value: aboutConfigs.values },
-    { key: 'team_members', value: JSON.stringify(aboutConfigs.teamMembers) }
+    { key: 'about_company', name: '公司简介', value: aboutConfigs.companyIntro },
+    { key: 'about_company_detail', name: '公司详细介绍', value: aboutConfigs.companyDetail },
+    { key: 'company_intro_image', name: '公司简介配图', value: aboutConfigs.companyImage },
+    { key: 'company_mission', name: '企业使命', value: aboutConfigs.mission },
+    { key: 'company_vision', name: '企业愿景', value: aboutConfigs.vision },
+    { key: 'company_values', name: '企业价值观', value: aboutConfigs.values },
+    { key: 'team_members', name: '团队成员', value: JSON.stringify(aboutConfigs.teamMembers) }
   ];
 
   try {
     for (const config of configUpdates) {
       if (configIds[config.key]) {
         await configsAPI.update(configIds[config.key], { value: config.value });
+      } else {
+        // 旧的 configs.json 中没有该 key（如公司简介配图），首次保存时自动补建
+        const created = await configsAPI.create({
+          key: config.key,
+          name: config.name,
+          value: config.value
+        });
+        // 拦截器返回完整响应体 { code, data }，新建配置在 data 中
+        const createdId = created?.data?.id || created?.id;
+        if (createdId) configIds[config.key] = createdId;
       }
     }
     ElMessage.success('配置保存成功');

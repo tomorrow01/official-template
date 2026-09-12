@@ -1,7 +1,9 @@
 <template>
   <div class="home-container">
-    <!-- 英雄区域 -->
-    <section class="hero-section relative overflow-hidden" style="z-index: 0;">
+    <!-- 顶部轮播图：从后端获取，有数据时展示；无数据时兜底显示静态英雄区 -->
+    <Banner v-if="banners.length" :banners="banners" />
+    <!-- 英雄区域（兜底） -->
+    <section v-else class="hero-section relative overflow-hidden" style="z-index: 0;">
       <div class="absolute inset-0 z-0 overflow-hidden">
         <img 
           src="https://picsum.photos/id/1071/1920/1080" 
@@ -130,7 +132,7 @@
             class="service-card-link">
             <!-- 卡片图片区（overflow-hidden 截断放大效果） -->
             <div class="service-card-image">
-              <img :src="service.image" alt="服务图片" class="service-card-img">
+              <img :src="useImageUrl(service.image)" alt="服务图片" class="service-card-img">
             </div>
             
             <!-- 卡片内容区（flex 布局让按钮始终贴底） -->
@@ -168,7 +170,7 @@
         >
           <!-- 左侧图片 -->
           <div class="case-card-image" style="width: 350px; height: 250px; overflow: hidden; flex-shrink: 0;">
-            <img :src="caseItem.image" :alt="caseItem.title || caseItem.description" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease; transform: scale(1);" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+            <img :src="useImageUrl(caseItem.image)" :alt="caseItem.title || caseItem.description" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease; transform: scale(1);" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
           </div>
           <!-- 右侧内容 -->
           <div class="case-card-body" style="padding: 30px; flex: 1; background-color: white;">
@@ -225,7 +227,7 @@
             <!-- 图片区域（overflow:hidden 截断 scale 放大） -->
             <div class="article-card-image">
               <img 
-                :src="article.image || `https://picsum.photos/seed/article${index}/600/400`" 
+                :src="useImageUrl(article.image) || `https://picsum.photos/seed/article${index}/600/400`" 
                 alt="文章封面" 
                 class="article-card-img"
               >
@@ -347,16 +349,29 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 import Navbar from '@/components/Navbar.vue';
 import Footer from '@/components/Footer.vue';
+import Banner from '@/components/Banner.vue';
 import { ArrowUp } from '@element-plus/icons-vue';
+import { getBannerList } from '@/api/banner';
 import { getServiceList } from '@/api/services';
 import { getCaseList } from '@/api/cases';
 import { getArticleList } from '@/api/articles';
+import { useImageUrl } from '@/composables/useImageUrl';
 
 // 数据状态
+const banners = ref([]);
 const services = ref([]);
 const cases = ref([]);
 const latestArticles = ref([]);
 const showBackToTop = ref(false);
+
+// 获取轮播图数据（后端真实数据，仅取启用项并按排序值升序）
+const fetchBanners = async () => {
+  try {
+    banners.value = await getBannerList();
+  } catch (err) {
+    console.error('获取轮播图数据失败:', err);
+  }
+};
 
 // 获取服务数据（后端真实数据）
 const fetchServices = async () => {
@@ -440,6 +455,7 @@ const handleScroll = () => {
 };
 
 onMounted(() => {
+  fetchBanners();
   fetchServices();
   fetchCaseList();
   fetchLatestArticles();

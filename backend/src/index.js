@@ -72,7 +72,12 @@ const storage = multer.diskStorage({
     cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
-    cb(null, `${Date.now()}-${file.originalname}`);
+    // 文件名一律 ASCII 化：原始文件名可能含中文，经浏览器/multer/nginx 多层编解码后
+    // 容易产生乱码导致静态资源 404，这里只保留时间戳+随机串+安全扩展名
+    const extRaw = path.extname(file.originalname || '').toLowerCase().replace(/^\./, '');
+    const safeExt = /^[a-z0-9]{1,5}$/.test(extRaw) ? extRaw : 'jpg';
+    const random = Math.random().toString(36).slice(2, 10);
+    cb(null, `${Date.now()}-${random}.${safeExt}`);
   }
 });
 

@@ -19,8 +19,8 @@
       <el-table-column prop="imageUrl" label="轮播图" min-width="180">
         <template #default="scope">
           <el-image 
-            :src="scope.row.imageUrl || scope.row.image" 
-            :preview-src-list="[scope.row.imageUrl || scope.row.image]"
+            :src="normalizeImageUrl(scope.row.imageUrl || scope.row.image)" 
+            :preview-src-list="[normalizeImageUrl(scope.row.imageUrl || scope.row.image)]"
             fit="cover" 
             style="width: 100px; height: 60px; cursor: pointer;"
           />
@@ -54,7 +54,7 @@
     >
       <el-form :model="form" :rules="rules" ref="formRef">
         <el-form-item label="轮播图" prop="imageUrl">
-          <el-input v-model="form.imageUrl" placeholder="请输入图片URL" />
+          <CoverUploader v-model="form.imageUrl" button-text="上传轮播图" tip="建议尺寸 1920×1080，支持 jpg/png/gif/webp，大小不超过 5MB" />
         </el-form-item>
         <el-form-item label="链接地址" prop="link">
           <el-input v-model="form.link" placeholder="请输入跳转链接" />
@@ -75,6 +75,8 @@
 import { ref, onMounted, nextTick } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { bannersAPI } from '../utils/api';
+import { normalizeImageUrl } from '../utils/imageUrl';
+import CoverUploader from '../components/CoverUploader.vue';
 
 // 表格数据
 const banners = ref([]);
@@ -93,7 +95,7 @@ const formRef = ref(null);
 
 // 表单验证规则
 const rules = ref({
-  imageUrl: [{ required: true, message: '请输入图片URL', trigger: 'blur' }],
+  imageUrl: [{ required: true, message: '请上传轮播图', trigger: 'change' }],
   link: [{ required: true, message: '请输入跳转链接', trigger: 'blur' }]
 });
 

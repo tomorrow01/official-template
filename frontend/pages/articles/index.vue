@@ -30,7 +30,7 @@
           class="article-card"
         >
           <div class="article-image">
-            <img :src="article.image" alt="文章封面" />
+            <img :src="useImageUrl(article.image)" alt="文章封面" />
           </div>
           <div class="article-info">
             <h3>{{ article.title }}</h3>
@@ -67,6 +67,7 @@ import { ref, onMounted } from 'vue';
 import Navbar from '@/components/Navbar.vue';
 import Footer from '@/components/Footer.vue';
 import { getArticleList } from '@/api/articles';
+import { useImageUrl } from '@/composables/useImageUrl';
 
 const articles = ref([]);
 const loading = ref(true);

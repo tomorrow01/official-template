@@ -36,7 +36,7 @@
         
         <!-- 案例图片 -->
         <div v-if="detail.image" class="case-image-wrapper">
-          <img :src="detail.image" :alt="detail.title || detail.description" class="case-image">
+          <img :src="useImageUrl(detail.image)" :alt="detail.title || detail.description" class="case-image">
         </div>
         
         <!-- 案例简介 -->
@@ -60,6 +60,7 @@
 import { ref, onMounted, watch } from 'vue';
 import { useRoute } from '#app';
 import { getCaseDetail } from '@/api/cases';
+import { useImageUrl } from '@/composables/useImageUrl';
 import Navbar from '@/components/Navbar.vue';
 import Footer from '@/components/Footer.vue';
 

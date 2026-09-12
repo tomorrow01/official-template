@@ -19,7 +19,7 @@
             <p>{{ configs.companyDetail }}</p>
           </div>
           <div class="intro-image">
-            <img src="/images/case1.jpg" alt="公司办公环境" class="company-img">
+            <img :src="companyImgSrc" alt="公司办公环境" class="company-img" @error="onCompanyImgError">
           </div>
         </div>
       </div>
@@ -60,7 +60,7 @@
         <div class="team-grid">
           <div v-for="(member, index) in configs.teamMembers" :key="index" class="team-member">
             <!-- 有有效图片 → 渲染 img；没图片或路径无效 → 渐变色占位 + 首字母 -->
-            <img v-if="hasValidImage(member.image, index)" :src="member.image" :alt="member.name" class="team-img" @error="onImgError($event, index)">
+            <img v-if="hasValidImage(member.image, index)" :src="useImageUrl(member.image)" :alt="member.name" class="team-img" @error="onImgError($event, index)">
             <div v-else class="team-placeholder" :style="{ background: avatarBg(index) }">
               {{ avatarInitial(member.name) }}
             </div>
@@ -78,18 +78,35 @@
 import { Star } from '@element-plus/icons-vue';
 import Footer from '@/components/Footer.vue';
 import Navbar from '@/components/Navbar.vue';
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import request from '@/api/request';
+import { useImageUrl } from '@/composables/useImageUrl';
 
 // 默认兜底数据（API 失败时显示）
 const configs = ref({
   companyIntro: '我们是一家专注于前端开发和内容管理系统解决方案的高科技企业，致力于为客户提供高质量、高性能的Web应用和数字体验。',
   companyDetail: '自成立以来，我们始终坚持技术创新和客户至上的理念，不断提升服务质量和技术水平，已成功为数百个客户提供了专业的Web开发服务。',
+  companyImage: '',
   mission: '通过技术创新，赋能企业数字化转型，为客户创造更大价值。',
   vision: '成为行业领先的Web应用解决方案提供商，引领技术发展潮流。',
   values: '诚信、创新、协作、卓越，始终以客户需求为中心。',
   teamMembers: []
 });
+
+// 公司简介配图加载失败时回退到内置默认图
+const companyImgFailed = ref(false);
+const companyImgSrc = computed(() => {
+  const url = configs.value.companyImage;
+  if (!companyImgFailed.value && url) {
+    const normalized = useImageUrl(url);
+    if (normalized) return normalized;
+  }
+  return '/images/case1.jpg';
+});
+
+function onCompanyImgError() {
+  companyImgFailed.value = true;
+}
 
 // 获取配置数据（后端 JSON 文件存储的 key-value 配置）
 async function fetchConfigs() {
@@ -106,6 +123,9 @@ async function fetchConfigs() {
           break;
         case 'about_company_detail':
           if (config.value) configs.value.companyDetail = config.value;
+          break;
+        case 'company_intro_image':
+          if (config.value) configs.value.companyImage = config.value;
           break;
         case 'company_mission':
           if (config.value) configs.value.mission = config.value;

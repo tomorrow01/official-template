@@ -23,8 +23,8 @@
         <template #default="scope">
           <el-image 
             v-if="scope.row.image"
-            :src="scope.row.image" 
-            :preview-src-list="[scope.row.image]" 
+            :src="normalizeImageUrl(scope.row.image)" 
+            :preview-src-list="[normalizeImageUrl(scope.row.image)]" 
             style="width: 100px; height: 60px; object-fit: cover"
           />
           <span v-else style="color: #999;">无</span>
@@ -71,7 +71,7 @@
           <el-input v-model="form.intro" type="textarea" :rows="2" placeholder="请输入案例简介，用于列表页展示" />
         </el-form-item>
         <el-form-item label="案例图片" prop="image">
-          <el-input v-model="form.image" placeholder="请输入案例图片URL" />
+          <CoverUploader v-model="form.image" button-text="上传案例图片" />
         </el-form-item>
         <el-form-item label="案例详情" prop="description">
           <RichTextEditor v-model="form.description" placeholder="请输入案例详细描述" />
@@ -95,7 +95,9 @@
 import { ref, onMounted, nextTick } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { casesAPI } from '../utils/api';
+import { normalizeImageUrl } from '../utils/imageUrl';
 import RichTextEditor from '../components/RichTextEditor.vue';
+import CoverUploader from '../components/CoverUploader.vue';
 
 // 表格数据
 const casesList = ref([]);

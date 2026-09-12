@@ -37,7 +37,7 @@
           class="service-card"
         >
           <div class="service-image">
-            <img :src="service.image" :alt="service.title" class="card-image">
+            <img :src="useImageUrl(service.image)" :alt="service.title" class="card-image">
           </div>
           <div class="service-content">
             <h3>{{ service.title }}</h3>
@@ -91,6 +91,7 @@ import { ref, onMounted } from 'vue'
 import Navbar from '~/components/Navbar.vue'
 import Footer from '~/components/Footer.vue'
 import { getServiceList } from '@/api/services'
+import { useImageUrl } from '@/composables/useImageUrl'
 
 // 服务数据
 const services = ref([])

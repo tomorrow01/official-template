@@ -22,7 +22,7 @@
         <NuxtLink :to="item.link || '#'" class="banner-link block w-full h-full relative overflow-hidden">
           <div class="banner-overlay absolute inset-0 z-10"></div>
           <img 
-            :src="item.image" 
+            :src="useImageUrl(item.image)" 
             :alt="item.title || '轮播图'" 
             class="banner-image w-full h-full object-cover transition-transform duration-7000 ease-in-out"
           >
@@ -60,6 +60,7 @@
 
 <script setup>
 import { defineProps, ref, computed, onMounted, onUnmounted } from 'vue';
+import { useImageUrl } from '@/composables/useImageUrl';
 
 // 定义接收的轮播数据 prop
 const props = defineProps({
@@ -71,24 +72,23 @@ const props = defineProps({
 });
 
 const currentIndex = ref(0);
+const windowWidth = ref(0);
 
-// 根据屏幕尺寸动态计算轮播图高度
+// 根据屏幕尺寸动态计算轮播图高度（SSR 安全：服务端无 window 时返回桌面高度）
 const bannerHeight = computed(() => {
-  const isMobile = window.innerWidth < 768;
-  const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024;
-  
-  if (isMobile) return '70vh';
-  if (isTablet) return '80vh';
+  const width = windowWidth.value || (process.client ? window.innerWidth : 1920);
+  if (width < 768) return '70vh';
+  if (width < 1024) return '80vh';
   return '90vh';
 });
 
 // 处理窗口大小变化
 const handleResize = () => {
-  // 强制重新计算高度
-  currentIndex.value = currentIndex.value;
+  windowWidth.value = window.innerWidth;
 };
 
 onMounted(() => {
+  windowWidth.value = window.innerWidth;
   window.addEventListener('resize', handleResize);
 });
 

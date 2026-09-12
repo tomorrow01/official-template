@@ -46,7 +46,7 @@
         
         <!-- 封面图 -->
         <div v-if="article.image" class="article-cover">
-          <img :src="article.image" :alt="article.title" class="cover-image">
+          <img :src="useImageUrl(article.image)" :alt="article.title" class="cover-image">
         </div>
         
         <!-- 文章内容（富文本） -->
@@ -66,6 +66,7 @@ import { useRoute } from '#app';
 import Navbar from '@/components/Navbar.vue';
 import Footer from '@/components/Footer.vue';
 import { getArticleDetail } from '@/api/articles';
+import { useImageUrl } from '@/composables/useImageUrl';
 
 definePageMeta({ ssr: false });
 
